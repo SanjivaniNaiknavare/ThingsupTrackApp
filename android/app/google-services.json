@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "121552412711",
+    "project_id": "thingsup-coldchain-dev",
+    "storage_bucket": "thingsup-coldchain-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121552412711:android:d7a2267bf91548ee83ae02",
+        "android_client_info": {
+          "package_name": "io.thingsup.trackapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121552412711-hvc8gbk3cs3nks8ku0tue58r8up37uhm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBxEw-k7Rmk1RqLSD5N4IALuvPSgTlGN4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "121552412711-hvc8gbk3cs3nks8ku0tue58r8up37uhm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
