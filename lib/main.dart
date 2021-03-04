@@ -1,4 +1,6 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
+import 'package:thingsuptrackapp/activities/GoogleMapScreen.dart';
 import 'package:thingsuptrackapp/activities/HomeScreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thingsuptrackapp/helpers/APIClass.dart';
 import 'activities/SignIn.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 
@@ -22,7 +25,7 @@ void main() async {
   {
     if (isUserLoggedIn)
     {
-      _defaultHome = new HomeScreen();
+      _defaultHome = new GoogleMapScreen();
     }
   }
 
@@ -51,7 +54,7 @@ class _MyAppState extends State<MyApp> {
     initDBHelper();
 
     global.helperClass=new HelperClass();
-
+    global.apiClass=new APIClass();
     getPermissions();
   }
 
@@ -66,10 +69,9 @@ class _MyAppState extends State<MyApp> {
 
   void getPermissions()async
   {
-//    Map<Permission, PermissionStatus> statuses = await [
-//      Permission.location,
-//      Permission.storage,
-//    ].request();
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location
+    ].request();
   }
 
   @override

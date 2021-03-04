@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'HomeScreen.dart';
 import 'ForgetPassword.dart';
+import 'dart:convert';
 
 class SignIn extends StatefulWidget
 {
@@ -43,6 +42,13 @@ class SignInState extends State<SignIn>
   {
 
     SharedPreferences prefs;
+    String idToken="";
+    String token="";
+    String decodedUserJson="";
+    List<String> idTokenList;
+    int decodelength=0;
+    int modData=0;
+    var resBody;
     emailaddress=emailController.text;
     password=passwordController.text;
 
@@ -65,6 +71,33 @@ class SignInState extends State<SignIn>
 
         global.firebaseInstance.signInWithEmailAndPassword(email: emailaddress, password: password).then((currentUser) async =>
         {
+          print(LOGTAG+" userToken->"+currentUser.toString()),
+
+          idToken=await currentUser.user.getIdToken(true),
+          global.idToken=idToken,
+
+          print(LOGTAG+"idToken->"+idToken.toString()),
+
+          idTokenList=idToken.split("."),
+
+          decodelength=idTokenList[1].length,
+          if(decodelength%4!=0)
+            {
+              modData=decodelength%4,
+              for(int k=0;k<modData;k++)
+                {
+                  idTokenList[1]=idTokenList[1]+"=",
+                }
+            },
+          decodedUserJson = utf8.decode(base64.decode(idTokenList[1])),
+
+          print(LOGTAG+" decodedUserJson->"),
+          print(decodedUserJson),
+          resBody=json.decode(decodedUserJson.toString()),
+
+          global.userRole=resBody["role"],
+          global.userID=resBody["user_id"],
+
           prefs = await SharedPreferences.getInstance(),
           prefs.setBool("LoggedInStatus",true),
           setState(() { isResponseReceived=false; }),
@@ -239,7 +272,7 @@ class SignInState extends State<SignIn>
                                           flex:1,
                                           fit: FlexFit.tight,
                                           child:new Container(
-                                            child:new Text("Welcome Back",style: TextStyle(fontSize: global.font22, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'PoppinsBold'))
+                                              child:new Text("Welcome Back",style: TextStyle(fontSize: global.font22, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'PoppinsBold'))
                                           ),
                                         )
                                       ],
@@ -272,12 +305,12 @@ class SignInState extends State<SignIn>
                                           height: 45,
                                           width: MediaQuery.of(context).size.width,
                                           child: new RaisedButton(
-                                            onPressed: () {
-                                               login();
-                                            },
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
-                                            color: global.mainColor,
-                                            child:new Text('LOGIN', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'PoppinsSemiBold'))
+                                              onPressed: () {
+                                                login();
+                                              },
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
+                                              color: global.mainColor,
+                                              child:new Text('LOGIN', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'PoppinsSemiBold'))
 
                                           ),
                                         ),

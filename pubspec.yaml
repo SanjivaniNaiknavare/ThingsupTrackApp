@@ -34,6 +34,8 @@ dependencies:
   firebase_analytics: ^5.0.13
   permission_handler: ^5.0.1+1
   http: ^0.12.0+2
+  google_maps_flutter: ^0.5.33
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,6 +68,7 @@ flutter:
      - assets/Splash_screen_logo.png
      - assets/back-arrow.png
      - assets/check-mail-icon.png
+     - assets/marker-icon.png
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

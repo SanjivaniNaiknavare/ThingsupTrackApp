@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:thingsuptrackapp/helpers/APIClass.dart';
 
 
 Color greenColor=Color(0xff00D355);
@@ -43,5 +45,11 @@ double font26=26;
 
 
 FirebaseAuth firebaseInstance;
-String userID="";
 HelperClass helperClass;
+APIClass apiClass;
+String idToken="";
+
+
+User currentUser;
+String userID="";
+String userRole="";
