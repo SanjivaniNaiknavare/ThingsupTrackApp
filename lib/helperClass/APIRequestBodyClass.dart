@@ -157,4 +157,89 @@ class TagUserToDevice
   }
 }
 
+class UserIDClass
+{
+  UserIDClass({this.userid});
+
+  String userid;
+
+  UserIDClass.fromJson(Map<String, dynamic> json)
+      : userid = json['userid'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userid':userid,
+    };
+  }
+}
+
+class AddGeofenceClass
+{
+  AddGeofenceClass({this.name,this.description,this.area,this.attributes});
+
+  String name;
+  String description;
+  List<LatLngClass> area;
+  AttributeClass attributes;
+
+  AddGeofenceClass.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        description = json['description'],
+        area = json['area'],
+        attributes = json['attributes'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name':name,
+      'description':description,
+      'area':area,
+      'attributes':attributes,
+    };
+  }
+}
+
+class UpdateGeofenceClass
+{
+  UpdateGeofenceClass({this.name,this.description,this.area,this.attributes,this.id});
+
+  String name;
+  String description;
+  List<LatLngClass> area;
+  AttributeClass attributes;
+  String id;
+
+  UpdateGeofenceClass.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        description = json['description'],
+        area = json['area'],
+        attributes = json['attributes'],
+        id = json['id'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name':name,
+      'description':description,
+      'area':area,
+      'attributes':attributes,
+      'id':id,
+    };
+  }
+}
+
+class AttributeClass
+{
+  AttributeClass(this.key, this.value);
+
+  dynamic key;
+  dynamic value;
+
+  AttributeClass.fromJson(Map<String, dynamic> json)
+      : key = json['key'],
+        value = double.parse(json['value'].toString().replaceAll(",", ""));
+
+  Map toJson() => {
+    key: value,
+  };
+}
+
 

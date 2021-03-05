@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        print(LOGTAG+" adduser->"+resBody.toString());
+        print(LOGTAG+" updateUser->"+resBody.toString());
       }
       else if (response.statusCode == 500)
       {
@@ -577,6 +577,314 @@ class _HomeScreenState extends State<HomeScreen>
     {
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
+  }
+
+
+  void enableUser() async
+  {
+    String userid="sanju@gmail.com";
+
+    UserIDClass userIDClass=new UserIDClass(userid: userid);
+    var jsonBody=jsonEncode(userIDClass);
+    print(LOGTAG+" enableUser jsonbody->"+jsonBody.toString());
+
+    Response response=await global.apiClass.EnableUser(jsonBody);
+    print(LOGTAG+" enableUser response->"+response.toString());
+
+    if(response!=null)
+    {
+      idToken=global.idToken.toString();
+      setState(() {});
+
+      print(LOGTAG+" enableUser statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" enableUser body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" enableUser->"+resBody.toString());
+      }
+      else  if (response.statusCode == 400)
+      {
+        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+  void disableUser() async
+  {
+    String userid="sanju@gmail.com";
+
+    UserIDClass userIDClass=new UserIDClass(userid: userid);
+    var jsonBody=jsonEncode(userIDClass);
+    print(LOGTAG+" disableUser jsonbody->"+jsonBody.toString());
+
+    Response response=await global.apiClass.DisableUser(jsonBody);
+    print(LOGTAG+" disableUser response->"+response.toString());
+
+    if(response!=null)
+    {
+      idToken=global.idToken.toString();
+      setState(() {});
+
+      print(LOGTAG+" disableUser statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" disableUser body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" disableUser->"+resBody.toString());
+      }
+      else  if (response.statusCode == 400)
+      {
+        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+
+  void  addGeofence() async
+  {
+    String name="Test Geofence";
+    String description="Test Geofence desc";
+    List<LatLngClass> area=new List();
+    AttributeClass attributes;
+
+    LatLngClass latLngClass=new LatLngClass(lat: 25.774,lng:-80.19 );
+    LatLngClass latLngClass1=new LatLngClass(lat: 18.466,lng:-72.118 );
+    LatLngClass latLngClass2=new LatLngClass(lat: 25.321,lng:-72.757 );
+    LatLngClass latLngClass3=new LatLngClass(lat: 25.774,lng:-80.19);
+    area.add(latLngClass);
+    area.add(latLngClass1);
+    area.add(latLngClass2);
+    area.add(latLngClass3);
+
+    attributes=new AttributeClass("Test", 123);
+
+    AddGeofenceClass addGeofenceClass=new AddGeofenceClass(name: name,description: description,area: area,attributes: attributes);
+    var jsonBody=jsonEncode(addGeofenceClass);
+    print(LOGTAG+" addGeofence jsonbody->"+jsonBody.toString());
+
+    Response response=await global.apiClass.AddGeofence(jsonBody);
+    print(LOGTAG+" addGeofence response->"+response.toString());
+
+    if(response!=null)
+    {
+      idToken=global.idToken.toString();
+      setState(() {});
+
+      print(LOGTAG+" addGeofence statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" addGeofence body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" addGeofence->"+resBody.toString());
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+
+  void getGeofence() async
+  {
+    Response response=await global.apiClass.GetGeofence();
+    print(LOGTAG+" getGeofence response->"+response.toString());
+
+    if(response!=null)
+    {
+      idToken=global.idToken.toString();
+      setState(() {});
+
+      print(LOGTAG+" getGeofence statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getGeofence body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" getGeofence->"+resBody.toString());
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+
+  void  deleteGeofence() async
+  {
+    int id=8;
+    Response response=await global.apiClass.DeleteGeofence(id.toString());
+    print(LOGTAG+" deleteGeofence response->"+response.toString());
+
+    if(response!=null)
+    {
+      print(LOGTAG+" deleteGeofence statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" deleteGeofence body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" deleteGeofence->"+resBody.toString());
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+  void updateGeofence() async
+  {
+    String id="8";
+    String name="Test Geofence 2";
+    String description="Test Geofence desc";
+    List<LatLngClass> area=new List();
+    AttributeClass attributes;
+
+    LatLngClass latLngClass=new LatLngClass(lat: 25.774,lng:-80.19 );
+    LatLngClass latLngClass1=new LatLngClass(lat: 18.466,lng:-72.118 );
+    LatLngClass latLngClass2=new LatLngClass(lat: 25.321,lng:-72.757 );
+    LatLngClass latLngClass3=new LatLngClass(lat: 25.774,lng:-80.19);
+    area.add(latLngClass);
+    area.add(latLngClass1);
+    area.add(latLngClass2);
+    area.add(latLngClass3);
+
+    attributes=new AttributeClass("Test", 123);
+
+    UpdateGeofenceClass updateGeofenceClass=new UpdateGeofenceClass(name: name,description: description,area: area,attributes: attributes,id:id);
+    var jsonBody=jsonEncode(updateGeofenceClass);
+    print(LOGTAG+" updateGeofence jsonbody->"+jsonBody.toString());
+
+    Response response=await global.apiClass.UpdateGeofence(jsonBody);
+    print(LOGTAG+" updateGeofence response->"+response.toString());
+
+    if(response!=null)
+    {
+
+      print(LOGTAG+" updateGeofence statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" updateGeofence body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG+" updateGeofence->"+resBody.toString());
+      }
+      else if (response.statusCode == 400)
+      {
+        global.helperClass.showAlertDialog(context, "", "Geofence Doesn't Exist", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+  void  getGeofenceDetails() async
+  {
+    String id="17";
+    Response response=await global.apiClass.GetGeofenceDetails(id);
+    print(LOGTAG+" getGeofenceDetails response->"+response.toString());
+
+    if(response!=null)
+    {
+      print(LOGTAG+" getGeofenceDetails statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getGeofenceDetails body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+      }
+      else if (response.statusCode == 400)
+      {
+        global.helperClass.showAlertDialog(context, "", "Geofence is Not Shared with Your Account", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
+
+  void getDeviceHistory() async
+  {
+    String uniqueid="SanjuDevice";
+    String starttime="2021-02-18T01:20:24.000Z";
+    String endtime="2021-02-18T01:20:24.000Z";
+
+    Response response=await global.apiClass.GetDeviceHistoryData(uniqueid,starttime,endtime);
+    print(LOGTAG+" getDeviceHistory response->"+response.toString());
+
+    if(response!=null)
+    {
+      print(LOGTAG+" getDeviceHistory statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getDeviceHistory body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        String status=resBody['status'];
+        if(status.toString().contains("No Data found"))
+        {
+          global.helperClass.showAlertDialog(context, "", "No data found", false, "");
+        }
+      }
+      else if (response.statusCode == 400)
+      {
+        global.helperClass.showAlertDialog(context, "", "Device Not Present in User Account. Access Denied", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
 
   }
 
@@ -588,7 +896,6 @@ class _HomeScreenState extends State<HomeScreen>
         onWillPop: _willPopCallback,
         child:Scaffold(
             key: _scaffoldKey,
-
             appBar:AppBar(
               titleSpacing: 0.0,
               elevation: 2,
@@ -605,8 +912,6 @@ class _HomeScreenState extends State<HomeScreen>
             body:new Column
               (
               children: <Widget>[
-
-
                 new Row(
                   children: <Widget>[
                     Flexible(
@@ -818,8 +1123,157 @@ class _HomeScreenState extends State<HomeScreen>
 
                   ],
                 ),
+                SizedBox(height:10),
+                new Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+                          enableUser();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Enable User"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+                          disableUser();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Disable User"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+
+                          addGeofence();
+
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Add Geofence"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+                          getGeofence();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Get Geofence"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+
+                          deleteGeofence();
+
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Delete geofence"),
+                        ),
+                      ),
+                    )
+
+                  ],
+                ),
+                SizedBox(height:10),
+                new Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+                          updateGeofence();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Update Geofence"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+                          getGeofenceDetails();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Get Geofence Details"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+
+                          getDeviceHistory();
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text("Get Device History"),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text(""),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child: GestureDetector(
+                        onTap:(){
+
+
+                        },
+                        child: new Container(
+                          padding: EdgeInsets.all(5),
+                          child: new Text(""),
+                        ),
+                      ),
+                    )
+
+                  ],
+                ),
+                SizedBox(height: 10,),
                 new Container(
-                    height:200,
+                    height:100,
                     child: new SelectableText(
 
                       idToken,

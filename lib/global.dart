@@ -53,3 +53,4 @@ String idToken="";
 User currentUser;
 String userID="";
 String userRole="";
+String lastFunction="";

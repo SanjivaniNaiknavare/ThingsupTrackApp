@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 
@@ -43,6 +46,19 @@ class HelperClass
     global.font20 = mul20 * unitHeightValue;
 
   }
+
+  Future<bool> isJsonObject(String datastr)
+  {
+    Future<bool> flag=Future.value(false);
+    try {
+      var decodedJSON = json.decode(datastr) as Map<String, dynamic>;
+      flag=Future.value(true);
+    } on FormatException catch (e) {
+      print('The provided string is not valid JSON');
+    }
+    return flag;
+  }
+
 
 
   bool isValidEmail(String emailAddress)

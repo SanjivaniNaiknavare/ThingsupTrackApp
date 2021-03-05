@@ -414,4 +414,238 @@ class APIClass
     return flag;
   }
 
+
+  Future<Response> EnableUser(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/user/enable";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" EnableUser url->"+url);
+
+    Response response = await post(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> DisableUser(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/user/disable";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" DisableUser url->"+url);
+
+    Response response = await post(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> AddGeofence(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/geofence";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" DisableUser url->"+url);
+
+    Response response = await put(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> GetGeofence() async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/geofence";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" GetGeofence url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> DeleteGeofence(String id) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/geofence";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    Map<String, String> queryParams = {
+      'id': id
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" DeleteGeofence url->"+url);
+
+    Response response = await delete(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> UpdateGeofence(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/geofence";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" UpdateGeofence url->"+url);
+
+    Response response = await post(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> GetGeofenceDetails(String id) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/geofence/details";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+    Map<String, String> queryParams = {
+      'id': id
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" GetGeofenceDetails url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> GetDeviceHistoryData(String uniqueid,String starttime,String endtime) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/device/history";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+    Map<String, String> queryParams = {
+      'uniqueid': uniqueid,
+      'starttime': starttime,
+      'endtime': endtime,
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" GetDeviceHistoryData url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
 }

@@ -51,23 +51,18 @@ class GoogleMapScreenState extends State<GoogleMapScreen> {
         ));
   }
 
-  void getMarker(){
-    ImageConfiguration configuration = createLocalImageConfiguration(context);
-
-    BitmapDescriptor.fromAssetImage(configuration, 'assets/marker-icon.png')
-
-        .then((icon) {
-
-      setState(() {
-
-        customIcon1 = icon;
-
-      });
-
-    });
+  void getMarker()
+  {
+//    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(5, 5)), 'assets/marker-icon.png').then((icon) {
+//
+//      setState(() {customIcon1 = icon;});
+//
+//    });
   }
 
   void _setMarkers(LatLng point) {
+
+
 
     final String markerIdVal = 'marker_id_$_markerIdCounter';
     _markerIdCounter++;
@@ -77,6 +72,7 @@ class GoogleMapScreenState extends State<GoogleMapScreen> {
           icon: customIcon1,
           markerId: MarkerId(markerIdVal),
           position: point,
+          anchor: Offset(0.5,0.5)
         ),
       );
     });

@@ -1,5 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
+import 'package:thingsuptrackapp/activities/GeofenceScreen.dart';
 import 'package:thingsuptrackapp/activities/GoogleMapScreen.dart';
 import 'package:thingsuptrackapp/activities/HomeScreen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thingsuptrackapp/activities/UserScreen.dart';
 import 'package:thingsuptrackapp/helpers/APIClass.dart';
 import 'activities/SignIn.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
@@ -25,7 +27,7 @@ void main() async {
   {
     if (isUserLoggedIn)
     {
-      _defaultHome = new GoogleMapScreen();
+      _defaultHome = new UserScreen();
     }
   }
 
