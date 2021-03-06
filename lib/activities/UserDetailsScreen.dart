@@ -26,6 +26,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 {
   String LOGTAG="UserDetailsScreen";
 
+  bool isResponseReceived=true;
   String expectedRole="";
   bool nameValidate=false;
   bool useridValidate=false;
@@ -73,10 +74,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   void deleteUser(String userindex) async
   {
+    isResponseReceived=false;
+    setState(() {});
+
     Response response=await global.apiClass.DeleteUser(userindex);
-
-    print(LOGTAG+" deleteUser response->"+response.toString());
-
     if(response!=null)
     {
       print(LOGTAG+" deleteUser statusCode->"+response.statusCode.toString());
@@ -90,15 +91,21 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       }
       else if (response.statusCode == 400)
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
       }
       else if (response.statusCode == 500)
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
+      isResponseReceived=true;
+      setState(() {});
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
   }
@@ -196,6 +203,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       var jsonBody=jsonEncode(addUserClass);
       print(LOGTAG+" addUser jsonbody->"+jsonBody.toString());
 
+      isResponseReceived=false;
+      setState(() {});
+
       Response response=await global.apiClass.AddUser(jsonBody);
 
       if(response!=null)
@@ -213,6 +223,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         }
         else if (response.statusCode == 400)
         {
+          isResponseReceived=true;
+          setState(() {});
+
           var resBody = json.decode(response.body);
           String status=resBody['status'];
           if(status.toString().contains("User Already Exist"))
@@ -226,11 +239,15 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         }
         else if (response.statusCode == 500)
         {
+          isResponseReceived=true;
+          setState(() {});
           global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
         }
       }
       else
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
       }
 
@@ -286,9 +303,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       var jsonBody=jsonEncode(updateUserClass);
       print(LOGTAG+" updateUser jsonbody->"+jsonBody.toString());
 
-      Response response=await global.apiClass.UpdateUser(jsonBody);
-      print(LOGTAG+" updateUser response->"+response.toString());
+      isResponseReceived=false;
+      setState(() {});
 
+      Response response=await global.apiClass.UpdateUser(jsonBody);
       if(response!=null)
       {
         print(LOGTAG+" updateUser statusCode->"+response.statusCode.toString());
@@ -302,11 +320,15 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         }
         else if (response.statusCode == 500)
         {
+          isResponseReceived=true;
+          setState(() {});
           global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
         }
       }
       else
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
       }
     }
@@ -315,7 +337,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   void deleteConfirmationPopup(String selindex)
   {
-
     showDialog(
         context: context,
         builder: (BuildContext context)
@@ -342,11 +363,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                     SizedBox(height: 20,),
                     new Container(
                       width: MediaQuery.of(context).size.width,
-                      decoration: new BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                          bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),
-                        ),
+                      decoration: new BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
                       ),
                     ),
                     new Row(
@@ -397,10 +414,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   void showDropDownDiailogForDevice()
   {
-
-
-    print(LOGTAG+" listofDevices->"+widget.listofDevices.length.toString());
-
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -441,7 +454,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                           {
                             _selectedDevice="";
                           }
-
                           deviceController.text=_selectedDevice;
                           Navigator.of(context).pop();
                         },
@@ -683,279 +695,288 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child:SingleChildScrollView(
-
-                    child: new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("User ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: useridField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Name :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: nameField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Password :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child:SizedBox(
-                                    height: 50,
-                                    child: passwordField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Role :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: roleField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Phone :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: phoneField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("CustomMap :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: customMapField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.userObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Devices :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child:isResponseReceived?SingleChildScrollView(
+                  child: new Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("User ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
-                              fit: FlexFit.tight,
-                              child:  new Container(
+                              fit:FlexFit.tight,
+                              child: new Container(
                                 padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
                                 child: SizedBox(
                                   height: 50,
-                                  child: deviceField,
+                                  child: useridField,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit: FlexFit.tight,
-                                child:new Row(
-                                  children: <Widget>[
-                                    new Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Text("TwelveHourFormat :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                          Checkbox(
-                                            onChanged: (bool flag) {
-                                              twelveHourFormat=flag;
-                                              setState(() {});
-                                            },
-                                            value: twelveHourFormat,
-                                          ),
-                                        ]
-                                    )
-                                  ],
-                                )
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 15,),
-                        widget.userObject!=null?new Row(
-                          children: <Widget>[
-
-                            Flexible(
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Name :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
                               fit:FlexFit.tight,
-                              child:   new Container(
-                                padding: EdgeInsets.fromLTRB(0,0,5,0),
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                child: new Container(
-                                  width: MediaQuery.of(context).size.width,
+                              child: new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
                                   height: 50,
-                                  child: new RaisedButton(
-                                      onPressed: () {
-                                        deleteConfirmationPopup(widget.userObject.email);
-                                      },
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),side: BorderSide(color: Color(0xffF7716E))),
-                                      color: global.whiteColor,
-                                      child:new Text('Delete User', style: TextStyle(fontSize: global.font14, color: Color(0xffF7716E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                                  ),
+                                  child: nameField,
                                 ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Password :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child: new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child:SizedBox(
+                                  height: 50,
+                                  child: passwordField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Role :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: roleField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Phone :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: phoneField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("CustomMap :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: customMapField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.userObject!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Devices :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                            flex:1,
+                            fit: FlexFit.tight,
+                            child:  new Container(
+                              padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                              child: SizedBox(
+                                height: 50,
+                                child: deviceField,
                               ),
                             ),
-                            Flexible(
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
                               fit: FlexFit.tight,
-                              child: new Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              child:new Row(
+                                children: <Widget>[
+                                  new Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Text("TwelveHourFormat :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                        Checkbox(
+                                          onChanged: (bool flag) {
+                                            twelveHourFormat=flag;
+                                            setState(() {});
+                                          },
+                                          value: twelveHourFormat,
+                                        ),
+                                      ]
+                                  )
+                                ],
+                              )
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 15,),
+                      widget.userObject!=null?new Row(
+                        children: <Widget>[
+                          Flexible(
+                            flex:1,
+                            fit:FlexFit.tight,
+                            child:new Container(
+                              padding: EdgeInsets.fromLTRB(0,0,5,0),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              child:new Container(
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: new RaisedButton(
                                     onPressed: () {
-                                      updateUser();
+                                      deleteConfirmationPopup(widget.userObject.email);
                                     },
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                                    color: Color(0xff2D9F4C),
-                                    child:new Text('Update User', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),side: BorderSide(color: Color(0xffF7716E))),
+                                    color: global.whiteColor,
+                                    child:new Text('Delete User', style: TextStyle(fontSize: global.font14, color: Color(0xffF7716E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                                 ),
                               ),
-                            )
-                          ],
-                        ):new Container(
-                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                          width: MediaQuery.of(context).size.width,
-                          height: 50,
-                          child: new RaisedButton(
-                              onPressed: () {
-                                addUser();
-                              },
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                              color: Color(0xff2D9F4C),
-                              child:new Text('Add User', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                            ),
                           ),
+                          Flexible(
+                            flex:1,
+                            fit: FlexFit.tight,
+                            child: new Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              width: MediaQuery.of(context).size.width,
+                              height: 50,
+                              child: new RaisedButton(
+                                  onPressed: () {
+                                    updateUser();
+                                  },
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                  color: Color(0xff2D9F4C),
+                                  child:new Text('Update User', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                              ),
+                            ),
+                          )
+                        ],
+                      ):new Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                        width: MediaQuery.of(context).size.width,
+                        height: 50,
+                        child: new RaisedButton(
+                            onPressed: () {
+                              addUser();
+                            },
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                            color: Color(0xff2D9F4C),
+                            child:new Text('Add User', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                         ),
-                      ],
-                    )
-                )
+                      ),
+                    ],
+                  )
+              ):new Container(
+                  child:Center(
+                    child:new Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(
+                        valueColor: new AlwaysStoppedAnimation<Color>(global.secondaryBlueColor),
+                        backgroundColor: global.lightGreyColor,
+                        strokeWidth: 5,),
+                    ),
+                  )
+              ),
             )
         )
     );

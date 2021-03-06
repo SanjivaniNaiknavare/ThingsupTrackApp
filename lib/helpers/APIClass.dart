@@ -648,4 +648,63 @@ class APIClass
     return flag;
   }
 
+  Future<Response> GetSharingDevices() async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/device/sharing";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" GetSharingDevices url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> DeleteSharingDevice(String id) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/device/sharing";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    Map<String, String> queryParams = {
+      'id': id,
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" DeleteSharingDevice url->"+url);
+
+    Response response = await delete(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
 }

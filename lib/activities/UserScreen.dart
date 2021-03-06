@@ -1,16 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
-import 'package:thingsuptrackapp/activities/GeofenceDetailsScreen.dart';
 import 'package:thingsuptrackapp/activities/UserDetailsScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helperClass/UserObject.dart';
-import 'package:thingsuptrackapp/helpers/ListOfGeofences.dart';
 import 'package:thingsuptrackapp/helpers/ListOfUsers.dart';
 
 
@@ -36,24 +33,18 @@ class _UserScreenState extends State<UserScreen>
     getOwnedDevices();
     getUsers();
     super.initState();
-
-
   }
 
   void getOwnedDevices() async
   {
-
     Response response=await global.apiClass.GetOwnedDevices();
-    print(LOGTAG+" getOwnedDevices response->"+response.toString());
-
     if(response!=null)
     {
       print(LOGTAG+" getOwnedDevices statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getOwnedDevices->"+response.body.toString());
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        print(LOGTAG+" getOwnedDevices->"+resBody.toString());
-
         List<dynamic> payloadList=resBody;
 
         for (int i = 0; i < payloadList.length; i++)
@@ -69,17 +60,16 @@ class _UserScreenState extends State<UserScreen>
           if(latlngStatic!=null)
           {
             Map<String, dynamic> datamap = json.decode(latlngStatic);
-            if (datamap.length > 0) {
+            if (datamap.length > 0)
+            {
               double lat = datamap['lat'];
               double lng = datamap['lng'];
               static = new LatLngClass(lat: lat, lng: lng);
             }
           }
-
           DeviceObjectOwned deviceObjectOwned=new DeviceObjectOwned(name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
           listofDevices.add(deviceObjectOwned);
         }
-
       }
       else if (response.statusCode == 500)
       {
@@ -90,21 +80,16 @@ class _UserScreenState extends State<UserScreen>
     {
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
-
-
   }
 
   void getUsers() async
   {
-
     isResponseReceived=false;
     isUserFound=false;
     listOfUsers.clear();
     setState(() {});
 
     Response response=await global.apiClass.GetChildUsers();
-    print(LOGTAG+" getChildUsers response->"+response.toString());
-
     if(response!=null)
     {
       print(LOGTAG+" getChildUsers statusCode->"+response.statusCode.toString());
@@ -113,9 +98,7 @@ class _UserScreenState extends State<UserScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-
         List<dynamic> payloadList=resBody;
-
         for (int i = 0; i < payloadList.length; i++)
         {
           int id= payloadList.elementAt(i)['id'];
@@ -142,16 +125,13 @@ class _UserScreenState extends State<UserScreen>
 
           UserObject userObject=new UserObject(id: id,email: email,name: name,password: password,role: role,disabled: disabled,phone: phone,twelvehourformat: twelvehourformat,custommap: customMap,devices: "");
           listOfUsers.add(userObject);
-
         }
-
         isResponseReceived=true;
         if(listOfUsers.length>0)
         {
           isUserFound=true;
         }
         setState(() {});
-
       }
       else if (response.statusCode == 500)
       {
@@ -162,18 +142,15 @@ class _UserScreenState extends State<UserScreen>
     {
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
-
   }
 
   void onTabClicked(int index, UserObject userObject) async
   {
-
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UserDetailsScreen(index: index,userObject: userObject,listofDevices:listofDevices))).then((value) => ({
 
-      if(global.lastFunction.toString().contains("addUser"))
-        {
-          global.helperClass.showAlertDialog(context, "", "User added successfully", false, "")
-        }
+      if(global.lastFunction.toString().contains("addUser")){
+        global.helperClass.showAlertDialog(context, "", "User added successfully", false, "")
+      }
       else if(global.lastFunction.toString().contains("updateUser")){
         global.helperClass.showAlertDialog(context, "", "User updated successfully", false, "")
       }
@@ -189,7 +166,6 @@ class _UserScreenState extends State<UserScreen>
   {
     Navigator.of(context).pop();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -292,9 +268,7 @@ class _UserScreenState extends State<UserScreen>
                                 return Container(
                                   color: global.transparent,
                                   child: ListOfUsers(index: index, userObject: listOfUsers[index],onTabCicked: (flag){
-
                                     onTabClicked(index,listOfUsers[index]);
-
                                   },
                                   ),
                                 );
@@ -303,7 +277,6 @@ class _UserScreenState extends State<UserScreen>
                         ]
                     ),
                   )
-                  //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
                 ],
               )
           ):new Container(

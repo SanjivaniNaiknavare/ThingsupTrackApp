@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thingsuptrackapp/activities/UserDevicesScreen.dart';
 import 'package:thingsuptrackapp/activities/UserScreen.dart';
+import 'package:thingsuptrackapp/activities/UserSharedDevicesScreen.dart';
 import 'package:thingsuptrackapp/helpers/APIClass.dart';
 import 'activities/SignIn.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
@@ -28,7 +30,7 @@ void main() async {
   {
     if (isUserLoggedIn)
     {
-      _defaultHome = new DevicesScreen();
+      _defaultHome = new UserSharedDevicesScreen();
     }
   }
 

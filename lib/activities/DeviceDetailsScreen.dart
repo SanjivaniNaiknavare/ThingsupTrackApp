@@ -18,8 +18,6 @@ class DeviceDetailsScreen extends StatefulWidget
   DeviceDetailsScreen({Key key,this.index,this.deviceObjectAllAccount}) : super(key: key);
   int index;
   DeviceObjectAllAccount deviceObjectAllAccount;
-
-
   @override
   _DeviceDetailsScreenState createState() => _DeviceDetailsScreenState();
 }
@@ -29,6 +27,7 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
   String selectedTypeForDevice = "";
 
+  bool isResponseReceived=true;
   bool nameValidate = false;
   bool deviceIDValidate = false;
   bool grpIDValidate = false;
@@ -51,27 +50,27 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
   final typeController = TextEditingController();
 
   Completer<GoogleMapController> _controller = Completer();
-
-
   LatLng _center = new LatLng(18.6, 73.7);
   Set<Marker> _markers = new HashSet<Marker>();
 
   @override
-  void initState() {
+  void initState()
+  {
     super.initState();
     global.lastFunction = "";
 
-    if (widget.deviceObjectAllAccount != null) {
+    if (widget.deviceObjectAllAccount != null)
+    {
       nameController.text = widget.deviceObjectAllAccount.name.toString();
-      deviceIDController.text =
-          widget.deviceObjectAllAccount.uniqueid.toString();
+      deviceIDController.text = widget.deviceObjectAllAccount.uniqueid.toString();
       grpIDController.text = widget.deviceObjectAllAccount.groupid.toString();
       phoneController.text = widget.deviceObjectAllAccount.phone.toString();
       modelController.text = widget.deviceObjectAllAccount.model.toString();
       contactController.text = widget.deviceObjectAllAccount.contact.toString();
       typeController.text = widget.deviceObjectAllAccount.type.toString();
 
-      if (widget.deviceObjectAllAccount.static != null) {
+      if (widget.deviceObjectAllAccount.static != null)
+      {
         LatLngClass latLngClass = widget.deviceObjectAllAccount.static;
         latController.text = latLngClass.lat.toString();
         longController.text = latLngClass.lng.toString();
@@ -80,7 +79,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
         isStatic = true;
       }
     }
-
     setState(() {});
   }
 
@@ -110,32 +108,37 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
   void deleteDevice(String userindex) async
   {
+    isResponseReceived=false;
+    setState(() {});
 
     Response response=await global.apiClass.DeleteDevice(userindex);
-    print(LOGTAG+" deleteDelete response->"+response.toString());
-
     if(response!=null)
     {
       print(LOGTAG+" deleteDelete statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" deleteDelete body->"+response.body.toString());
 
       if (response.statusCode == 200)
       {
-        var resBody = json.decode(response.body);
-        print(LOGTAG+" deleteDelete->"+resBody.toString());
         global.lastFunction="deleteDevice";
         _onbackButtonPressed();
       }
       else if (response.statusCode == 400)
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
       }
       else if (response.statusCode == 500)
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
+      isResponseReceived=true;
+      setState(() {});
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
 
@@ -144,7 +147,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
   void addDevice() async
   {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-
     bool isvalid = false;
     nameValidate = false;
     deviceIDValidate = false;
@@ -152,8 +154,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
     selectedTypeForDevice=typeController.text;
     String nameData = nameController.text;
     String deviceIDData = deviceIDController.text;
-
-    print(LOGTAG + " nameData->" + nameData.toString() + " deviceIDData->" + deviceIDData.toString());
 
     if (nameData.isEmpty || nameData == " " || nameData.length == 0 || nameData == "null")
     {
@@ -222,10 +222,11 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
     if (isvalid)
     {
-      print(LOGTAG + " isValid->" + isvalid.toString() + " selectedTypeForDevice->" + selectedTypeForDevice.toString());
-
       if (!selectedTypeForDevice.isEmpty && selectedTypeForDevice != " " && selectedTypeForDevice.length > 0)
       {
+        isResponseReceived=false;
+        setState(() {});
+
         String name = nameData;
         String uniqueid = deviceIDData;
         String groupid = grpIDController.text;
@@ -247,8 +248,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
         print(LOGTAG + " addDevice jsonbody->" + jsonBody.toString());
 
         Response response = await global.apiClass.AddDevice(jsonBody);
-        print(LOGTAG + " addDevice response->" + response.toString());
-
         if (response != null)
         {
           print(LOGTAG + " addDevice statusCode->" + response.statusCode.toString());
@@ -256,32 +255,37 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
           if (response.statusCode == 200)
           {
-            var resBody = json.decode(response.body);
-            print(LOGTAG + " addDevice->" + resBody.toString());
             global.lastFunction="addDevice";
             _onbackButtonPressed();
           }
           else if (response.statusCode == 400)
           {
+            isResponseReceived=true;
+            setState(() {});
+
             var resBody = json.decode(response.body);
             String status = resBody['status'];
 
-            if (static.toString().contains("Device Already Exist"))
+            if (status.toString().contains("Device Already Exist"))
             {
               global.helperClass.showAlertDialog(context, "", "Device Already Exist", false, "");
             }
-            else if (static.toString().contains("Unsupported Type"))
+            else if (status.toString().contains("Unsupported Type"))
             {
               global.helperClass.showAlertDialog(context, "", "Unsupported Device Type", false, "");
             }
           }
           else if (response.statusCode == 500)
           {
+            isResponseReceived=true;
+            setState(() {});
             global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
           }
         }
         else
         {
+          isResponseReceived=true;
+          setState(() {});
           global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
         }
       }
@@ -294,11 +298,12 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
     {
       global.helperClass.showAlertDialog(context, "", "Please provide valid data", false, "");
     }
-
   }
 
   void updateDevice() async
   {
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+
     bool isvalid = false;
     nameValidate = false;
     deviceIDValidate = false;
@@ -306,8 +311,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
     selectedTypeForDevice=typeController.text;
     String nameData = nameController.text;
     String deviceIDData = deviceIDController.text;
-
-    print(LOGTAG + " nameData->" + nameData.toString() + " deviceIDData->" + deviceIDData.toString());
 
     if (nameData.isEmpty || nameData == " " || nameData.length == 0 || nameData == "null")
     {
@@ -376,10 +379,11 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
     if (isvalid)
     {
-      print(LOGTAG + " isValid->" + isvalid.toString() + " selectedTypeForDevice->" + selectedTypeForDevice.toString());
-
       if (!selectedTypeForDevice.isEmpty && selectedTypeForDevice != " " && selectedTypeForDevice.length > 0)
       {
+        isResponseReceived=false;
+        setState(() {});
+
         String name = nameData;
         String uniqueid = deviceIDData;
         String groupid = grpIDController.text;
@@ -401,8 +405,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
         print(LOGTAG+" updateDevice jsonbody->"+jsonBody.toString());
 
         Response response=await global.apiClass.UpdateDevice(jsonBody);
-        print(LOGTAG+" updateDevice response->"+response.toString());
-
         if(response!=null)
         {
           print(LOGTAG+" updateDevice statusCode->"+response.statusCode.toString());
@@ -411,21 +413,26 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
           if (response.statusCode == 200)
           {
             var resBody = json.decode(response.body);
-            print(LOGTAG+" updateDevice->"+resBody.toString());
             global.lastFunction="updateDevice";
             _onbackButtonPressed();
           }
           else if (response.statusCode == 400)
           {
+            isResponseReceived=true;
+            setState(() {});
             global.helperClass.showAlertDialog(context, "", "Device Already Exist", false, "");
           }
           else if (response.statusCode == 500)
           {
+            isResponseReceived=true;
+            setState(() {});
             global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
           }
         }
         else
         {
+          isResponseReceived=true;
+          setState(() {});
           global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
         }
       }
@@ -438,13 +445,10 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
     {
       global.helperClass.showAlertDialog(context, "", "Please provide valid data", false, "");
     }
-
-
   }
 
   void deleteConfirmationPopup(String selindex)
   {
-
     showDialog(
         context: context,
         builder: (BuildContext context)
@@ -473,9 +477,7 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
                       width: MediaQuery.of(context).size.width,
                       decoration: new BoxDecoration(
                         color: Colors.white,
-                        border: Border(
-                          bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),
-                        ),
+                        border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
                       ),
                     ),
                     new Row(
@@ -521,7 +523,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
   void showDropDownDiailogForType()
   {
-
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -604,7 +605,6 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
   {
     Navigator.of(context).pop();
   }
-
 
   @override
   Widget build(BuildContext context){
@@ -883,8 +883,8 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  GestureDetector(
+                      padding: EdgeInsets.fromLTRB(15,0,0,0),
+                      child: GestureDetector(
                           onTap: (){_onbackButtonPressed();},
                           child: new Container(
                             height: 25,
@@ -901,328 +901,338 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child:SingleChildScrollView(
-
-                    child: new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Name :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: nameField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Device ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: deviceIDField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Group ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child: new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child:SizedBox(
-                                    height: 50,
-                                    child: groupIDField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Phone No :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: phoneField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Model :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: modelField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Contact :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: contactField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Type :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child:isResponseReceived? SingleChildScrollView(
+                  child: new Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Name :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
-                              fit: FlexFit.tight,
-                              child:  new Container(
+                              fit:FlexFit.tight,
+                              child: new Container(
                                 padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
                                 child: SizedBox(
                                   height: 50,
-                                  child: typeField,
+                                  child: nameField,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit: FlexFit.tight,
-                                child:new Row(
-                                  children: <Widget>[
-                                    new Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Text("Static :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                          Checkbox(
-                                            onChanged: (bool flag) {
-                                              isStatic=flag;
-                                              setState(() {});
-                                            },
-                                            value: isStatic,
-                                          ),
-                                        ]
-                                    )
-                                  ],
-                                )
-                            )
-                          ],
-                        ),
-                        isStatic?SizedBox(height: 10,):new Container(width: 0,height: 0,),
-                        isStatic?new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: latitudeField,
-                                  ),
-                                )
-                            ),
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: longitudeField,
-                                  ),
-                                )
-                            )
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        isStatic?SizedBox(height: 10,):new Container(width: 0,height: 0,),
-                        isStatic?new Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.width,
-                            child:GoogleMap(
-                              onMapCreated: _onMapCreated,
-                              initialCameraPosition:CameraPosition(
-                                target: _center,
-                                zoom: 11.0,
-                              ),
-                              gestureRecognizers: Set()
-                                ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
-                                ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
-                                ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
-                                ..add(Factory<VerticalDragGestureRecognizer>(
-                                        () => VerticalDragGestureRecognizer())),
-                              markers: _markers,
-                              onTap: (point){
-                                _setMarkers(point);
-                              },
-                            )
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 15,),
-                        widget.deviceObjectAllAccount!=null?new Row(
-                          children: <Widget>[
-
-                            Flexible(
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Device ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
                               fit:FlexFit.tight,
-                              child:   new Container(
-                                padding: EdgeInsets.fromLTRB(0,0,5,0),
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                child: new Container(
-                                  width: MediaQuery.of(context).size.width,
+                              child: new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
                                   height: 50,
-                                  child: new RaisedButton(
-                                      onPressed: () {
-                                        deleteConfirmationPopup(widget.deviceObjectAllAccount.uniqueid);
-                                      },
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),side: BorderSide(color: Color(0xffF7716E))),
-                                      color: global.whiteColor,
-                                      child:new Text('Delete Device', style: TextStyle(fontSize: global.font14, color: Color(0xffF7716E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                                  ),
+                                  child: deviceIDField,
                                 ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Group ID :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child: new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child:SizedBox(
+                                  height: 50,
+                                  child: groupIDField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Phone No :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: phoneField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Model :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: modelField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Contact :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: contactField,
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              child:new Text("Type :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 5,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                            flex:1,
+                            fit: FlexFit.tight,
+                            child:  new Container(
+                              padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                              child: SizedBox(
+                                height: 50,
+                                child: typeField,
                               ),
                             ),
-                            Flexible(
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
                               flex:1,
                               fit: FlexFit.tight,
+                              child:new Row(
+                                children: <Widget>[
+                                  new Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Text("Static :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                        Checkbox(
+                                          onChanged: (bool flag) {
+                                            isStatic=flag;
+                                            setState(() {});
+                                          },
+                                          value: isStatic,
+                                        ),
+                                      ]
+                                  )
+                                ],
+                              )
+                          )
+                        ],
+                      ),
+                      isStatic?SizedBox(height: 10,):new Container(width: 0,height: 0,),
+                      isStatic?new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: latitudeField,
+                                ),
+                              )
+                          ),
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: longitudeField,
+                                ),
+                              )
+                          )
+                        ],
+                      ):new Container(width: 0,height: 0,),
+                      isStatic?SizedBox(height: 10,):new Container(width: 0,height: 0,),
+                      isStatic?new Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width,
+                          child:GoogleMap(
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition:CameraPosition(
+                              target: _center,
+                              zoom: 11.0,
+                            ),
+                            gestureRecognizers: Set()
+                              ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                              ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                              ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                              ..add(Factory<VerticalDragGestureRecognizer>(
+                                      () => VerticalDragGestureRecognizer())),
+                            markers: _markers,
+                            onTap: (point){
+                              _setMarkers(point);
+                            },
+                          )
+                      ):new Container(width: 0,height: 0,),
+                      SizedBox(height: 15,),
+                      widget.deviceObjectAllAccount!=null?new Row(
+                        children: <Widget>[
+
+                          Flexible(
+                            flex:1,
+                            fit:FlexFit.tight,
+                            child:   new Container(
+                              padding: EdgeInsets.fromLTRB(0,0,5,0),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               child: new Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: new RaisedButton(
                                     onPressed: () {
-                                      updateDevice();
+                                      deleteConfirmationPopup(widget.deviceObjectAllAccount.uniqueid);
                                     },
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                                    color: Color(0xff2D9F4C),
-                                    child:new Text('Update Device', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),side: BorderSide(color: Color(0xffF7716E))),
+                                    color: global.whiteColor,
+                                    child:new Text('Delete Device', style: TextStyle(fontSize: global.font14, color: Color(0xffF7716E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                                 ),
                               ),
-                            )
-                          ],
-                        ):new Container(
-                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                          width: MediaQuery.of(context).size.width,
-                          height: 50,
-                          child: new RaisedButton(
-                              onPressed: () {
-                                addDevice();
-                              },
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                              color: Color(0xff2D9F4C),
-                              child:new Text('Add Device', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                            ),
                           ),
+                          Flexible(
+                            flex:1,
+                            fit: FlexFit.tight,
+                            child: new Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              width: MediaQuery.of(context).size.width,
+                              height: 50,
+                              child: new RaisedButton(
+                                  onPressed: () {
+                                    updateDevice();
+                                  },
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                  color: Color(0xff2D9F4C),
+                                  child:new Text('Update Device', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                              ),
+                            ),
+                          )
+                        ],
+                      ):new Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                        width: MediaQuery.of(context).size.width,
+                        height: 50,
+                        child: new RaisedButton(
+                            onPressed: () {
+                              addDevice();
+                            },
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                            color: Color(0xff2D9F4C),
+                            child:new Text('Add Device', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                         ),
-                      ],
-                    )
-                )
+                      ),
+                    ],
+                  )
+              ):new Container(
+                  child:Center(
+                    child:new Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(
+                        valueColor: new AlwaysStoppedAnimation<Color>(global.secondaryBlueColor),
+                        backgroundColor: global.lightGreyColor,
+                        strokeWidth: 5,),
+                    ),
+                  )
+              ),
             )
         )
     );

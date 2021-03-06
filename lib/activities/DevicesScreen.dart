@@ -61,6 +61,7 @@ class _DevicesScreenState extends State<DevicesScreen>
 
         for (int i = 0; i < payloadList.length; i++)
         {
+          int id=payloadList.elementAt(i)['id'];
           String uniqueid= payloadList.elementAt(i)['uniqueid'];
           String name = payloadList.elementAt(i)['name'];
           String type = payloadList.elementAt(i)['type'];
@@ -79,7 +80,7 @@ class _DevicesScreenState extends State<DevicesScreen>
             }
           }
 
-          DeviceObjectAllAccount deviceObjectAllAccount=new DeviceObjectAllAccount(name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
+          DeviceObjectAllAccount deviceObjectAllAccount=new DeviceObjectAllAccount(id:id,name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
           listOfDevices.add(deviceObjectAllAccount);
         }
 
@@ -94,11 +95,15 @@ class _DevicesScreenState extends State<DevicesScreen>
       }
       else if (response.statusCode == 500)
       {
+        isResponseReceived=true;
+        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
+      isResponseReceived=true;
+      setState(() {});
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
 

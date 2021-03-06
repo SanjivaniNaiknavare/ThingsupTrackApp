@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
@@ -14,14 +13,11 @@ class ShowDevicePopupForUser extends StatefulWidget
 
   @override
   ShowDevicePopupForUserState createState() => ShowDevicePopupForUserState();
-
 }
 
 class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
 {
-
   String LOGTAG="ShowDevicePopupForUser";
-
   List<String> selectedDeviceList=new List();
 
   @override
@@ -32,9 +28,6 @@ class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
     {
       selectedDeviceList.addAll(widget.selectedDeviceList);
     }
-
-
-    print(LOGTAG+" deviceList->"+widget.deviceList.length.toString());
   }
 
   @override
@@ -121,12 +114,9 @@ class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
                                         _secValue = true;
                                       }
                                     }
-
                                     return new Container(
                                         child: Container(
-                                            decoration:BoxDecoration(
-                                              border: Border(bottom: BorderSide(color: global.textLightGreyColor, width: 0.5,),),
-                                            ),
+                                            decoration:BoxDecoration(border: Border(bottom: BorderSide(color: global.textLightGreyColor, width: 0.5,),),),
                                             padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                             margin: EdgeInsets.fromLTRB(0,0, 15, 0),
                                             child: new Column(
@@ -160,14 +150,12 @@ class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
                                                                   onChanged: (bool flag) {
                                                                     _secValue=flag;
                                                                     String currentname=widget.deviceList.elementAt(index).uniqueid.toString();
-                                                                    print(LOGTAG+" currentname->"+currentname.toString()+" _secValue->"+_secValue.toString());
                                                                     if(flag)
                                                                     {
                                                                       if(!selectedDeviceList.contains(currentname))
                                                                       {
                                                                         selectedDeviceList.add(currentname);
                                                                       }
-
                                                                     }
                                                                     else
                                                                     {
@@ -206,10 +194,7 @@ class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
         SizedBox(height: 20,),
         new Container(
           width: MediaQuery.of(context).size.width,
-          decoration: new BoxDecoration(
-            color: Colors.white,
-            border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
-          ),
+          decoration: new BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),),
         ),
         new Row(
           children: <Widget>[

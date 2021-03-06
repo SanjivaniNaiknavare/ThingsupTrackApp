@@ -54,3 +54,5 @@ User currentUser;
 String userID="";
 String userRole="manager";
 String lastFunction="";
+
+Map<int,dynamic> myAllDevices=new Map();
