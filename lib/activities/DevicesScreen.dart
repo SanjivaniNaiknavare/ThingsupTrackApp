@@ -1,60 +1,63 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
-import 'package:thingsuptrackapp/activities/GeofenceDetailsScreen.dart';
-import 'package:thingsuptrackapp/activities/UserDetailsScreen.dart';
+import 'package:thingsuptrackapp/activities/DeviceDetailsScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
-import 'package:thingsuptrackapp/helperClass/UserObject.dart';
-import 'package:thingsuptrackapp/helpers/ListOfGeofences.dart';
-import 'package:thingsuptrackapp/helpers/ListOfUsers.dart';
+import 'package:thingsuptrackapp/helpers/ListOfDevices.dart';
 
 
-class UserScreen extends StatefulWidget
+
+class DevicesScreen extends StatefulWidget
 {
   @override
-  _UserScreenState createState() => _UserScreenState();
+  _DevicesScreenState createState() => _DevicesScreenState();
 }
 
-class _UserScreenState extends State<UserScreen>
+class _DevicesScreenState extends State<DevicesScreen>
 {
-  String LOGTAG="UserScreen";
+  String LOGTAG="DevicesScreen";
 
-  List<DeviceObjectOwned> listofDevices=new List();
-  List<UserObject> listOfUsers=new List();
+  List<DeviceObjectAllAccount> listOfDevices=new List();
   ScrollController _scrollController=new ScrollController();
   bool isResponseReceived=false;
-  bool isUserFound=false;
+  bool isDeviceFound=false;
 
   @override
   void initState()
   {
-    getOwnedDevices();
-    getUsers();
+    getDevices();
     super.initState();
 
 
   }
 
-  void getOwnedDevices() async
+  void getDevices() async
   {
 
-    Response response=await global.apiClass.GetOwnedDevices();
-    print(LOGTAG+" getOwnedDevices response->"+response.toString());
+    isResponseReceived=false;
+    isDeviceFound=false;
+    listOfDevices.clear();
+
+    setState(() {});
+
+    Response response=await global.apiClass.GetAccountDevices();
+    print(LOGTAG+" getAccountDevices response->"+response.toString());
 
     if(response!=null)
     {
-      print(LOGTAG+" getOwnedDevices statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getAccountDevices statusCode->"+response.statusCode.toString());
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        print(LOGTAG+" getOwnedDevices->"+resBody.toString());
+        print(LOGTAG+" getAccountDevices->"+resBody.toString());
 
         List<dynamic> payloadList=resBody;
+
+        print(LOGTAG+" payloadList->"+payloadList.length.toString());
 
         for (int i = 0; i < payloadList.length; i++)
         {
@@ -76,81 +79,17 @@ class _UserScreenState extends State<UserScreen>
             }
           }
 
-          DeviceObjectOwned deviceObjectOwned=new DeviceObjectOwned(name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
-          listofDevices.add(deviceObjectOwned);
-        }
-
-      }
-      else if (response.statusCode == 500)
-      {
-        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
-      }
-    }
-    else
-    {
-      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
-    }
-
-
-  }
-
-  void getUsers() async
-  {
-
-    isResponseReceived=false;
-    isUserFound=false;
-    listOfUsers.clear();
-    setState(() {});
-
-    Response response=await global.apiClass.GetChildUsers();
-    print(LOGTAG+" getChildUsers response->"+response.toString());
-
-    if(response!=null)
-    {
-      print(LOGTAG+" getChildUsers statusCode->"+response.statusCode.toString());
-      print(LOGTAG+" getChildUsers->"+response.body.toString());
-
-      if (response.statusCode == 200)
-      {
-        var resBody = json.decode(response.body);
-
-        List<dynamic> payloadList=resBody;
-
-        for (int i = 0; i < payloadList.length; i++)
-        {
-          int id= payloadList.elementAt(i)['id'];
-          String email= payloadList.elementAt(i)['email'];
-          String name = payloadList.elementAt(i)['name'];
-          String password = payloadList.elementAt(i)['password'];
-          String role = payloadList.elementAt(i)['role'];
-          int disabledInt = payloadList.elementAt(i)['disabled'];
-          String phone = payloadList.elementAt(i)['phone'];
-          int twelvehourformatInt= payloadList.elementAt(i)['twelvehourformat'];
-          String customMap=payloadList.elementAt(i)['custommap'];
-          bool disabled=false;
-          bool twelvehourformat=false;
-
-          if(disabledInt==1)
-          {
-            disabled=true;
-          }
-
-          if(twelvehourformatInt==1)
-          {
-            twelvehourformat=true;
-          }
-
-          UserObject userObject=new UserObject(id: id,email: email,name: name,password: password,role: role,disabled: disabled,phone: phone,twelvehourformat: twelvehourformat,custommap: customMap,devices: "");
-          listOfUsers.add(userObject);
-
+          DeviceObjectAllAccount deviceObjectAllAccount=new DeviceObjectAllAccount(name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
+          listOfDevices.add(deviceObjectAllAccount);
         }
 
         isResponseReceived=true;
-        if(listOfUsers.length>0)
+        if(listOfDevices.length>0)
         {
-          isUserFound=true;
+          isDeviceFound=true;
         }
         setState(() {});
+        print(LOGTAG+" listOfDevices->"+listOfDevices.length.toString());
 
       }
       else if (response.statusCode == 500)
@@ -165,22 +104,22 @@ class _UserScreenState extends State<UserScreen>
 
   }
 
-  void onTabClicked(int index, UserObject userObject) async
+  void onTabClicked(int index, DeviceObjectAllAccount deviceObjectAllAccount) async
   {
 
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UserDetailsScreen(index: index,userObject: userObject,listofDevices:listofDevices))).then((value) => ({
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DeviceDetailsScreen(index: index,deviceObjectAllAccount: deviceObjectAllAccount,))).then((value) => ({
 
-      if(global.lastFunction.toString().contains("addUser"))
+      if(global.lastFunction.toString().contains("addDevice"))
         {
-          global.helperClass.showAlertDialog(context, "", "User added successfully", false, "")
+          global.helperClass.showAlertDialog(context, "", "Device added successfully", false, "")
         }
-      else if(global.lastFunction.toString().contains("updateUser")){
-        global.helperClass.showAlertDialog(context, "", "User updated successfully", false, "")
+      else if(global.lastFunction.toString().contains("updateDevice")){
+        global.helperClass.showAlertDialog(context, "", "Device updated successfully", false, "")
       }
-      else if(global.lastFunction.toString().contains("deleteUser")){
-          global.helperClass.showAlertDialog(context, "", "User deleted successfully", false, "")
+      else if(global.lastFunction.toString().contains("deleteDevice")){
+          global.helperClass.showAlertDialog(context, "", "Device deleted successfully", false, "")
         },
-      getUsers()
+      getDevices()
     }));
   }
 
@@ -217,7 +156,7 @@ class _UserScreenState extends State<UserScreen>
                 ),
                 Container(
                     padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                    child:  new Text("User Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                    child:  new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                 ),
               ],
             ),
@@ -235,7 +174,7 @@ class _UserScreenState extends State<UserScreen>
             backgroundColor:global.screenBackColor,
           ),
           body: isResponseReceived?(
-              !isUserFound?new Stack(
+              !isDeviceFound?new Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
                   new Container(
@@ -271,7 +210,7 @@ class _UserScreenState extends State<UserScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Geofence Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+                          child: new Text('No Device Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
                         )
                       ],
                     ),
@@ -284,21 +223,21 @@ class _UserScreenState extends State<UserScreen>
                     margin:EdgeInsets.fromLTRB(8,10,8,10),
                     child: CustomScrollView(
                         controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
+                        physics: AlwaysScrollableScrollPhysics(),
                         slivers: <Widget>[
                           SliverList(
                               delegate: SliverChildBuilderDelegate((context, index)
                               {
                                 return Container(
                                   color: global.transparent,
-                                  child: ListOfUsers(index: index, userObject: listOfUsers[index],onTabCicked: (flag){
+                                  child: ListOfDevices(index: index, deviceObject: listOfDevices[index],onTabClicked: (flag){
 
-                                    onTabClicked(index,listOfUsers[index]);
+                                    onTabClicked(index,listOfDevices[index]);
 
                                   },
                                   ),
                                 );
-                              }, childCount: listOfUsers.length)
+                              }, childCount: listOfDevices.length)
                           )
                         ]
                     ),

@@ -68,19 +68,6 @@ class UpdateUserClass
   }
 }
 
-//{
-//    "name":"testdevice",
-//    "uniqueid":"TestDevice3",
-//    "static":{
-//        "lat":12.34,
-//        "lng":13.5
-//    },
-//    "groupid":null,
-//    "phone":"",
-//    "model":"",
-//    "contact":"",
-//    "type":"car"
-//}
 
 class LatLngClass
 {

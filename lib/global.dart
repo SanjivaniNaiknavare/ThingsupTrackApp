@@ -52,5 +52,5 @@ String idToken="";
 
 User currentUser;
 String userID="";
-String userRole="";
+String userRole="manager";
 String lastFunction="";

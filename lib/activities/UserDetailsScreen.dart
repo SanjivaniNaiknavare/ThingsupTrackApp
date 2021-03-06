@@ -8,13 +8,15 @@ import 'package:http/http.dart';
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/UserObject.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
+import 'package:thingsuptrackapp/helpers/ShowDevicePopupForUser.dart';
+import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 
 class UserDetailsScreen extends StatefulWidget
 {
-  UserDetailsScreen({Key key,this.index,this.userObject}) : super(key: key);
+  UserDetailsScreen({Key key,this.index,this.userObject,this.listofDevices}) : super(key: key);
   int index;
   UserObject userObject;
-
+  List<DeviceObjectOwned> listofDevices;
 
   @override
   _UserDetailsScreenState createState() => _UserDetailsScreenState();
@@ -24,7 +26,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 {
   String LOGTAG="UserDetailsScreen";
 
-  String currentRole="user";
+  String expectedRole="";
   bool nameValidate=false;
   bool useridValidate=false;
   bool passwordValidate=false;
@@ -42,18 +44,30 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
   final phoneController = TextEditingController();
   final roleController = TextEditingController();
 
+  List<String> selectedlistofDevices=new List();
 
   @override
   void initState(){
     super.initState();
-
     global.lastFunction="";
+    if(global.userRole.toString().compareTo("manager")==0)
+    {
+      expectedRole="user";
+    }
+    else if(global.userRole.toString().compareTo("admin")==0)
+    {
+      expectedRole="manager";
+    }
+
     if(widget.userObject!=null)
     {
       nameController.text=widget.userObject.name;
       phoneController.text=widget.userObject.phone;
       twelveHourFormat=widget.userObject.twelvehourformat;
     }
+
+
+    setState(() {});
   }
 
 
@@ -107,7 +121,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
     }
     else
     {
-      useridValidate=false;
+      bool verFlag=global.helperClass.isValidEmail(useridData);
+      if(!verFlag)
+      {
+        useridValidate=true;
+        global.helperClass.showAlertDialog(context, "", "Please enter valid email address", false, "");
+      }
+      else
+      {
+        useridValidate=false;
+      }
     }
 
     if(nameData.isEmpty || nameData==" " || nameData.length==0)
@@ -138,8 +161,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       {
         phoneValidate=false;
       }
-      else{
+      else
+      {
         phoneValidate=true;
+        global.helperClass.showAlertDialog(context, "", "Please enter valid phone number with country code", false, "");
       }
     }
 
@@ -151,20 +176,27 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       String userid=useridData;
       String name=nameData;
       String password=passwordData;
-      String role=currentRole;
+      String role=expectedRole;
       bool disabled=false;
       String phone=phoneData;
       bool twelvehourformat=twelveHourFormat;
       String custommap="";
       String devices="";
 
+      for(int s=0;s<selectedlistofDevices.length;s++)
+      {
+        devices=devices+selectedlistofDevices.elementAt(s).toString()+",";
+      }
+      if(devices.length>0)
+      {
+        devices=devices.substring(0,devices.length-1);
+      }
+
       AddUserClass addUserClass=new AddUserClass(userid: userid,name: name,password: password,role: role,disabled: disabled,phone: phone,twelvehourformat: twelvehourformat,custommap: custommap,devices: devices);
       var jsonBody=jsonEncode(addUserClass);
       print(LOGTAG+" addUser jsonbody->"+jsonBody.toString());
 
       Response response=await global.apiClass.AddUser(jsonBody);
-
-      print(LOGTAG+" adduser response->"+response.toString());
 
       if(response!=null)
       {
@@ -214,7 +246,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
     String nameData=nameController.text;
     String phoneData=phoneController.text;
 
-    if(nameData.isEmpty || nameData==" " || nameData.length==0)
+    if(nameData.isEmpty || nameData==" " || nameData.length==0 || nameData=="null")
     {
       nameValidate=true;
     }
@@ -223,7 +255,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       nameValidate=false;
     }
 
-    if(phoneData.isEmpty || phoneData==" " || phoneData.length==0)
+    if(phoneData.isEmpty || phoneData==" " || phoneData.length==0 || phoneData=="null")
     {
       phoneValidate=true;
     }
@@ -235,6 +267,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       }
       else{
         phoneValidate=true;
+        global.helperClass.showAlertDialog(context, "", "Please enter valid phone number with country code", false, "");
       }
     }
 
@@ -302,7 +335,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Text("Are you sure you want to delete the \'"+widget.userObject.name.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                          new Text("Are you sure you want to delete the \'"+widget.userObject.email.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
                         ],
                       ),
                     ),
@@ -357,11 +390,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         });
   }
 
-
-
-
-
-
   Future<bool> _onbackButtonPressed()
   {
     Navigator.of(context).pop();
@@ -369,6 +397,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   void showDropDownDiailogForDevice()
   {
+
+
+    print(LOGTAG+" listofDevices->"+widget.listofDevices.length.toString());
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -381,38 +413,39 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
               ),
               child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 18, 0, 0),
+                  padding: EdgeInsets.fromLTRB(0, 18, 0, 0),
                   child:SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                      child:new Text("Hi")
-//                      ShowAlarmDevicePopup(
-//                        deviceList: listofDevices,
-//                        currentDeviceList: currentofDevices,
-//                        selectedDevices: (value){
-//
-//                          currentofDevices.clear();
-//                          currentofDevices.addAll(value);
-//                          int cur_length=currentofDevices.length;
-//                          if(cur_length>0)
-//                          {
-//                            if(cur_length==1)
-//                            {
-//                              _selectedDevice=currentofDevices.elementAt(0);
-//                            }
-//                            else
-//                            {
-//                              _selectedDevice=currentofDevices.elementAt(0)+" and others";
-//                            }
-//                          }
-//                          else
-//                          {
-//                            _selectedDevice="";
-//                          }
-//
-//                          deviceController.text=_selectedDevice;
-//                          Navigator.of(context).pop();
-//                        },
-//                      )
+                      child: ShowDevicePopupForUser(
+                        deviceList: widget.listofDevices,
+                        selectedDeviceList:selectedlistofDevices,
+                        selectedDevices: (value){
+
+                          selectedlistofDevices.clear();
+                          selectedlistofDevices.addAll(value);
+                          print(value);
+                          String _selectedDevice="";
+                          int cur_length=selectedlistofDevices.length;
+                          if(cur_length>0)
+                          {
+                            if(cur_length==1)
+                            {
+                              _selectedDevice=selectedlistofDevices.elementAt(0);
+                            }
+                            else
+                            {
+                              _selectedDevice=selectedlistofDevices.elementAt(0)+" and others";
+                            }
+                          }
+                          else
+                          {
+                            _selectedDevice="";
+                          }
+
+                          deviceController.text=_selectedDevice;
+                          Navigator.of(context).pop();
+                        },
+                      )
                   )
               ),
             ),
@@ -486,6 +519,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       onTap: () {
         setState(() {passwordValidate = false;});
       },
+      enabled:widget.userObject!=null?false:true,
       textInputAction: TextInputAction.done,
       style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       cursorColor: global.mainColor,
@@ -497,7 +531,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText:  widget.userObject==null?"Password":widget.userObject.password.toString(),
+        hintText:  "Password",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
@@ -505,7 +539,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.userObject==null?"Password":widget.userObject.password.toString(),
+        hintText: "Password",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -523,7 +557,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
           focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText:  "user",
+          hintText:  expectedRole,
           hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
         )
     );
@@ -536,6 +570,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       cursorColor: global.mainColor,
       obscureText: false,
+      keyboardType: TextInputType.phone,
       controller: phoneController,
       decoration:!phoneValidate? InputDecoration(
         filled: true,
@@ -543,7 +578,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText:  widget.userObject==null?"Phone":widget.userObject.phone.toString(),
+        hintText:  widget.userObject==null?"Phone No(+919988776655)":widget.userObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
@@ -551,7 +586,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.userObject==null?"Phone":widget.userObject.phone.toString(),
+        hintText: widget.userObject==null?"Phone No(+919988776655)":widget.userObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -605,7 +640,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Select Device",
+        hintText: "Devices",
         hintStyle: TextStyle( color:Color.fromRGBO(0, 0, 0, 0.4),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
@@ -613,7 +648,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Select Device",
+        hintText: "Devices",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -811,6 +846,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                           ],
                         ),
                         SizedBox(height: 10,),
+                        widget.userObject!=null?new Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            new Container(
+                                child:new Text("Devices :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                            ),
+                          ],
+                        ):new Container(width: 0,height: 0,),
+                        SizedBox(height: 5,),
                         new Row(
                           children: <Widget>[
                             Flexible(
@@ -824,6 +869,11 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                        SizedBox(height: 10,),
+                        new Row(
+                          children: <Widget>[
                             Flexible(
                                 flex:1,
                                 fit: FlexFit.tight,
