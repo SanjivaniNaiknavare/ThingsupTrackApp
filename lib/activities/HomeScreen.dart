@@ -506,7 +506,6 @@ class _HomeScreenState extends State<HomeScreen>
     String uniqueid="SanjuDevice";
     String taguserid="sanju@gmail.com";
 
-
     TagUserToDevice tagUserToDevice=new TagUserToDevice(uniqueid: uniqueid,taguserid: taguserid);
     var jsonBody=jsonEncode(tagUserToDevice);
     print(LOGTAG+" tagUserToDevice jsonbody->"+jsonBody.toString());

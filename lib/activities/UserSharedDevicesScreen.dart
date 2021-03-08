@@ -117,32 +117,42 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
     if(response!=null)
     {
       print(LOGTAG+" getSharedDevices statusCode->"+response.statusCode.toString());
-      if (response.statusCode == 200)
-      {
+      if (response.statusCode == 200) {
         var resBody = json.decode(response.body);
-        print(LOGTAG+" getSharedDevices->"+resBody.toString());
+        print(LOGTAG + " getSharedDevices->" + resBody.toString());
 
-        List<dynamic> payloadList=resBody;
-
-        print(LOGTAG+" payloadList->"+payloadList.length.toString());
-
-        for (int i = 0; i < payloadList.length; i++)
+        String status = resBody['status'];
+        if (status.toString().contains("success"))
         {
-          int id= payloadList.elementAt(i)['id'];
-          int deviceid = payloadList.elementAt(i)['deviceid'];
-          int userid = payloadList.elementAt(i)['userid'];
-          String token =  payloadList.elementAt(i)['token'];
+          List<dynamic> payloadList = resBody;
+          print(LOGTAG + " payloadList->" + payloadList.length.toString());
 
-          SharedDeviceObject sharedDeviceObject=new SharedDeviceObject(id: id,deviceid: deviceid,userid: userid,token: token);
-          listOfDevices.add(sharedDeviceObject);
+          for (int i = 0; i < payloadList.length; i++)
+          {
+            int id = payloadList.elementAt(i)['id'];
+            int deviceid = payloadList.elementAt(i)['deviceid'];
+            int userid = payloadList.elementAt(i)['userid'];
+            String token = payloadList.elementAt(i)['token'];
+
+            SharedDeviceObject sharedDeviceObject = new SharedDeviceObject(id: id, deviceid: deviceid, userid: userid, token: token);
+            listOfDevices.add(sharedDeviceObject);
+          }
+
+          isResponseReceived = true;
+          if (listOfDevices.length > 0)
+          {
+            isDeviceFound = true;
+          }
+          setState(() {});
         }
-
-        isResponseReceived=true;
-        if(listOfDevices.length>0)
+        else if(status.toString().contains("Devices not found"))
         {
-          isDeviceFound=true;
+          isResponseReceived = true;
+          isDeviceFound = false;
+
+          setState(() {});
+          global.helperClass.showAlertDialog(context, "", "Device Not Found", false, "");
         }
-        setState(() {});
       }
       else if (response.statusCode == 500)
       {
@@ -281,39 +291,39 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-          appBar: AppBar(
-            titleSpacing: 0.0,
-            elevation: 5,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                    child: GestureDetector(
-                        onTap: () {
-                          _onbackButtonPressed();
-                        },
-                        child: new Container(
-                          height: 25,
-                          child: Image(
-                              image: AssetImage('assets/back-arrow.png')),
-                        )
-                    )
-                ),
-                Container(
-                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                    child: new Text("UserDevices", style: TextStyle(
-                        fontSize: global.font18,
-                        color: global.mainColor,
-                        fontWeight: FontWeight.normal,
-                        fontFamily: 'MulishRegular'))
-                ),
-              ],
-            ),
-            backgroundColor: global.screenBackColor,
-          ),
+//          appBar: AppBar(
+//            titleSpacing: 0.0,
+//            elevation: 5,
+//            automaticallyImplyLeading: false,
+//            title: Row(
+//              mainAxisAlignment: MainAxisAlignment.start,
+//              crossAxisAlignment: CrossAxisAlignment.center,
+//              children: [
+//                Container(
+//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+//                    child: GestureDetector(
+//                        onTap: () {
+//                          _onbackButtonPressed();
+//                        },
+//                        child: new Container(
+//                          height: 25,
+//                          child: Image(
+//                              image: AssetImage('assets/back-arrow.png')),
+//                        )
+//                    )
+//                ),
+//                Container(
+//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+//                    child: new Text("UserDevices", style: TextStyle(
+//                        fontSize: global.font18,
+//                        color: global.mainColor,
+//                        fontWeight: FontWeight.normal,
+//                        fontFamily: 'MulishRegular'))
+//                ),
+//              ],
+//            ),
+//            backgroundColor: global.screenBackColor,
+//          ),
           body: isResponseReceived?(
               !isDeviceFound?new Stack(
                 alignment: Alignment.center,

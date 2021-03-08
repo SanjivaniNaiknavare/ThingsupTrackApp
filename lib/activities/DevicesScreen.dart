@@ -141,43 +141,43 @@ class _DevicesScreenState extends State<DevicesScreen>
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-          appBar:AppBar(
-            titleSpacing: 0.0,
-            elevation: 5,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                    child:  GestureDetector(
-                        onTap: (){_onbackButtonPressed();},
-                        child: new Container(
-                          height: 25,
-                          child:Image(image: AssetImage('assets/back-arrow.png')),
-                        )
-                    )
-                ),
-                Container(
-                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                    child:  new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              GestureDetector(
-                onTap: (){
-                  onTabClicked(null,null);
-                },
-                child: new Container(
-                  width: 50,
-                  child: Icon(Icons.add,color: global.appbarTextColor,),
-                ),
-              )
-            ],
-            backgroundColor:global.screenBackColor,
-          ),
+//          appBar:AppBar(
+//            titleSpacing: 0.0,
+//            elevation: 5,
+//            automaticallyImplyLeading: false,
+//            title: Row(
+//              mainAxisAlignment: MainAxisAlignment.start,
+//              crossAxisAlignment: CrossAxisAlignment.center,
+//              children: [
+//                Container(
+//                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                    child:  GestureDetector(
+//                        onTap: (){_onbackButtonPressed();},
+//                        child: new Container(
+//                          height: 25,
+//                          child:Image(image: AssetImage('assets/back-arrow.png')),
+//                        )
+//                    )
+//                ),
+//                Container(
+//                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                    child:  new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+//                ),
+//              ],
+//            ),
+//            actions: <Widget>[
+//              GestureDetector(
+//                onTap: (){
+//                  onTabClicked(null,null);
+//                },
+//                child: new Container(
+//                  width: 50,
+//                  child: Icon(Icons.add,color: global.appbarTextColor,),
+//                ),
+//              )
+//            ],
+//            backgroundColor:global.screenBackColor,
+//          ),
           body: isResponseReceived?(
               !isDeviceFound?new Stack(
                 alignment: Alignment.center,
@@ -261,6 +261,15 @@ class _DevicesScreenState extends State<DevicesScreen>
                     strokeWidth: 5,),
                 ),
               )
+          ),
+          floatingActionButton:FloatingActionButton(
+            child: new Container(
+              child:Icon(Icons.add,color: global.whiteColor,),
+            ),
+            backgroundColor: global.mainColor,
+            onPressed: () {
+              onTabClicked(null,null);
+            },
           ),
         )
     );

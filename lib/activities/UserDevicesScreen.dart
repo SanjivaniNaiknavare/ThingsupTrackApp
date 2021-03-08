@@ -7,6 +7,7 @@ import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helpers/ListOfDevices.dart';
+import 'package:thingsuptrackapp/helpers/TagDevicePopup.dart';
 
 class UserDevicesScreen extends StatefulWidget
 {
@@ -22,6 +23,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
   bool isDeviceFound=false;
   bool sensorValidate=false;
   String _selectedUser;
+  String lastSelectedUser="";
   ScrollController _scrollController=new ScrollController();
   List<String> listOfUsers=new List();
   List<DeviceObjectAllAccount> listOfDevices=new List();
@@ -45,6 +47,10 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
 
   void searchDevice() async
   {
+
+    lastSelectedUser=_selectedUser;
+    listOfDevices.clear();
+
     if(_selectedUser==null)
     {
       global.helperClass.showAlertDialog(context, "", "Please select user", false, "");
@@ -133,44 +139,39 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
     }
   }
 
-  void deleteDevice(String deviceUniqueID,int index) async
+  void unTagDevice(String deviceUniqueID,int index) async
   {
-    isResponseReceived=false;
-    setState(() {});
+    String uniqueid=deviceUniqueID;
+    String taguserid=lastSelectedUser;
 
-    Response response=await global.apiClass.DeleteDevice(deviceUniqueID);
+    Response response=await global.apiClass.UntagUserFromDevice(uniqueid,taguserid);
+    print(LOGTAG+" untagUserFromDevice response->"+response.toString());
+
     if(response!=null)
     {
-      print(LOGTAG+" deleteDelete statusCode->"+response.statusCode.toString());
-      print(LOGTAG+" deleteDelete body->"+response.body.toString());
+      print(LOGTAG+" untagUserFromDevice statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" untagUserFromDevice body->"+response.body.toString());
 
       if (response.statusCode == 200)
       {
-        isResponseReceived=true;
+        var resBody = json.decode(response.body);
         listOfDevices.removeAt(index);
         setState(() {});
-        global.helperClass.showAlertDialog(context, "", "Device deleted successfully", false, "");
+        print(LOGTAG+" untagUserFromDevice->"+resBody.toString());
       }
       else if (response.statusCode == 400)
       {
-        isResponseReceived=true;
-        setState(() {});
-        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
+        global.helperClass.showAlertDialog(context, "", "User is not Child/Access Denied", false, "");
       }
       else if (response.statusCode == 500)
       {
-        isResponseReceived=true;
-        setState(() {});
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
-      isResponseReceived=true;
-      setState(() {});
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
-
   }
 
   void deleteConfirmationPopup(String devUniqueID,DeviceObjectAllAccount deviceObject,int index)
@@ -194,7 +195,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Text("Are you sure you want to delete the \'"+deviceObject.name.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                          new Text("Are you sure you want to untag the \'"+deviceObject.name.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
                         ],
                       ),
                     ),
@@ -230,7 +231,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                                 FlatButton(
                                   child: Text("OK", style: TextStyle(fontSize: global.font15,color:global.mainColor,fontStyle: FontStyle.normal)),
                                   onPressed: () async {
-                                    deleteDevice(devUniqueID,index);
+                                    unTagDevice(devUniqueID,index);
                                     Navigator.of(context).pop();
                                   },
                                 )
@@ -247,38 +248,119 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
         });
   }
 
+  void showTagDevicePopup() async
+  {
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+
+          return Dialog(
+            backgroundColor: global.transparent,
+            child: Container(
+
+              decoration: BoxDecoration(
+                color: global.popupBackColor,
+                border: Border.all(color:global.popupBackColor, width: 1.0),
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+              ),
+              child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 18, 0, 0),
+                  child:SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child:Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        new Container(
+                            padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+                            child: new Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                new Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                      flex: 3,
+                                      fit: FlexFit.tight,
+                                      child: new Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          new Text("Tag Devices", style: TextStyle(fontSize: global.font20,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishSemiBold')),
+                                        ],
+                                      ),
+                                    ),
+                                    Flexible(
+                                      flex: 1,
+                                      fit: FlexFit.tight,
+                                      child: new Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          GestureDetector(
+                                            onTap:(){
+                                              Navigator.of(context).pop();
+                                            },
+                                            child:new Container(
+                                              width:20,
+                                              height:20,
+                                              child: Image(image: AssetImage('assets/close-red-icon.png')),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height:10),
+                                TagDevicePopup(deviceList: listOfDevices,selecteduserID: lastSelectedUser,),
+                              ],
+                            )
+                        ),
+                        SizedBox(height: 20,),
+                      ],
+                    ),
+                  )
+              ),
+            ),
+          );
+        });
+
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-            appBar:AppBar(
-              titleSpacing: 0.0,
-              elevation: 5,
-              automaticallyImplyLeading: false,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  GestureDetector(
-                          onTap: (){_onbackButtonPressed();},
-                          child: new Container(
-                            height: 25,
-                            child:Image(image: AssetImage('assets/back-arrow.png')),
-                          )
-                      )
-                  ),
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  new Text("UserDevices",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                  ),
-                ],
-              ),
-              backgroundColor:global.screenBackColor,
-            ),
+//            appBar:AppBar(
+//              titleSpacing: 0.0,
+//              elevation: 5,
+//              automaticallyImplyLeading: false,
+//              title: Row(
+//                mainAxisAlignment: MainAxisAlignment.start,
+//                crossAxisAlignment: CrossAxisAlignment.center,
+//                children: [
+//                  Container(
+//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                      child:  GestureDetector(
+//                          onTap: (){_onbackButtonPressed();},
+//                          child: new Container(
+//                            height: 25,
+//                            child:Image(image: AssetImage('assets/back-arrow.png')),
+//                          )
+//                      )
+//                  ),
+//                  Container(
+//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                      child:  new Text("UserDevices",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+//                  ),
+//                ],
+//              ),
+//              backgroundColor:global.screenBackColor,
+//            ),
             body:new Container(
                 child:  new Container(
                   color: global.screenBackColor,
@@ -364,6 +446,37 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                             ],
                           ),
                         ),
+                        isResponseReceived && isDeviceFound?SliverList(
+                            delegate:SliverChildListDelegate(
+                                [
+                                  new Container(
+                                      height: 50,
+                                      child: Container(
+                                        width: MediaQuery.of(context).size.width,
+                                        decoration: BoxDecoration(
+                                          color: global.mainColor,
+                                          border: Border.all(color: global.mainColor, width: 1.0),
+                                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                        ),
+                                        padding: EdgeInsets.fromLTRB(0,2,0,2),
+                                        child: FlatButton(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          child: Text('Tag Device',style: TextStyle(fontSize: global.font15,fontStyle: FontStyle.normal,fontFamily: 'MulishBold'),),
+                                          textColor: global.whiteColor,
+                                          onPressed: () {
+                                            showTagDevicePopup();
+                                          },
+                                        ),
+                                      )
+                                  )
+                                ]
+                            ) ):SliverList(
+                            delegate:SliverChildListDelegate(
+                                [
+                                  new Container(width: 0,height: 0,)
+                                ]
+                            )),
+
                         isResponseReceived?(isDeviceFound?SliverList(
                             delegate: SliverChildBuilderDelegate((context, index)
                             {

@@ -1,5 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
+import 'package:thingsuptrackapp/activities/DeviceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/DevicesScreen.dart';
 import 'package:thingsuptrackapp/activities/GeofenceScreen.dart';
 import 'package:thingsuptrackapp/activities/GoogleMapScreen.dart';
@@ -30,7 +31,7 @@ void main() async {
   {
     if (isUserLoggedIn)
     {
-      _defaultHome = new UserSharedDevicesScreen();
+      _defaultHome = new DeviceManagementScreen();
     }
   }
 
