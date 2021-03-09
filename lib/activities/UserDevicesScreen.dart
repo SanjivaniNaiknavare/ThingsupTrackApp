@@ -6,7 +6,8 @@ import 'package:http/http.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
-import 'package:thingsuptrackapp/helpers/ListOfDevices.dart';
+import 'package:thingsuptrackapp/helperClass/UserObject.dart';
+import 'package:thingsuptrackapp/helpers/ListOfUserDevices.dart';
 import 'package:thingsuptrackapp/helpers/TagDevicePopup.dart';
 
 class UserDevicesScreen extends StatefulWidget
@@ -34,10 +35,96 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
   {
     super.initState();
 
-    listOfUsers.add("sanju@gmail.com");
-    listOfUsers.add("sanju10@gmail.com");
-    listOfUsers.add("sanju11@gmail.com");
 
+//    listOfUsers.add("sanju@gmail.com");
+//    listOfUsers.add("sanju10@gmail.com");
+//    listOfUsers.add("sanju11@gmail.com");
+
+    getUsers();
+  }
+
+  void getUsers() async
+  {
+    isResponseReceived=false;
+    listOfUsers.clear();
+    global.myUsers.clear();
+    if(mounted) {
+      setState(() {});
+    }
+    Response response=await global.apiClass.GetChildUsers();
+    if(response!=null)
+    {
+      print(LOGTAG+" getChildUsers statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getChildUsers->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        int statusLength=resBody.toString().length;
+        print(LOGTAG+" statusLength->"+statusLength.toString());
+
+        if(statusLength>30)
+        {
+          List<dynamic> payloadList=resBody;
+          for (int i = 0; i < payloadList.length; i++)
+          {
+            int id = payloadList.elementAt(i)['id'];
+            String email = payloadList.elementAt(i)['email'];
+            String name = payloadList.elementAt(i)['name'];
+            String password = payloadList.elementAt(i)['password'];
+            String role = payloadList.elementAt(i)['role'];
+            int disabledInt = payloadList.elementAt(i)['disabled'];
+            String phone = payloadList.elementAt(i)['phone'];
+            int twelvehourformatInt = payloadList.elementAt(i)['twelvehourformat'];
+            String customMap = payloadList.elementAt(i)['custommap'];
+            bool disabled = false;
+            bool twelvehourformat = false;
+
+            if (disabledInt == 1)
+            {
+              disabled = true;
+            }
+
+            if (twelvehourformatInt == 1)
+            {
+              twelvehourformat = true;
+            }
+
+            UserObject userObject = new UserObject(id: id, email: email, name: name, password: password, role: role, disabled: disabled, phone: phone, twelvehourformat: twelvehourformat, custommap: customMap, devices: "");
+            listOfUsers.add(email);
+            global.myUsers.putIfAbsent(email, () => userObject);
+          }
+          isResponseReceived=true;
+        }
+        else
+        {
+          String status=resBody['status'];
+          if(status.toString().compareTo("Childs not found")==0)
+          {
+            isResponseReceived=true;
+          }
+        }
+        if(mounted) {
+          setState(() {});
+        }
+      }
+      else if (response.statusCode == 500)
+      {
+        isResponseReceived=true;
+        if(mounted) {
+          setState(() {});
+        }
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      isResponseReceived=true;
+      if(mounted) {
+        setState(() {});
+      }
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
   }
 
   Future<bool> _onbackButtonPressed()
@@ -63,7 +150,9 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
     {
       isResponseReceived=false;
       isDeviceFound=false;
-      setState(() {});
+      if(mounted) {
+        setState(() {});
+      }
 
       Response response=await global.apiClass.GetTaggedDevices(_selectedUser);
       if(response!=null)
@@ -76,7 +165,9 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
           if(resBody.toString().contains("Devices not found"))
           {
             isResponseReceived=true;
-            setState(() {});
+            if(mounted) {
+              setState(() {});
+            }
             global.helperClass.showAlertDialog(context, "", "Device not found", false, "");
           }
           else
@@ -113,21 +204,26 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
             {
               isDeviceFound=true;
             }
-
-            setState(() {});
+            if(mounted) {
+              setState(() {});
+            }
 
           }
         }
         else if (response.statusCode == 400)
         {
           isResponseReceived=true;
-          setState(() {});
+          if(mounted) {
+            setState(() {});
+          }
           global.helperClass.showAlertDialog(context, "", "User is not Child/Access Denied", false, "");
         }
         else if (response.statusCode == 500)
         {
           isResponseReceived=true;
-          setState(() {});
+          if(mounted) {
+            setState(() {});
+          }
           global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
         }
       }
@@ -156,7 +252,9 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
       {
         var resBody = json.decode(response.body);
         listOfDevices.removeAt(index);
-        setState(() {});
+        if(mounted) {
+          setState(() {});
+        }
         print(LOGTAG+" untagUserFromDevice->"+resBody.toString());
       }
       else if (response.statusCode == 400)
@@ -482,7 +580,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                             {
                               return Container(
                                 color: global.transparent,
-                                child: ListOfDevices(index: index, deviceObject: listOfDevices[index],onTabClicked: (flag){
+                                child: ListOfUserDevices(index: index, deviceObject: listOfDevices[index],onTabClicked: (flag){
 
                                   deleteConfirmationPopup(listOfDevices[index].uniqueid,listOfDevices[index],index);
 

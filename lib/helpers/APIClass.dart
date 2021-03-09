@@ -707,4 +707,121 @@ class APIClass
     return flag;
   }
 
+
+  Future<Response> GetDrivers() async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/driver/";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" GetDrivers url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> AddDriver(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/driver/";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" AddDriver url->"+url);
+
+    Response response = await put(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      print(error);
+      return null;
+    }).timeout(Duration(milliseconds: 30000),onTimeout: (){
+      print("Timeout error");
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> UpdateDriver(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/driver/";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" UpdateDriver url->"+url);
+
+    Response response = await post(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+
+  Future<Response> DeleteDriver(String id) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/driver/";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    Map<String, String> queryParams = {
+      'id': id,
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" DeleteDriver url->"+url);
+
+    Response response = await delete(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
 }

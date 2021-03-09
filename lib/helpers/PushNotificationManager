@@ -1,0 +1,42 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class PushNotificationsManager {
+
+  PushNotificationsManager._();
+
+  factory PushNotificationsManager() => _instance;
+  static final PushNotificationsManager _instance = PushNotificationsManager._();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  bool _initialized = false;
+
+  Future<void> init() async
+  {
+    if (!_initialized)
+    {
+      String token = await _firebaseMessaging.getToken();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String prevToken=prefs.getString("FCMToken");
+      if(prevToken==null)
+      {
+        prefs.setString("FCMToken",token);
+      }
+      else
+      {
+        if(prevToken.toString().compareTo(token.toString())!=0)
+        {
+          await _firebaseMessaging.subscribeToTopic('weather');
+        }
+        else
+        {
+          await _firebaseMessaging.unsubscribeFromTopic('weather');
+          await _firebaseMessaging.subscribeToTopic('weather');
+        }
+      }
+
+      print("FirebaseMessaging token: $token");
+      _initialized = true;
+    }
+  }
+}

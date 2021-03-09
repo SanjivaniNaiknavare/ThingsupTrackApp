@@ -229,4 +229,57 @@ class AttributeClass
   };
 }
 
+class AddDriverClass
+{
+  AddDriverClass({this.name,this.phone,this.photo,this.attributes});
+
+  String name;
+  String phone;
+  String photo;
+  String attributes;
+
+  AddDriverClass.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        phone = json['phone'],
+        photo = json['photo'],
+        attributes = json['attributes'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name':name,
+      'phone':phone,
+      'photo':photo,
+      'attributes':attributes,
+    };
+  }
+}
+
+class UpdateDriverClass
+{
+  UpdateDriverClass({this.id,this.name,this.phone,this.photo,this.attributes});
+
+  String id;
+  String name;
+  String phone;
+  String photo;
+  String attributes;
+
+  UpdateDriverClass.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        phone = json['phone'],
+        photo = json['photo'],
+        attributes = json['attributes'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id':id,
+      'name':name,
+      'phone':phone,
+      'photo':photo,
+      'attributes':attributes,
+    };
+  }
+}
+
 

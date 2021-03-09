@@ -66,49 +66,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       phoneController.text=widget.userObject.phone;
       twelveHourFormat=widget.userObject.twelvehourformat;
     }
-
-
     setState(() {});
   }
 
-
-  void deleteUser(String userindex) async
-  {
-    isResponseReceived=false;
-    setState(() {});
-
-    Response response=await global.apiClass.DeleteUser(userindex);
-    if(response!=null)
-    {
-      print(LOGTAG+" deleteUser statusCode->"+response.statusCode.toString());
-      print(LOGTAG+" delete user->"+response.body.toString());
-
-      if (response.statusCode == 200)
-      {
-        var resBody = json.decode(response.body);
-        global.lastFunction="deleteUser";
-        _onbackButtonPressed();
-      }
-      else if (response.statusCode == 400)
-      {
-        isResponseReceived=true;
-        setState(() {});
-        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
-      }
-      else if (response.statusCode == 500)
-      {
-        isResponseReceived=true;
-        setState(() {});
-        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
-      }
-    }
-    else
-    {
-      isResponseReceived=true;
-      setState(() {});
-      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
-    }
-  }
 
   void addUser() async
   {
@@ -335,77 +295,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   }
 
-  void deleteConfirmationPopup(String selindex)
-  {
-    showDialog(
-        context: context,
-        builder: (BuildContext context)
-        {
-          return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            child: Container(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 18, 10, 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    new Container(
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new Text("Are you sure you want to delete the \'"+widget.userObject.email.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    new Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: new BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
-                      ),
-                    ),
-                    new Row(
-                      children: <Widget>[
-                        Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child:new Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                FlatButton(
-                                  child: Text("Cancel", style: TextStyle(fontSize: global.font15,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
-                                  onPressed: (){ Navigator.of(context).pop(); },
-                                )
-                              ],
-                            )
-                        ),
-                        Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child:new Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                FlatButton(
-                                  child: Text("OK", style: TextStyle(fontSize: global.font15,color:global.mainColor,fontStyle: FontStyle.normal)),
-                                  onPressed: () async {
-                                    deleteUser(selindex);
-                                    Navigator.of(context).pop();
-                                  },
-                                )
-                              ],
-                            )
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-  }
+
 
   Future<bool> _onbackButtonPressed()
   {
@@ -912,26 +802,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                       SizedBox(height: 15,),
                       widget.userObject!=null?new Row(
                         children: <Widget>[
-                          Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                              padding: EdgeInsets.fromLTRB(0,0,5,0),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                              child:new Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 50,
-                                child: new RaisedButton(
-                                    onPressed: () {
-                                      deleteConfirmationPopup(widget.userObject.email);
-                                    },
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),side: BorderSide(color: Color(0xffF7716E))),
-                                    color: global.whiteColor,
-                                    child:new Text('Delete User', style: TextStyle(fontSize: global.font14, color: Color(0xffF7716E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                                ),
-                              ),
-                            ),
-                          ),
                           Flexible(
                             flex:1,
                             fit: FlexFit.tight,

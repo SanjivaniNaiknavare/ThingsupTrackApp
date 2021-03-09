@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
+import 'package:thingsuptrackapp/activities/UserManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/DeviceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/DevicesScreen.dart';
 import 'package:thingsuptrackapp/activities/GeofenceScreen.dart';
@@ -11,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:thingsuptrackapp/helpers/PushNotificationManager';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thingsuptrackapp/activities/UserDevicesScreen.dart';
@@ -31,7 +37,7 @@ void main() async {
   {
     if (isUserLoggedIn)
     {
-      _defaultHome = new DeviceManagementScreen();
+      _defaultHome = new UserManagementScreen();
     }
   }
 
@@ -51,6 +57,28 @@ class _MyAppState extends State<MyApp> {
 
   FirebaseAnalytics analytics = FirebaseAnalytics();
   FirebaseAuth _auth;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  Future _showNotificationWithoutSound(String title, String body,String url,String receiptID,String mobileNo, String countryCode) async
+  {
+
+    String payload=receiptID;
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails('your channel id', 'your channel name', 'your channel description', playSound: false, importance: Importance.Max, priority: Priority.High,
+      icon: 'ic_app_icon',
+     // largeIcon: FilePathAndroidBitmap(largeIconPath),
+      largeIcon: DrawableResourceAndroidBitmap('app_icon'),
+    );
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails(presentSound: false);
+    var platformChannelSpecifics = new NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: payload,
+    );
+  }
 
   @override
   void initState()
@@ -62,6 +90,62 @@ class _MyAppState extends State<MyApp> {
     global.helperClass=new HelperClass();
     global.apiClass=new APIClass();
     getPermissions();
+
+
+    PushNotificationsManager pushNotificationManager=new PushNotificationsManager();
+    pushNotificationManager.init();
+
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.requestNotificationPermissions(const IosNotificationSettings(sound: true,badge: true, alert: true, provisional: true));
+    _firebaseMessaging.configure();
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('Firebase on message $message');
+
+
+        if(Platform.isAndroid)
+        {
+          print("noti title:"+message['notification']['title'].toString());
+          print("noti body:"+message['notification']['body'].toString());
+          print("noti image:"+message['notification']['image'].toString());
+
+          print("data image:" + message['data']['image'].toString());
+          print("data receiptID:" + message['data']['receiptId'].toString());
+          print("data mobNo:" + message['data']['mobileNo'].toString());
+          print("data cc:" + message['data']['countryCode'].toString());
+
+          if (message['data']['image'] != null &&
+              message['data']['receiptId'] != null &&
+              message['data']['mobileNo'] != null &&
+              message['data']['countryCode'] != null) {
+            _showNotificationWithoutSound(
+                message['notification']['title'],
+                message['notification']['body'],
+                message['data']['image'], message['data']['receiptId'],
+                message['data']['mobileNo'], message['data']['countryCode']);
+          }
+          else {
+
+            print("MainClass:" + " on message else is called");
+            _showNotificationWithoutSound(
+                message['notification']['title'],
+                message['notification']['body'],
+                "","","","");
+          }
+        }
+      },
+
+      onResume: (Map<String, dynamic> message) async {
+        print('Firebase on resume $message');
+
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('Firebase on launch $message');
+
+      },
+    );
+
   }
 
   void initDBHelper() async

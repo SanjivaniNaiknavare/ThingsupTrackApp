@@ -31,9 +31,24 @@ class TagDevicePopupState extends State<TagDevicePopup>
     super.initState();
 
 
-    for(int k=0;k<widget.deviceList.length;k++)
+    for(var key in global.myDevices.keys)
     {
-      deviceListStrList.add("my first device"+k.toString());
+      bool isPresent=false;
+      for(int k=0;k<widget.deviceList.length;k++)
+      {
+        DeviceObjectAllAccount deviceObjectAllAccount=widget.deviceList.elementAt(k);
+        if(deviceObjectAllAccount.uniqueid.toString().compareTo(key)==0)
+        {
+          isPresent=true;
+        }
+      }
+
+      if(!isPresent)
+      {
+        DeviceObjectAllAccount deviceObj=global.myDevices[key];
+        String tempData=key.toString()+"["+deviceObj.name.toString()+"]";
+        deviceListStrList.add(tempData);
+      }
     }
     setState(() {});
   }

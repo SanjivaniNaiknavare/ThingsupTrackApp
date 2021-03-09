@@ -1,39 +1,33 @@
-
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
-import 'package:thingsuptrackapp/helperClass/SharedDeviceObject.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 
 
-class ListOfSharedDevices extends StatefulWidget
+class ListOfUserDevices extends StatefulWidget
 {
-  ListOfSharedDevices({Key key,this.index,this.sharedDeviceObject,this.onTabClicked}) : super(key: key);
+  ListOfUserDevices({Key key,this.index,this.deviceObject,this.onTabClicked}) : super(key: key);
   int index;
   ValueChanged<bool> onTabClicked;
-  SharedDeviceObject sharedDeviceObject;
+  DeviceObjectAllAccount deviceObject;
 
   @override
-  _ListOfSharedDevicesState createState() => _ListOfSharedDevicesState();
+  _ListOfUserDevicesState createState() => _ListOfUserDevicesState();
 }
 
-class _ListOfSharedDevicesState extends State<ListOfSharedDevices>
+class _ListOfUserDevicesState extends State<ListOfUserDevices>
 {
 
-  String LOGTAG="ListOfSharedDevices";
+  String LOGTAG="ListOfUserDevices";
   bool status = false;
-
-  DeviceObjectAllAccount deviceObject;
 
   @override
   void initState(){
     super.initState();
 
-    print(global.myDevices);
-    if(global.myDevices.length>0)
-    {
-      deviceObject=global.myDevices[widget.sharedDeviceObject.deviceid];
-    }
+
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +58,10 @@ class _ListOfSharedDevicesState extends State<ListOfSharedDevices>
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                deviceObject!=null?new Text(deviceObject.name.toString(), style: new TextStyle(fontSize: global.font16, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
-                                new Text("DeviceName", style: new TextStyle(fontSize: global.font16, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                deviceObject!=null?new Text("https://dev.track.thingsup.io/livedata?token="+widget.sharedDeviceObject.token.toString(), style: new TextStyle(fontSize: global.font12, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):new Container(width: 0,height: 0,),
+                                new Text(widget.deviceObject.uniqueid.toString(), style: new TextStyle(fontSize: global.font16, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                new Text(widget.deviceObject.name.toString(), style: new TextStyle(fontSize: global.font14, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+//                                new Text("Role: "+widget.userObject.role.toString(), style: new TextStyle(fontSize: global.font14, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+
                               ],
                             )
                         ),

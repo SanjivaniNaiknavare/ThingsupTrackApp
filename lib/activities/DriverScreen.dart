@@ -1,166 +1,122 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
+import 'package:thingsuptrackapp/activities/DriverDetailsScreen.dart';
+import 'package:thingsuptrackapp/activities/UserDetailsScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
-import 'package:thingsuptrackapp/helperClass/SharedDeviceObject.dart';
-import 'package:thingsuptrackapp/helpers/ListOfSharedDevices.dart';
+import 'package:thingsuptrackapp/helperClass/DriverObject.dart';
+import 'package:thingsuptrackapp/helperClass/UserObject.dart';
+import 'package:thingsuptrackapp/helpers/ListOfDrivers.dart';
+import 'package:thingsuptrackapp/helpers/ListOfUsers.dart';
 
-class UserSharedDevicesScreen extends StatefulWidget
+
+class DriverScreen extends StatefulWidget
 {
   @override
-  _UserSharedDevicesScreenState createState() => _UserSharedDevicesScreenState();
+  _DriverScreenState createState() => _DriverScreenState();
 }
 
-class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
+class _DriverScreenState extends State<DriverScreen>
 {
+  String LOGTAG="DriverScreen";
 
-  String LOGTAG = "UserSharedDevicesScreen";
-
-  bool isResponseReceived = true;
-  bool isAPICalled = false;
-  bool isDeviceFound = false;
-  bool sensorValidate = false;
-
+  List<DeviceObjectOwned> listofDevices=new List();
+  List<DriverObject> listOfDrivers=new List();
   ScrollController _scrollController=new ScrollController();
-  List<SharedDeviceObject> listOfDevices = new List();
-  List<DeviceObjectAllAccount> myDeviceList = new List();
+  bool isResponseReceived=false;
+  bool isDriverFound=false;
 
   @override
   void initState()
   {
+    getDrivers();
     super.initState();
-
-
-    getSharedDevices();
-
   }
 
 
-  void getSharedDevices() async
+  void getDrivers() async
   {
     isResponseReceived=false;
-    isDeviceFound=false;
-    listOfDevices.clear();
+    isDriverFound=false;
+    listOfDrivers.clear();
+    global.myUsers.clear();
+    setState(() {});
 
-    if(mounted) {
-      setState(() {});
-    }
-
-    Response response=await global.apiClass.GetSharingDevices();
-    print(LOGTAG+" getSharedDevices response->"+response.toString());
-
+    Response response=await global.apiClass.GetDrivers();
     if(response!=null)
     {
-      print(LOGTAG+" getSharedDevices statusCode->"+response.statusCode.toString());
-      if (response.statusCode == 200) {
-        var resBody = json.decode(response.body);
-        print(LOGTAG + " getSharedDevices->" + resBody.toString());
-
-        String status = resBody['status'];
-        if (status.toString().contains("success"))
-        {
-          List<dynamic> payloadList = resBody;
-          print(LOGTAG + " payloadList->" + payloadList.length.toString());
-
-          for (int i = 0; i < payloadList.length; i++)
-          {
-            int id = payloadList.elementAt(i)['id'];
-            int deviceid = payloadList.elementAt(i)['deviceid'];
-            int userid = payloadList.elementAt(i)['userid'];
-            String token = payloadList.elementAt(i)['token'];
-
-            SharedDeviceObject sharedDeviceObject = new SharedDeviceObject(id: id, deviceid: deviceid, userid: userid, token: token);
-            listOfDevices.add(sharedDeviceObject);
-          }
-
-          isResponseReceived = true;
-          if (listOfDevices.length > 0)
-          {
-            isDeviceFound = true;
-          }
-          if(mounted) {
-            setState(() {});
-          }
-        }
-        else if(status.toString().contains("Devices not found"))
-        {
-          isResponseReceived = true;
-          isDeviceFound = false;
-          if(mounted) {
-            setState(() {});
-          }
-        }
-      }
-      else if (response.statusCode == 500)
-      {
-        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
-      }
-    }
-    else
-    {
-      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
-    }
-  }
-
-  Future<bool> _onbackButtonPressed() {
-    Navigator.of(context).pop();
-  }
-
-  void deleteSharing(int id,int listindex) async
-  {
-
-    isResponseReceived=false;
-    if(mounted) {
-      setState(() {});
-    }
-
-    Response response=await global.apiClass.DeleteSharingDevice(id.toString());
-    if(response!=null)
-    {
-      print(LOGTAG+" deleteSharing statusCode->"+response.statusCode.toString());
-      print(LOGTAG+" deleteSharing body->"+response.body.toString());
+      print(LOGTAG+" getDrivers statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getDrivers->"+response.body.toString());
 
       if (response.statusCode == 200)
       {
-        isResponseReceived=true;
-        listOfDevices.removeAt(listindex);
-        if(mounted) {
+        var resBody = json.decode(response.body);
+
+        int resLength=resBody.toString().length;
+        print(LOGTAG+" resLength->"+resLength.toString());
+
+        if(resLength>30)
+        {
+          List<dynamic> payloadList = resBody;
+          for (int i = 0; i < payloadList.length; i++)
+          {
+            int id = payloadList.elementAt(i)['id'];
+            int driverid = payloadList.elementAt(i)['driverid'];
+            String name = payloadList.elementAt(i)['name'];
+            String phone = payloadList.elementAt(i)['phone'];
+            String photo = payloadList.elementAt(i)['photo'];
+            String attributes = payloadList.elementAt(i)['attributes'];
+            DriverObject driverObject = new DriverObject(id: id.toString(), driverid: driverid.toString(), name: name, phone: phone, photo: photo, attributes: attributes);
+            listOfDrivers.add(driverObject);
+          }
+          isResponseReceived = true;
+          if (listOfDrivers.length > 0) {
+            isDriverFound = true;
+          }
           setState(() {});
         }
-        global.helperClass.showAlertDialog(context, "", "Device sharing deleted successfully", false, "");
-      }
-      else if (response.statusCode == 400)
-      {
-        isResponseReceived=true;
-        if(mounted) {
-          setState(() {});
+        else
+        {
+          String status=resBody['status'];
+          if(status.toString().compareTo("Drivers not found")==0)
+          {
+            isResponseReceived=true;
+            isDriverFound = false;
+            setState(() {});
+          }
         }
-        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
       }
       else if (response.statusCode == 500)
       {
-        isResponseReceived=true;
-        if(mounted) {
-          setState(() {});
-        }
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
-      isResponseReceived=true;
-      if(mounted) {
-        setState(() {});
-      }
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
   }
 
+  void onTabClicked(int index, DriverObject driverObject) async
+  {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DriverDetailsScreen(index: index,driverObject: driverObject))).then((value) => ({
 
-  void deleteConfirmationPopup(SharedDeviceObject deviceObject,int index)
+      if(global.lastFunction.toString().contains("addDriver")){
+        global.helperClass.showAlertDialog(context, "", "Driver added successfully", false, "")
+      }
+      else if(global.lastFunction.toString().contains("updateDriver")){
+        global.helperClass.showAlertDialog(context, "", "Driver updated successfully", false, "")
+      },
+      getDrivers()
+    }));
+  }
+
+
+  void deleteConfirmationPopup(DriverObject driverObject,int selindex)
   {
     showDialog(
         context: context,
@@ -181,16 +137,14 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Text("Are you sure you want to delete the \'"+"DeviceName"+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                          new Text("Are you sure you want to delete the \'"+driverObject.name.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
                         ],
                       ),
                     ),
                     SizedBox(height: 20,),
                     new Container(
                       width: MediaQuery.of(context).size.width,
-                      decoration: new BoxDecoration(
-                        color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
+                      decoration: new BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
                       ),
                     ),
                     new Row(
@@ -217,7 +171,7 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                                 FlatButton(
                                   child: Text("OK", style: TextStyle(fontSize: global.font15,color:global.mainColor,fontStyle: FontStyle.normal)),
                                   onPressed: () async {
-                                    deleteSharing(deviceObject.id,index);
+                                    deleteDriver(driverObject,selindex);
                                     Navigator.of(context).pop();
                                   },
                                 )
@@ -234,46 +188,68 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
         });
   }
 
+  void deleteDriver(DriverObject driverObject,int index) async
+  {
+    isResponseReceived=false;
+    setState(() {});
+
+    Response response=await global.apiClass.DeleteDriver(driverObject.id);
+    if(response!=null)
+    {
+      print(LOGTAG+" deleteDriver statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" deleteDriver body->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+
+        var resBody = json.decode(response.body);
+        listOfDrivers.removeAt(index);
+        isResponseReceived=true;
+        if(listOfDrivers.length==0)
+        {
+          isDriverFound=false;
+        }
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "Driver deleted successfully", false, "");
+
+      }
+      else if (response.statusCode == 400)
+      {
+        isResponseReceived=true;
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "Driver Not Found", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        isResponseReceived=true;
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      isResponseReceived=true;
+      setState(() {});
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+
+  }
+
+
+
+  Future<bool> _onbackButtonPressed()
+  {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-//          appBar: AppBar(
-//            titleSpacing: 0.0,
-//            elevation: 5,
-//            automaticallyImplyLeading: false,
-//            title: Row(
-//              mainAxisAlignment: MainAxisAlignment.start,
-//              crossAxisAlignment: CrossAxisAlignment.center,
-//              children: [
-//                Container(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: GestureDetector(
-//                        onTap: () {
-//                          _onbackButtonPressed();
-//                        },
-//                        child: new Container(
-//                          height: 25,
-//                          child: Image(
-//                              image: AssetImage('assets/back-arrow.png')),
-//                        )
-//                    )
-//                ),
-//                Container(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: new Text("UserDevices", style: TextStyle(
-//                        fontSize: global.font18,
-//                        color: global.mainColor,
-//                        fontWeight: FontWeight.normal,
-//                        fontFamily: 'MulishRegular'))
-//                ),
-//              ],
-//            ),
-//            backgroundColor: global.screenBackColor,
-//          ),
           body: isResponseReceived?(
-              !isDeviceFound?new Stack(
+              !isDriverFound?new Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
                   new Container(
@@ -309,7 +285,7 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Device Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+                          child: new Text('No Driver Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
                         )
                       ],
                     ),
@@ -322,26 +298,30 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                     margin:EdgeInsets.fromLTRB(8,10,8,10),
                     child: CustomScrollView(
                         controller: _scrollController,
-                        physics: AlwaysScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         slivers: <Widget>[
                           SliverList(
                               delegate: SliverChildBuilderDelegate((context, index)
                               {
                                 return Container(
                                   color: global.transparent,
-                                  child: ListOfSharedDevices(index: index, sharedDeviceObject: listOfDevices[index],onTabClicked: (flag){
-
-                                    deleteConfirmationPopup(listOfDevices[index],index);
-
+                                  child: ListOfDrivers(index: index, driverObject: listOfDrivers[index],onTabCicked: (flag){
+                                    if(flag.toString().compareTo("Edit")==0)
+                                    {
+                                      onTabClicked(index, listOfDrivers[index]);
+                                    }
+                                    else if(flag.toString().compareTo("Delete")==0)
+                                    {
+                                      deleteConfirmationPopup(listOfDrivers[index],index);
+                                    }
                                   },
                                   ),
                                 );
-                              }, childCount: listOfDevices.length)
+                              }, childCount: listOfDrivers.length)
                           )
                         ]
                     ),
                   )
-                  //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
                 ],
               )
           ):new Container(
@@ -355,6 +335,15 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                     strokeWidth: 5,),
                 ),
               )
+          ),
+          floatingActionButton:FloatingActionButton(
+            child: new Container(
+              child:Icon(Icons.add,color: global.whiteColor,),
+            ),
+            backgroundColor: global.mainColor,
+            onPressed: () {
+              onTabClicked(null,null);
+            },
           ),
         )
     );

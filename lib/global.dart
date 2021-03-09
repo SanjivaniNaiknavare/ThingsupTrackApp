@@ -3,6 +3,7 @@ import 'package:thingsuptrackapp/HelperClass.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/helpers/APIClass.dart';
+import 'helperClass/DeviceObject.dart';
 
 
 Color greenColor=Color(0xff00D355);
@@ -55,4 +56,9 @@ String userID="";
 String userRole="manager";
 String lastFunction="";
 
-Map<int,dynamic> myAllDevices=new Map();
+
+
+List<DeviceObjectOwned> listofOwnedDevices=new List();
+Map<String,dynamic> myDevices=new Map();
+Map<String,dynamic> myUsers=new Map();
+

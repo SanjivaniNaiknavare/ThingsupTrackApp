@@ -894,7 +894,8 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
                   ),
                   Container(
                       padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  new Text("Device Details",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                      child: widget.deviceObjectAllAccount!=null?new Text("Edit Device",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
+                      new Text("Add Device",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                   ),
                 ],
               ),

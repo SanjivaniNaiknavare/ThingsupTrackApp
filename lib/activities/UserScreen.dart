@@ -37,6 +37,8 @@ class _UserScreenState extends State<UserScreen>
 
   void getOwnedDevices() async
   {
+    listofDevices.clear();
+    global.listofOwnedDevices.clear();
     Response response=await global.apiClass.GetOwnedDevices();
     if(response!=null)
     {
@@ -69,6 +71,7 @@ class _UserScreenState extends State<UserScreen>
           }
           DeviceObjectOwned deviceObjectOwned=new DeviceObjectOwned(name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
           listofDevices.add(deviceObjectOwned);
+          global.listofOwnedDevices.add(deviceObjectOwned);
         }
       }
       else if (response.statusCode == 500)
@@ -87,6 +90,7 @@ class _UserScreenState extends State<UserScreen>
     isResponseReceived=false;
     isUserFound=false;
     listOfUsers.clear();
+    global.myUsers.clear();
     setState(() {});
 
     Response response=await global.apiClass.GetChildUsers();
@@ -98,40 +102,63 @@ class _UserScreenState extends State<UserScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        List<dynamic> payloadList=resBody;
-        for (int i = 0; i < payloadList.length; i++)
-        {
-          int id= payloadList.elementAt(i)['id'];
-          String email= payloadList.elementAt(i)['email'];
-          String name = payloadList.elementAt(i)['name'];
-          String password = payloadList.elementAt(i)['password'];
-          String role = payloadList.elementAt(i)['role'];
-          int disabledInt = payloadList.elementAt(i)['disabled'];
-          String phone = payloadList.elementAt(i)['phone'];
-          int twelvehourformatInt= payloadList.elementAt(i)['twelvehourformat'];
-          String customMap=payloadList.elementAt(i)['custommap'];
-          bool disabled=false;
-          bool twelvehourformat=false;
 
-          if(disabledInt==1)
-          {
-            disabled=true;
+        int resLength=resBody.toString().length;
+        print(LOGTAG+" resLength->"+resLength.toString());
+
+        if(resLength>30) {
+          List<dynamic> payloadList = resBody;
+          for (int i = 0; i < payloadList.length; i++) {
+            int id = payloadList.elementAt(i)['id'];
+            String email = payloadList.elementAt(i)['email'];
+            String name = payloadList.elementAt(i)['name'];
+            String password = payloadList.elementAt(i)['password'];
+            String role = payloadList.elementAt(i)['role'];
+            int disabledInt = payloadList.elementAt(i)['disabled'];
+            String phone = payloadList.elementAt(i)['phone'];
+            int twelvehourformatInt = payloadList.elementAt(
+                i)['twelvehourformat'];
+            String customMap = payloadList.elementAt(i)['custommap'];
+            bool disabled = false;
+            bool twelvehourformat = false;
+
+            if (disabledInt == 1) {
+              disabled = true;
+            }
+
+            if (twelvehourformatInt == 1) {
+              twelvehourformat = true;
+            }
+
+            UserObject userObject = new UserObject(id: id,
+                email: email,
+                name: name,
+                password: password,
+                role: role,
+                disabled: disabled,
+                phone: phone,
+                twelvehourformat: twelvehourformat,
+                custommap: customMap,
+                devices: "");
+            listOfUsers.add(userObject);
+            global.myUsers.putIfAbsent(email, () => userObject);
           }
-
-          if(twelvehourformatInt==1)
-          {
-            twelvehourformat=true;
+          isResponseReceived = true;
+          if (listOfUsers.length > 0) {
+            isUserFound = true;
           }
-
-          UserObject userObject=new UserObject(id: id,email: email,name: name,password: password,role: role,disabled: disabled,phone: phone,twelvehourformat: twelvehourformat,custommap: customMap,devices: "");
-          listOfUsers.add(userObject);
+          setState(() {});
         }
-        isResponseReceived=true;
-        if(listOfUsers.length>0)
+        else
         {
-          isUserFound=true;
+          String status=resBody['status'];
+          if(status.toString().compareTo("Childs not found")==0)
+          {
+            isResponseReceived=true;
+            isUserFound = false;
+            setState(() {});
+          }
         }
-        setState(() {});
       }
       else if (response.statusCode == 500)
       {
@@ -153,13 +180,128 @@ class _UserScreenState extends State<UserScreen>
       }
       else if(global.lastFunction.toString().contains("updateUser")){
         global.helperClass.showAlertDialog(context, "", "User updated successfully", false, "")
-      }
-      else if(global.lastFunction.toString().contains("deleteUser")){
-          global.helperClass.showAlertDialog(context, "", "User deleted successfully", false, "")
-        },
+      },
       getUsers()
     }));
   }
+
+
+  void deleteConfirmationPopup(UserObject userObject,int selindex)
+  {
+    showDialog(
+        context: context,
+        builder: (BuildContext context)
+        {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Container(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 18, 10, 0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    new Container(
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          new Text("Are you sure you want to delete the \'"+userObject.email.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    new Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: new BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: Color(0xffdcdcdc), width: 1.0,),),
+                      ),
+                    ),
+                    new Row(
+                      children: <Widget>[
+                        Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child:new Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                FlatButton(
+                                  child: Text("Cancel", style: TextStyle(fontSize: global.font15,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                                  onPressed: (){ Navigator.of(context).pop(); },
+                                )
+                              ],
+                            )
+                        ),
+                        Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child:new Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                FlatButton(
+                                  child: Text("OK", style: TextStyle(fontSize: global.font15,color:global.mainColor,fontStyle: FontStyle.normal)),
+                                  onPressed: () async {
+                                    deleteUser(userObject.email,selindex);
+                                    Navigator.of(context).pop();
+                                  },
+                                )
+                              ],
+                            )
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  void deleteUser(String useremail,int index) async
+  {
+    isResponseReceived=false;
+    setState(() {});
+
+    Response response=await global.apiClass.DeleteUser(useremail);
+    if(response!=null)
+    {
+      print(LOGTAG+" deleteUser statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" delete user->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        listOfUsers.removeAt(index);
+        isResponseReceived=true;
+        if(listOfUsers.length==0)
+        {
+          isUserFound=false;
+        }
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "User deleted successfully", false, "");
+      }
+      else if (response.statusCode == 400)
+      {
+        isResponseReceived=true;
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "User Not Found", false, "");
+      }
+      else if (response.statusCode == 500)
+      {
+        isResponseReceived=true;
+        setState(() {});
+        global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+      }
+    }
+    else
+    {
+      isResponseReceived=true;
+      setState(() {});
+      global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+    }
+  }
+
 
 
   Future<bool> _onbackButtonPressed()
@@ -173,43 +315,6 @@ class _UserScreenState extends State<UserScreen>
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-          appBar:AppBar(
-            titleSpacing: 0.0,
-            elevation: 5,
-            automaticallyImplyLeading: false,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                    child:  GestureDetector(
-                        onTap: (){_onbackButtonPressed();},
-                        child: new Container(
-                          height: 25,
-                          child:Image(image: AssetImage('assets/back-arrow.png')),
-                        )
-                    )
-                ),
-                Container(
-                    padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                    child:  new Text("User Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              GestureDetector(
-                onTap: (){
-                  onTabClicked(null,null);
-                },
-                child: new Container(
-                  width: 50,
-                  child: Icon(Icons.add,color: global.appbarTextColor,),
-                ),
-              )
-            ],
-            backgroundColor:global.screenBackColor,
-          ),
           body: isResponseReceived?(
               !isUserFound?new Stack(
                 alignment: Alignment.center,
@@ -247,7 +352,7 @@ class _UserScreenState extends State<UserScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Geofence Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+                          child: new Text('No User Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
                         )
                       ],
                     ),
@@ -268,7 +373,14 @@ class _UserScreenState extends State<UserScreen>
                                 return Container(
                                   color: global.transparent,
                                   child: ListOfUsers(index: index, userObject: listOfUsers[index],onTabCicked: (flag){
-                                    onTabClicked(index,listOfUsers[index]);
+                                    if(flag.toString().compareTo("Edit")==0)
+                                    {
+                                      onTabClicked(index, listOfUsers[index]);
+                                    }
+                                    else if(flag.toString().compareTo("Delete")==0)
+                                    {
+                                      deleteConfirmationPopup(listOfUsers[index],index);
+                                    }
                                   },
                                   ),
                                 );
@@ -291,6 +403,15 @@ class _UserScreenState extends State<UserScreen>
                 ),
               )
           ),
+//          floatingActionButton:FloatingActionButton(
+//            child: new Container(
+//              child:Icon(Icons.add,color: global.whiteColor,),
+//            ),
+//            backgroundColor: global.mainColor,
+//            onPressed: () {
+//              onTabClicked(null,null);
+//            },
+//          ),
         )
     );
   }

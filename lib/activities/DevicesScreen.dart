@@ -41,8 +41,11 @@ class _DevicesScreenState extends State<DevicesScreen>
     isResponseReceived=false;
     isDeviceFound=false;
     listOfDevices.clear();
+    global.myDevices.clear();
 
-    setState(() {});
+    if(mounted) {
+      setState(() {});
+    }
 
     Response response=await global.apiClass.GetAccountDevices();
     print(LOGTAG+" getAccountDevices response->"+response.toString());
@@ -55,55 +58,80 @@ class _DevicesScreenState extends State<DevicesScreen>
         var resBody = json.decode(response.body);
         print(LOGTAG+" getAccountDevices->"+resBody.toString());
 
-        List<dynamic> payloadList=resBody;
 
-        print(LOGTAG+" payloadList->"+payloadList.length.toString());
+        int reslength=resBody.toString().length;
+        print(LOGTAG+" resBody length->"+reslength.toString());
 
-        for (int i = 0; i < payloadList.length; i++)
+
+        if(reslength>50)
         {
-          int id=payloadList.elementAt(i)['id'];
-          String uniqueid= payloadList.elementAt(i)['uniqueid'];
-          String name = payloadList.elementAt(i)['name'];
-          String type = payloadList.elementAt(i)['type'];
-          String phone = payloadList.elementAt(i)['phone'];
-          String model = payloadList.elementAt(i)['model'];
-          String contact = payloadList.elementAt(i)['contact'];
-          var latlngStatic=payloadList.elementAt(i)['static'];
-          LatLngClass static;
-          if(latlngStatic!=null)
+          List<dynamic> payloadList = resBody;
+          print(LOGTAG + " payloadList->" + payloadList.length.toString());
+
+          for (int i = 0; i < payloadList.length; i++)
           {
-            Map<String, dynamic> datamap = json.decode(latlngStatic);
-            if (datamap.length > 0) {
-              double lat = datamap['lat'];
-              double lng = datamap['lng'];
-              static = new LatLngClass(lat: lat, lng: lng);
+            int id = payloadList.elementAt(i)['id'];
+            String uniqueid = payloadList.elementAt(i)['uniqueid'];
+            String name = payloadList.elementAt(i)['name'];
+            String type = payloadList.elementAt(i)['type'];
+            String phone = payloadList.elementAt(i)['phone'];
+            String model = payloadList.elementAt(i)['model'];
+            String contact = payloadList.elementAt(i)['contact'];
+            var latlngStatic = payloadList.elementAt(i)['static'];
+            LatLngClass static;
+            if (latlngStatic != null)
+            {
+              Map<String, dynamic> datamap = json.decode(latlngStatic);
+              if (datamap.length > 0)
+              {
+                double lat = datamap['lat'];
+                double lng = datamap['lng'];
+                static = new LatLngClass(lat: lat, lng: lng);
+              }
             }
+
+            DeviceObjectAllAccount deviceObjectAllAccount = new DeviceObjectAllAccount(id: id, name: name, uniqueid: uniqueid, static: static, groupid: null, phone: phone.toString(), model: model.toString(), contact: contact.toString(), type: type);
+            listOfDevices.add(deviceObjectAllAccount);
+            global.myDevices.putIfAbsent(uniqueid, () => deviceObjectAllAccount);
           }
 
-          DeviceObjectAllAccount deviceObjectAllAccount=new DeviceObjectAllAccount(id:id,name: name,uniqueid: uniqueid,static: static,groupid: null,phone: phone.toString(),model: model.toString(),contact: contact.toString(),type: type);
-          listOfDevices.add(deviceObjectAllAccount);
+          isResponseReceived=true;
+          if(listOfDevices.length>0)
+          {
+            isDeviceFound=true;
+          }
+          if(mounted) {
+            setState(() {});
+          }
         }
-
-        isResponseReceived=true;
-        if(listOfDevices.length>0)
+        else
         {
-          isDeviceFound=true;
+          String status=resBody['status'];
+          if(status.toString().compareTo("Devices not found")==0)
+          {
+            isResponseReceived=true;
+            isDeviceFound=false;
+            if(mounted) {
+              setState(() {});
+            }
+          }
         }
-        setState(() {});
-        print(LOGTAG+" listOfDevices->"+listOfDevices.length.toString());
-
       }
       else if (response.statusCode == 500)
       {
         isResponseReceived=true;
-        setState(() {});
+        if(mounted) {
+          setState(() {});
+        }
         global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
       }
     }
     else
     {
       isResponseReceived=true;
-      setState(() {});
+      if(mounted) {
+        setState(() {});
+      }
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
 

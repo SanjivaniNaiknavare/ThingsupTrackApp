@@ -1,17 +1,20 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart';
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/UserObject.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
+import 'package:flutter_svg/flutter_svg.dart';
+
 
 
 class ListOfUsers extends StatefulWidget
 {
   ListOfUsers({Key key,this.index,this.userObject,this.onTabCicked}) : super(key: key);
   int index;
-  ValueChanged<bool> onTabCicked;
+  ValueChanged<String> onTabCicked;
   UserObject userObject;
 
   @override
@@ -114,8 +117,6 @@ class _ListOfUsersState extends State<ListOfUsers>
     {
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
-
-
   }
 
 
@@ -123,80 +124,216 @@ class _ListOfUsersState extends State<ListOfUsers>
   Widget build(BuildContext context) {
     return new Container(
         margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-        child:GestureDetector(
-            onTap: (){
-              widget.onTabCicked(true);
-            },
-            child:new Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
-                child:Container(
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    height: 76,
-                    decoration: new BoxDecoration(
-                      color: global.screenBackColor,
-                      boxShadow: [BoxShadow(color: Color.fromRGBO(18,18,18,0.1), blurRadius: 22.0, offset: Offset(0,8),),],
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    ),
-                    child:new Row(
+        child:new Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
+            child:Container(
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                decoration: new BoxDecoration(
+                  color: global.whiteColor,
+                  border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                ),
+                child:new Column(
+                  children: <Widget>[
+                    new Row(
                       children: <Widget>[
-
-                        Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: new Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                new Text(widget.userObject.name.toString(), style: new TextStyle(fontSize: global.font16, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                new Text(widget.userObject.email.toString(), style: new TextStyle(fontSize: global.font14, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                new Text("Role: "+widget.userObject.role.toString(), style: new TextStyle(fontSize: global.font14, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-
-                              ],
+                        new Flexible(
+                            flex:1,
+                            fit:FlexFit.tight,
+                            child:new Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: Image(image: AssetImage("assets/dummy-user-profile.png")),
                             )
                         ),
-                        Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: new Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        new Flexible(
+                            flex:3,
+                            fit:FlexFit.tight,
+                            child:new Column(
                               children: <Widget>[
-                                Flexible(
-                                  flex:2,
-                                  fit: FlexFit.tight,
-                                  child: new Text("Disable User",style: TextStyle(fontSize: global.font14, color: Color(0xff121212), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'),),
+                                new Row(
+                                  children: <Widget>[
+                                    new Container(
+                                        child:new SvgPicture.asset('assets/blue-user-icon.svg')
+                                    ),
+                                    SizedBox(width:5),
+                                    Expanded(
+                                        child: new Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              new Text(widget.userObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                            ]
+                                        )
+                                    ),
+                                  ],
                                 ),
-                                Flexible(
-                                  flex:1,
-                                  fit:FlexFit.tight,
-                                  child: FlutterSwitch(
-                                    value: status,
-                                    onToggle: (val) {
-                                      setState(() {
-                                        status = val;
-                                      });
-                                      if(val)
-                                      {
-                                        enableUser();
-                                      }
-                                      else
-                                      {
-                                        disableUser();
-                                      }
-                                    },
-                                  ),
-                                )
+                                SizedBox(height:5),
+                                new Row(
+                                  children: <Widget>[
+                                    new Container(
+                                        child:new SvgPicture.asset('assets/yellow-mail-icon.svg')
+                                    ),
+                                    SizedBox(width:5),
+                                    Expanded(
+                                        child: new Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            new Text(widget.userObject.email.toString(),
+                                              maxLines: 10,
+                                              style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'),
+                                            )
+                                          ],
+                                        )
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height:5),
+                                new Row(
+                                  children: <Widget>[
+                                    new Container(
+                                        child:new SvgPicture.asset('assets/green-phone-icon.svg')
+                                    ),
+                                    SizedBox(width:5),
+                                    Expanded(
+                                        child: new Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              widget.userObject.phone!=null?new Text(widget.userObject.phone.toString(), style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular')):
+                                              new Text("NA",
+                                                  maxLines: 10,
+                                                  style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                            ]
+                                        )
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height:5),
                               ],
                             )
+                        )
+                      ],
+                    ),
+                    SizedBox(height:5),
+                    new Row(
+                      children: <Widget>[
+                        new Flexible(
+                            flex:1,
+                            fit:FlexFit.tight,
+                            child:new Container(
+                            )
                         ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Icon(Icons.chevron_right,color: Color(0xffD3616A),),
+                        new Flexible(
+                            flex:3,
+                            fit:FlexFit.tight,
+                            child:new Container(
+                                height: 45,
+                                child: new Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                        flex:1,
+                                        fit:FlexFit.tight,
+                                        child:GestureDetector(
+                                          onTap: (){
+                                            widget.onTabCicked("Edit");
+                                          },
+                                          child: new Container(
+                                              width: MediaQuery.of(context).size.width,
+                                              height: 45,
+                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
+                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
+                                              decoration: new BoxDecoration(
+                                                color: global.transparent,
+                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                              ),
+                                              child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
+                                          ),
+                                        )
+                                    ),
+                                    Flexible(
+                                        flex:1,
+                                        fit:FlexFit.tight,
+                                        child:GestureDetector(
+                                          onTap: (){
+                                            widget.onTabCicked("Delete");
+                                          },
+                                          child: new Container(
+                                              height: 45,
+                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
+                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
+                                              width: MediaQuery.of(context).size.width,
+                                              decoration: new BoxDecoration(
+                                                color: global.transparent,
+                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                              ),
+                                              child: new SvgPicture.asset('assets/delete-icon.svg')
+                                          ),
+                                        )
+                                    ),
+                                    Flexible(
+                                        flex:2,
+                                        fit:FlexFit.tight,
+                                        child:new Container(
+                                            margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                            decoration: new BoxDecoration(
+                                              color: global.transparent,
+                                              border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                              borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                            ),
+                                            child:new Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                Flexible(
+                                                    flex:1,
+                                                    fit:FlexFit.tight,
+                                                    child:new Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: <Widget>[
+                                                        new Text("Status", style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')),
+                                                      ],
+                                                    )
+                                                ),
+                                                Flexible(
+                                                    flex:1,
+                                                    fit:FlexFit.tight,
+                                                    child: Switch(
+                                                      onChanged: (val){
+                                                        setState(() {
+                                                          status = val;
+                                                        });
+                                                        if(val)
+                                                        {
+                                                          enableUser();
+                                                        }
+                                                        else
+                                                        {
+                                                          disableUser();
+                                                        }
+                                                      },
+                                                      value: status,
+                                                      activeColor: Color(0xff0E4DA4),
+                                                      activeTrackColor: Color(0xff0E4DA4).withOpacity(0.24),
+                                                      inactiveThumbColor: Color(0xff0E4DA4).withOpacity(0.3),
+                                                      inactiveTrackColor:Color(0xff0E4DA4).withOpacity(0.24),
+                                                    )
+                                                )
+                                              ],
+                                            )
+                                        )
+                                    )
+                                  ],
+                                )
+                            )
                         )
                       ],
                     )
+                  ],
                 )
             )
         )
