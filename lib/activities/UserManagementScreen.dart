@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:thingsuptrackapp/activities/DevicesScreen.dart';
 import 'package:thingsuptrackapp/activities/DriverScreen.dart';
-import 'package:thingsuptrackapp/activities/UserDetailsScreen.dart';
-import 'package:thingsuptrackapp/activities/UserDevicesScreen.dart';
+import 'package:thingsuptrackapp/activities/DriverTaggingScreen.dart';
 import 'package:thingsuptrackapp/activities/UserScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
-import 'package:thingsuptrackapp/helperClass/UserObject.dart';
+
 
 class UserManagementScreen extends StatefulWidget
 {
@@ -30,7 +25,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> with Single
     super.initState();
 
 
-    _controller = TabController(length: 2, vsync: this);
+    _controller = TabController(length: 1, vsync: this);
     _controller.addListener(() {
       tabIndex = _controller.index;
       setState(() {});
@@ -99,24 +94,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> with Single
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:CrossAxisAlignment.center,
                                     children: <Widget>[
-                                      tabIndex==0?Text("Drivers",style: TextStyle(fontSize: global.font13,color:global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
-                                      Text("Drivers",style: TextStyle(fontSize: global.font13,color:Color(0xff3C74DC),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                    ],
-                                  )
-                              ),
-                            ),
-                            Tab(
-                              child: Container(
-                                  padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                  decoration: BoxDecoration(
-                                      color: tabIndex==1?Color(0xff3C74DC):global.whiteColor,
-                                      borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(color: Color(0xff3C74DC), width: 1)),
-                                  child: new Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      tabIndex==1?Text("Users",style: TextStyle(fontSize: global.font13,color:global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
+                                      tabIndex==0?Text("Users",style: TextStyle(fontSize: global.font13,color:global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
                                       Text("Users",style: TextStyle(fontSize: global.font13,color:Color(0xff3C74DC),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                                     ],
                                   )
@@ -133,7 +111,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> with Single
               body:TabBarView(
                 controller: _controller,
                 children: [
-                  DriverScreen(),
                   UserScreen(),
                 ],
               ),

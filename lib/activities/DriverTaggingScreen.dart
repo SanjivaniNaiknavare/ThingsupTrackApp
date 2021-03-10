@@ -3,47 +3,46 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
-import 'package:thingsuptrackapp/activities/DriverDetailsScreen.dart';
+
+import 'package:thingsuptrackapp/activities/TaggedDriverDetailsScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helperClass/DriverObject.dart';
 import 'package:thingsuptrackapp/helpers/ListOfDrivers.dart';
+import 'package:thingsuptrackapp/helpers/ListOfTaggedDrivers.dart';
 
 
 
-class DriverScreen extends StatefulWidget
+class DriverTaggingScreen extends StatefulWidget
 {
   @override
-  _DriverScreenState createState() => _DriverScreenState();
+  _DriverTaggingScreenState createState() => _DriverTaggingScreenState();
 }
 
-class _DriverScreenState extends State<DriverScreen>
+class _DriverTaggingScreenState extends State<DriverTaggingScreen>
 {
-  String LOGTAG="DriverScreen";
+  String LOGTAG="DriverTaggingScreen";
 
   List<DeviceObjectOwned> listofDevices=new List();
   List<DriverObject> listOfDrivers=new List();
+  List<TaggedDriverObject> listOfTaggedDrivers=new List();
   ScrollController _scrollController=new ScrollController();
   bool isResponseReceived=false;
-  bool isDriverFound=false;
+  bool isTaggedDriverFound=false;
 
   @override
   void initState()
   {
+    getTaggedDrivers();
     getDrivers();
     super.initState();
   }
 
-
   void getDrivers() async
   {
-    isResponseReceived=false;
-    isDriverFound=false;
-    listOfDrivers.clear();
-    global.myUsers.clear();
-    if(mounted){
-      setState(() {});
-    }
+
+    global.myDrivers.clear();
+
 
     Response response=await global.apiClass.GetDrivers();
     if(response!=null)
@@ -70,15 +69,56 @@ class _DriverScreenState extends State<DriverScreen>
             String photo = payloadList.elementAt(i)['photo'];
             String attributes = payloadList.elementAt(i)['attributes'];
             DriverObject driverObject = new DriverObject(id: id.toString(), driverid: driverid.toString(), name: name, phone: phone, photo: photo, attributes: attributes);
-            listOfDrivers.add(driverObject);
+            global.myDrivers.putIfAbsent(id.toString(), () => driverObject);
+          }
+        }
+      }
+    }
+  }
+
+  void getTaggedDrivers() async
+  {
+    isResponseReceived=false;
+    isTaggedDriverFound=false;
+    listOfDrivers.clear();
+    global.myUsers.clear();
+    if(mounted){
+      setState(() {});
+    }
+
+    Response response=await global.apiClass.GetTaggedDrivers();
+    if(response!=null)
+    {
+      print(LOGTAG+" getTaggedDrivers statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" getTaggedDrivers->"+response.body.toString());
+
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+
+        int resLength=resBody.toString().length;
+        print(LOGTAG+" resLength->"+resLength.toString());
+
+        if(resLength>30)
+        {
+          List<dynamic> payloadList = resBody;
+          for (int i = 0; i < payloadList.length; i++)
+          {
+            int id = payloadList.elementAt(i)['id'];
+            String uniqueid = payloadList.elementAt(i)['uniqueid'];
+            String name = payloadList.elementAt(i)['name'];
+
+            TaggedDriverObject taggedDriverObject = new TaggedDriverObject(id: id.toString(), uniqueid: uniqueid, name: name);
+            listOfTaggedDrivers.add(taggedDriverObject);
           }
           isResponseReceived = true;
-          if (listOfDrivers.length > 0) {
-            isDriverFound = true;
+          if (listOfTaggedDrivers.length > 0) {
+            isTaggedDriverFound = true;
           }
           if(mounted){
             setState(() {});
           }
+
         }
         else
         {
@@ -86,7 +126,7 @@ class _DriverScreenState extends State<DriverScreen>
           if(status.toString().compareTo("Drivers not found")==0)
           {
             isResponseReceived=true;
-            isDriverFound = false;
+            isTaggedDriverFound = false;
             if(mounted){
               setState(() {});
             }
@@ -104,22 +144,22 @@ class _DriverScreenState extends State<DriverScreen>
     }
   }
 
-  void onTabClicked(int index, DriverObject driverObject) async
+  void onTabClicked(int index, TaggedDriverObject driverObject) async
   {
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => DriverDetailsScreen(index: index,driverObject: driverObject))).then((value) => ({
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => TaggedDriverDetailsScreen(index: index,driverObject: driverObject))).then((value) => ({
 
-      if(global.lastFunction.toString().contains("addDriver")){
-        global.helperClass.showAlertDialog(context, "", "Driver added successfully", false, "")
+      if(global.lastFunction.toString().contains("tagDriver")){
+        global.helperClass.showAlertDialog(context, "", "Driver tagged to device successfully", false, "")
       }
-      else if(global.lastFunction.toString().contains("updateDriver")){
-        global.helperClass.showAlertDialog(context, "", "Driver updated successfully", false, "")
+      else if(global.lastFunction.toString().contains("untagDriver")){
+        global.helperClass.showAlertDialog(context, "", "Driver untagged from device successfully", false, "")
       },
-      getDrivers()
+      getTaggedDrivers()
     }));
   }
 
 
-  void deleteConfirmationPopup(DriverObject driverObject,int selindex)
+  void deleteConfirmationPopup(TaggedDriverObject driverObject,int selindex)
   {
     showDialog(
         context: context,
@@ -140,7 +180,7 @@ class _DriverScreenState extends State<DriverScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Text("Are you sure you want to delete the \'"+driverObject.name.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
+                          new Text("Are you sure you want to untag \'"+driverObject.name.toString()+"\' from \'"+driverObject.uniqueid.toString()+"\'?", maxLines:3,textAlign: TextAlign.center,style: TextStyle(fontSize: global.font16,color:global.textLightGreyColor,fontStyle: FontStyle.normal)),
                         ],
                       ),
                     ),
@@ -174,7 +214,7 @@ class _DriverScreenState extends State<DriverScreen>
                                 FlatButton(
                                   child: Text("OK", style: TextStyle(fontSize: global.font15,color:global.mainColor,fontStyle: FontStyle.normal)),
                                   onPressed: () async {
-                                    deleteDriver(driverObject,selindex);
+                                    untagDriver(driverObject,selindex);
                                     Navigator.of(context).pop();
                                   },
                                 )
@@ -191,33 +231,35 @@ class _DriverScreenState extends State<DriverScreen>
         });
   }
 
-  void deleteDriver(DriverObject driverObject,int index) async
+  void untagDriver(TaggedDriverObject deviceObject,int index) async
   {
     isResponseReceived=false;
     if(mounted){
       setState(() {});
     }
 
-    Response response=await global.apiClass.DeleteDriver(driverObject.id);
+    String id=deviceObject.id;
+    String uniqueid=deviceObject.uniqueid;
+
+    Response response=await global.apiClass.UntagDriverFromDevice(id,uniqueid);
     if(response!=null)
     {
-      print(LOGTAG+" deleteDriver statusCode->"+response.statusCode.toString());
-      print(LOGTAG+" deleteDriver body->"+response.body.toString());
+      print(LOGTAG+" untagDriver statusCode->"+response.statusCode.toString());
+      print(LOGTAG+" untagDriver body->"+response.body.toString());
 
       if (response.statusCode == 200)
       {
-
         var resBody = json.decode(response.body);
-        listOfDrivers.removeAt(index);
+        listOfTaggedDrivers.removeAt(index);
         isResponseReceived=true;
-        if(listOfDrivers.length==0)
+        if(listOfTaggedDrivers.length==0)
         {
-          isDriverFound=false;
+          isTaggedDriverFound=false;
         }
-        if(mounted){
+        if(mounted) {
           setState(() {});
         }
-        global.helperClass.showAlertDialog(context, "", "Driver deleted successfully", false, "");
+        print(LOGTAG+" untagUserFromDevice->"+resBody.toString());
 
       }
       else if (response.statusCode == 400)
@@ -249,7 +291,6 @@ class _DriverScreenState extends State<DriverScreen>
   }
 
 
-
   Future<bool> _onbackButtonPressed()
   {
     Navigator.of(context).pop();
@@ -262,7 +303,7 @@ class _DriverScreenState extends State<DriverScreen>
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
           body: isResponseReceived?(
-              !isDriverFound?new Stack(
+              !isTaggedDriverFound?new Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
                   new Container(
@@ -298,7 +339,7 @@ class _DriverScreenState extends State<DriverScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Driver Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                          child: new Text('No Tagged Driver Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                         )
                       ],
                     ),
@@ -318,19 +359,15 @@ class _DriverScreenState extends State<DriverScreen>
                               {
                                 return Container(
                                   color: global.transparent,
-                                  child: ListOfDrivers(index: index, driverObject: listOfDrivers[index],onTabCicked: (flag){
-                                    if(flag.toString().compareTo("Edit")==0)
+                                  child: ListOfTaggedDrivers(index: index, taggedDriverObject: listOfTaggedDrivers[index],onTabCicked: (flag){
+                                    if(flag.toString().compareTo("Delete")==0)
                                     {
-                                      onTabClicked(index, listOfDrivers[index]);
-                                    }
-                                    else if(flag.toString().compareTo("Delete")==0)
-                                    {
-                                      deleteConfirmationPopup(listOfDrivers[index],index);
+                                      deleteConfirmationPopup(listOfTaggedDrivers[index],index);
                                     }
                                   },
                                   ),
                                 );
-                              }, childCount: listOfDrivers.length)
+                              }, childCount: listOfTaggedDrivers.length)
                           )
                         ]
                     ),

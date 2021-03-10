@@ -73,7 +73,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
       onTap: () {
         setState(() {  emailadd_validate = false; });
       },
-      style:TextStyle( color:Color.fromRGBO(0, 0, 0, 0.87),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'PoppinsRegular'),
+      style:TextStyle( color:Color.fromRGBO(0, 0, 0, 0.87),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       cursorColor: global.mainColor,
       obscureText: false,
       controller: emailController,
@@ -85,7 +85,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
         focusedBorder: OutlineInputBorder(borderSide: BorderSide(width: 0.5, color: Color(0xff819BD0)), borderRadius: BorderRadius.circular(12.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         hintText: "Email address",
-        hintStyle: TextStyle( color:Color.fromRGBO(0, 0, 0, 0.4),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'PoppinsRegular'),
+        hintStyle: TextStyle( color:Color.fromRGBO(0, 0, 0, 0.4),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
@@ -93,7 +93,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
         focusedBorder: OutlineInputBorder(borderSide: BorderSide(width: 0.5,color: Color(0xffc0c0c0)), borderRadius: BorderRadius.circular(12.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         hintText: "Email address",
-        hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'PoppinsRegular'),
+        hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
 
@@ -128,9 +128,9 @@ class _ForgetPasswordState extends State<ForgetPassword>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(height: 25,),
-              new Text('Forget Password', style: TextStyle(fontSize: global.font22, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'PoppinsBold')),
+              new Text('Forget Password', style: TextStyle(fontSize: global.font22, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'MulishSemiBold')),
               SizedBox(height: 20,),
-              new Text('Enter the email associated with your account and we’ll send an email with instructions to reset your password.', style: TextStyle(fontSize: global.font15, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+              new Text('Enter the email associated with your account and we’ll send an email with instructions to reset your password.', style: TextStyle(fontSize: global.font15, color: Color(0xff3F414E),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
               SizedBox(height: 20,),
               SizedBox(
                 height: 50,
@@ -144,7 +144,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
                     onPressed: () { resetPassword(); },
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
                     color: global.mainColor,
-                    child:new Text('SUBMIT', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular'))
+                    child:new Text('SUBMIT', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                 ),
               ),
             ],

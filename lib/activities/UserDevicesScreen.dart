@@ -34,12 +34,6 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
   void initState()
   {
     super.initState();
-
-
-//    listOfUsers.add("sanju@gmail.com");
-//    listOfUsers.add("sanju10@gmail.com");
-//    listOfUsers.add("sanju11@gmail.com");
-
     getUsers();
   }
 
@@ -592,7 +586,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                                 [
                                   isAPICalled?new Container(
                                       height: MediaQuery.of(context).size.height,
-                                      child: new Text("No device found",style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular'),)):new Container(width: 0,height: 0,)
+                                      child: new Text("No device found",style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'),)):new Container(width: 0,height: 0,)
                                 ]
                             )
                         )

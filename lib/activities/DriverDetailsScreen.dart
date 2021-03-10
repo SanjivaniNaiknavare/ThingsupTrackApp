@@ -1,28 +1,25 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
-import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helperClass/DriverObject.dart';
-import 'package:thingsuptrackapp/helpers/ShowTypePopupForDevice.dart';
+
 
 class DriverDetailsScreen extends StatefulWidget
 {
   DriverDetailsScreen({Key key,this.index,this.driverObject}) : super(key: key);
   int index;
   DriverObject driverObject;
+
   @override
   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
 }
@@ -43,7 +40,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   File tempfile;
   File userSelectedImg;
 
-
   @override
   void initState()
   {
@@ -51,7 +47,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     global.lastFunction = "";
 
     getData();
-
   }
 
   void getData() async
@@ -61,15 +56,17 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       nameController.text = widget.driverObject.name.toString();
       phoneController.text = widget.driverObject.phone.toString();
 
-      Uint8List MainprofileImg=base64Decode(widget.driverObject.photo);
-
-      final tempDir = await getTemporaryDirectory();
-      final file = await new File('${tempDir.path}/image'+DateTime.now().millisecondsSinceEpoch.toString()+'.jpg').create();
-      file.writeAsBytesSync(MainprofileImg);
-      setState(()
+      if(widget.driverObject.photo!=null)
       {
-        userSelectedImg=file;
-      });
+        if(widget.driverObject.photo.length>0)
+        {
+          Uint8List MainprofileImg = base64Decode(widget.driverObject.photo);
+          final tempDir = await getTemporaryDirectory();
+          final file = await new File('${tempDir.path}/image' + DateTime.now().millisecondsSinceEpoch.toString() + '.jpg').create();
+          file.writeAsBytesSync(MainprofileImg);
+          userSelectedImg = file;
+        }
+      }
     }
     setState(() {});
   }
@@ -115,7 +112,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   void addDriver() async
   {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-    bool isvalid = false;
+
     nameValidate = false;
     phoneValidate=false;
 
@@ -144,11 +141,9 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
 
     if (!nameValidate && !phoneValidate)
     {
-
       if(userSelectedImg!=null)
       {
         List<int> imageBytes = userSelectedImg.readAsBytesSync();
-        print(imageBytes);
         imageSelected = base64Encode(imageBytes);
         print(LOGTAG+" image length->"+imageSelected.length.toString());
       }
@@ -159,7 +154,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       }
       else
       {
-
         isResponseReceived=false;
         setState(() {});
 
@@ -210,18 +204,14 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         }
       }
     }
-
-
   }
 
   void updateDriver() async
   {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
 
-    bool isvalid = false;
     nameValidate = false;
     phoneValidate = false;
-
 
     String nameData = nameController.text;
     String phoneData = phoneController.text;
@@ -243,8 +233,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     {
       phoneValidate = false;
     }
-
-
     setState(() {});
 
     if (!nameValidate && !phoneValidate)
@@ -252,7 +240,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       if(userSelectedImg!=null)
       {
         List<int> imageBytes = userSelectedImg.readAsBytesSync();
-        print(imageBytes);
         imageSelected = base64Encode(imageBytes);
         print(LOGTAG+" image length->"+imageSelected.length.toString());
       }
@@ -271,7 +258,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         String phone = phoneController.text;
         String photo = imageSelected;
         String attributes = "{}";
-
 
         UpdateDriverClass updateDriverClass = new UpdateDriverClass(id: id, name: name, phone: phone, photo: photo, attributes: attributes);
         var jsonBody = jsonEncode(updateDriverClass);
@@ -324,13 +310,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       setState(() {});
     });
 
-
-
     print(LOGTAG+"selected gallery image:"+tempfile.toString());
-
   }
-
-
 
   Future<bool> _onbackButtonPressed()
   {
@@ -351,17 +332,17 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       controller: nameController,
       decoration:!nameValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.driverObject==null?"Name":widget.driverObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.driverObject==null?"Name":widget.driverObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -381,19 +362,19 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       controller: phoneController,
       decoration:!phoneValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText:  widget.driverObject==null?"Phone No(+919988776655)":widget.driverObject.phone.toString(),
+        hintText:  widget.driverObject==null?"Phone No":widget.driverObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.driverObject==null?"Phone No(+919988776655)":widget.driverObject.phone.toString(),
+        hintText: widget.driverObject==null?"Phone No":widget.driverObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -409,24 +390,22 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       controller: attrController,
       decoration:!atttrValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.driverObject==null?"Attributes":widget.driverObject.attributes.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.driverObject==null?"Attributes":widget.driverObject.attributes.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
-
-
 
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
@@ -554,7 +533,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                       ):new Container(width: 0,height: 0,),
                       SizedBox(height: 5,),
                       SizedBox(
-                        height:200,
+                        height:150,
                         child:
                         new Row(
                           children: <Widget>[
@@ -591,7 +570,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                               ),
                             ),
                             Flexible(
-                                flex:1,
+                                flex:2,
                                 fit:FlexFit.tight,
                                 child:new Column(
                                   mainAxisAlignment: MainAxisAlignment.center,

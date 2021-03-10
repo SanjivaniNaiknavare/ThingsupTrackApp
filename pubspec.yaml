@@ -82,6 +82,22 @@ flutter:
      - assets/edit-pencil-icon.svg
      - assets/green-phone-icon.svg
      - assets/yellow-mail-icon.svg
+     - assets/tracking-app-logo.png
+     - assets/drawer-home-icon.svg
+     - assets/drawer-user-icon.svg
+     - assets/drawer-device-icon.svg
+     - assets/drawer-geofence-icon.svg
+     - assets/drawer-profile-icon.svg
+     - assets/drawer-exit-icon.svg
+     - assets/drawer-history-icon.svg
+     - assets/sidemenu-icon.svg
+     - assets/default-avatar-icon.png
+     - assets/search-icon.svg
+     - assets/notification-icon.svg
+     - assets/green-wifi-icon.svg
+     - assets/speed-icon.svg
+     - assets/green-driver-icon.svg
+     - assets/share-icon.svg
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
@@ -98,18 +114,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: PoppinsMedium
+    - family: MulishMedium
       fonts:
-        - asset: fonts/Poppins-Medium.ttf
-    - family: PoppinsRegular
-      fonts:
-        - asset: fonts/Poppins-Regular.ttf
-    - family: PoppinsSemiBold
-      fonts:
-        - asset: fonts/Poppins-SemiBold.ttf
-    - family: PoppinsBold
-      fonts:
-        - asset: fonts/Poppins-Bold.ttf
+        - asset: fonts/Mulish-Medium.ttf
     - family: MulishRegular
       fonts:
         - asset: fonts/Mulish-Regular.ttf

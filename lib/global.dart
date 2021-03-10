@@ -53,6 +53,7 @@ String idToken="";
 
 User currentUser;
 String userID="";
+String userName="";
 String userRole="manager";
 String lastFunction="";
 
@@ -61,4 +62,5 @@ String lastFunction="";
 List<DeviceObjectOwned> listofOwnedDevices=new List();
 Map<String,dynamic> myDevices=new Map();
 Map<String,dynamic> myUsers=new Map();
+Map<String,dynamic> myDrivers=new Map();
 

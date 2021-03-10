@@ -352,7 +352,7 @@ class _UserScreenState extends State<UserScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No User Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+                          child: new Text('No User Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                         )
                       ],
                     ),
@@ -403,15 +403,15 @@ class _UserScreenState extends State<UserScreen>
                 ),
               )
           ),
-//          floatingActionButton:FloatingActionButton(
-//            child: new Container(
-//              child:Icon(Icons.add,color: global.whiteColor,),
-//            ),
-//            backgroundColor: global.mainColor,
-//            onPressed: () {
-//              onTabClicked(null,null);
-//            },
-//          ),
+          floatingActionButton:FloatingActionButton(
+            child: new Container(
+              child:Icon(Icons.add,color: global.whiteColor,),
+            ),
+            backgroundColor: global.mainColor,
+            onPressed: () {
+              onTabClicked(null,null);
+            },
+          ),
         )
     );
   }

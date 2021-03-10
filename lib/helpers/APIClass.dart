@@ -797,7 +797,6 @@ class APIClass
     FirebaseApp defaultApp = await Firebase.initializeApp();
     FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
     String idToken=await _auth.currentUser.getIdToken(true);
-    global.idToken=idToken;
 
     String url = SERVER_URL+"/api/driver/";
     Map<String, String> headers = {
@@ -814,6 +813,91 @@ class APIClass
     url=Uri.decodeComponent(url);
 
     print(LOGTAG+" DeleteDriver url->"+url);
+
+    Response response = await delete(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> GetTaggedDrivers() async
+  {
+    Future<Response> flag = Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken = await _auth.currentUser.getIdToken(true);
+
+    String url = SERVER_URL + "/api/driver/tag";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer " + idToken,
+    };
+
+    print(LOGTAG + " GetTaggedDrivers url->" + url);
+
+    Response response = await get(url, headers: headers).catchError((error,
+        stacktrace) {
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod), onTimeout: () {
+      return null;
+    });
+    flag = Future.value(response);
+    return flag;
+
+  }
+
+  Future<Response> TagDriverToDevice(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+
+    String url = SERVER_URL+"/api/driver/tag";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" TagDriverToDevice url->"+url);
+
+    Response response = await post(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
+  Future<Response> UntagDriverFromDevice(String id,String uniqueid) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+
+    String url = SERVER_URL+"/api/driver/tag";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    Map<String, String> queryParams = {
+      'id': id,
+      'uniqueid': uniqueid,
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" UntagDriverFromDevice url->"+url);
 
     Response response = await delete(url, headers: headers).catchError((error,stacktrace){
       return null;

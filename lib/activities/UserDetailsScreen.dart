@@ -37,6 +37,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
   bool customMapValidate=false;
   String devicesValidate="";
   bool twelveHourFormat=false;
+  bool obscureText=true;
 
   final nameController = TextEditingController();
   final deviceController = TextEditingController();
@@ -425,9 +426,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       textInputAction: TextInputAction.done,
       style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       cursorColor: global.mainColor,
-      obscureText: false,
+      obscureText: obscureText,
       controller: passwordController,
       decoration:!passwordValidate? InputDecoration(
+        suffixIcon:widget.userObject==null?IconButton(
+          icon: Icon(
+            !obscureText ? Icons.visibility : Icons.visibility_off,
+            color: global.darkGreyColor,
+          ),
+          onPressed: () { setState(() { obscureText = !obscureText; }); },
+        ):null,
         filled: true,
         fillColor: Color(0xffEFF0F6),
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
@@ -578,7 +586,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                   ),
                   Container(
                       padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  new Text("User Details",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                      child: widget.userObject!=null? new Text("Edit User",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
+                      new Text("Add User",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                   ),
                 ],
               ),

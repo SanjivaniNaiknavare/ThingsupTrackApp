@@ -10,7 +10,6 @@ import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helpers/ListOfDevices.dart';
 
 
-
 class DevicesScreen extends StatefulWidget
 {
   @override
@@ -32,12 +31,10 @@ class _DevicesScreenState extends State<DevicesScreen>
     getDevices();
     super.initState();
 
-
   }
 
   void getDevices() async
   {
-
     isResponseReceived=false;
     isDeviceFound=false;
     listOfDevices.clear();
@@ -243,7 +240,7 @@ class _DevicesScreenState extends State<DevicesScreen>
                         new Container(
                           color: global.screenBackColor,
                           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Device Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular')),
+                          child: new Text('No Device Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                         )
                       ],
                     ),

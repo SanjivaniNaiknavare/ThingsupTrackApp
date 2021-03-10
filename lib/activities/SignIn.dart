@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:thingsuptrackapp/activities/AllAPIScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,7 +81,12 @@ class SignInState extends State<SignIn>
 
           idTokenList=idToken.split("."),
 
+          print(LOGTAG+" idTokenList length->"+idTokenList.length.toString()),
+
           decodelength=idTokenList[1].length,
+
+          print(LOGTAG+" decodelength->"+decodelength.toString()),
+
           if(decodelength%4!=0)
             {
               modData=decodelength%4,
@@ -89,18 +95,23 @@ class SignInState extends State<SignIn>
                   idTokenList[1]=idTokenList[1]+"=",
                 }
             },
-          decodedUserJson = utf8.decode(base64.decode(idTokenList[1])),
 
-          print(LOGTAG+" decodedUserJson->"),
-          print(decodedUserJson),
-          resBody=json.decode(decodedUserJson.toString()),
 
-          global.userRole=resBody["role"],
-          global.userID=resBody["user_id"],
 
+//          decodedUserJson = utf8.decode(base64.decode(idTokenList[1])),
+//          print(LOGTAG+" decodedUserJson->"),
+//          print(decodedUserJson),
+//          resBody=json.decode(decodedUserJson.toString()),
+//
+//          global.userRole=resBody["role"],
+//          global.userID=resBody["user_id"],
+//
           prefs = await SharedPreferences.getInstance(),
           prefs.setBool("LoggedInStatus",true),
           setState(() { isResponseReceived=false; }),
+
+          print(LOGTAG+" just before home screen called"),
+
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => HomeScreen()))
 
         }).catchError((err) => ({

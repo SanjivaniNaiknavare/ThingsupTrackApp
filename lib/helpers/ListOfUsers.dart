@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart';
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/UserObject.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:flutter_svg/flutter_svg.dart';
-
-
 
 class ListOfUsers extends StatefulWidget
 {
@@ -143,7 +140,7 @@ class _ListOfUsersState extends State<ListOfUsers>
                             fit:FlexFit.tight,
                             child:new Container(
                               width: MediaQuery.of(context).size.width,
-                              child: Image(image: AssetImage("assets/dummy-user-profile.png")),
+                              child: Image(image: AssetImage("assets/default-avatar-icon.png")),
                             )
                         ),
                         new Flexible(
@@ -319,8 +316,8 @@ class _ListOfUsersState extends State<ListOfUsers>
                                                       value: status,
                                                       activeColor: Color(0xff0E4DA4),
                                                       activeTrackColor: Color(0xff0E4DA4).withOpacity(0.24),
-                                                      inactiveThumbColor: Color(0xff0E4DA4).withOpacity(0.3),
-                                                      inactiveTrackColor:Color(0xff0E4DA4).withOpacity(0.24),
+                                                      inactiveThumbColor: Color(0xff4D5259),
+                                                      inactiveTrackColor:Color(0xff0E4DA4).withOpacity(0.1),
                                                     )
                                                 )
                                               ],

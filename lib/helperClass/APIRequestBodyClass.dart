@@ -282,4 +282,23 @@ class UpdateDriverClass
   }
 }
 
+class TagDriverToDeviceClass
+{
+  TagDriverToDeviceClass({this.id,this.uniqueid});
+
+  String id;
+  String uniqueid;
+
+  TagDriverToDeviceClass.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        uniqueid = json['uniqueid'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id':id,
+      'uniqueid':uniqueid,
+    };
+  }
+}
+
 

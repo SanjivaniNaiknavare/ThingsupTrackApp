@@ -29,3 +29,26 @@ class DriverObject
     };
   }
 }
+
+class TaggedDriverObject
+{
+  TaggedDriverObject({this.id,this.uniqueid,this.name});
+
+  String id;
+  String uniqueid;
+  String name;
+
+
+  TaggedDriverObject.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        uniqueid = json['uniqueid'],
+        name = json['name'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id':id,
+      'uniqueid':uniqueid,
+      'name':name,
+    };
+  }
+}

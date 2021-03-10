@@ -6,29 +6,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
+
 import 'package:thingsuptrackapp/helperClass/DriverObject.dart';
-import 'package:thingsuptrackapp/helperClass/UserObject.dart';
+
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:flutter_svg/flutter_svg.dart';
 
 
 
-class ListOfDrivers extends StatefulWidget
+class ListOfTaggedDrivers extends StatefulWidget
 {
-  ListOfDrivers({Key key,this.index,this.driverObject,this.onTabCicked}) : super(key: key);
+  ListOfTaggedDrivers({Key key,this.index,this.taggedDriverObject,this.onTabCicked}) : super(key: key);
   int index;
   ValueChanged<String> onTabCicked;
-  DriverObject driverObject;
+  TaggedDriverObject taggedDriverObject;
 
   @override
-  _ListOfDriversState createState() => _ListOfDriversState();
+  _ListOfTaggedDriversState createState() => _ListOfTaggedDriversState();
 }
 
-class _ListOfDriversState extends State<ListOfDrivers>
+class _ListOfTaggedDriversState extends State<ListOfTaggedDrivers>
 {
 
-  String LOGTAG="ListOfDrivers";
+  String LOGTAG="ListOfTaggedDrivers";
   bool status = false;
   File userSelectedImg;
   Uint8List imageBytes;
@@ -40,21 +40,26 @@ class _ListOfDriversState extends State<ListOfDrivers>
     initPhoto();
   }
 
-  void initPhoto() async{
+  void initPhoto() async
+  {
+    DriverObject driverObject=global.myDrivers[widget.taggedDriverObject.id];
 
-    if(widget.driverObject.photo!=null)
+    if(driverObject!=null)
     {
-      if(widget.driverObject.photo.length>0)
+      if(driverObject.photo!=null)
       {
-        Uint8List MainprofileImg=base64Decode(widget.driverObject.photo);
-        imageBytes=MainprofileImg;
+        if (driverObject.photo.length > 0)
+        {
+          Uint8List MainprofileImg = base64Decode(driverObject.photo);
+          imageBytes = MainprofileImg;
 
-        final tempDir = await getTemporaryDirectory();
-        final file = await new File('${tempDir.path}/image'+DateTime.now().millisecondsSinceEpoch.toString()+'.jpg').create();
-        file.writeAsBytesSync(MainprofileImg);
-        userSelectedImg=file;
+          final tempDir = await getTemporaryDirectory();
+          final file = await new File('${tempDir.path}/image' + DateTime.now().millisecondsSinceEpoch.toString() + '.jpg').create();
+          file.writeAsBytesSync(MainprofileImg);
+          userSelectedImg = file;
 
-        print(LOGTAG+" userSelectedImg path->"+userSelectedImg.path.toString());
+          print(LOGTAG + " userSelectedImg path->" + userSelectedImg.path.toString());
+        }
       }
     }
     setState(() {});
@@ -86,29 +91,29 @@ class _ListOfDriversState extends State<ListOfDrivers>
                           fit:FlexFit.tight,
                           child:new Container(
                             height: 80,
-                              decoration: userSelectedImg!=null?new BoxDecoration(
+                            decoration: userSelectedImg!=null?new BoxDecoration(
+                              color: global.whiteColor,
+                              image:  DecorationImage(
+                                image:  FileImage(File(userSelectedImg.path)),
+                                fit: BoxFit.cover,
+                              ),
+                              border: Border.all(
+                                color: global.whiteColor,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                            ):new BoxDecoration(
                                 color: global.whiteColor,
                                 image:  DecorationImage(
-                                  image:  FileImage(File(userSelectedImg.path)),
+                                  image:  AssetImage("assets/dummy-user-profile.png"),
                                   fit: BoxFit.cover,
                                 ),
                                 border: Border.all(
                                   color: global.whiteColor,
                                   width: 1.0,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                              ):new BoxDecoration(
-                                  color: global.whiteColor,
-                                  image:  DecorationImage(
-                                    image:  AssetImage("assets/dummy-user-profile.png"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  border: Border.all(
-                                    color: global.whiteColor,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
-                              ),
+                                borderRadius: BorderRadius.all(Radius.circular(8.0))
+                            ),
 
 //                              child: userSelectedImg==null?new Container(
 //                                child: Image(image: AssetImage("assets/dummy-user-profile.png")),
@@ -133,7 +138,7 @@ class _ListOfDriversState extends State<ListOfDrivers>
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              new Text(widget.driverObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                              new Text(widget.taggedDriverObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
                                             ]
                                         )
                                     ),
@@ -143,7 +148,7 @@ class _ListOfDriversState extends State<ListOfDrivers>
                                 new Row(
                                   children: <Widget>[
                                     new Container(
-                                        child:new SvgPicture.asset('assets/green-phone-icon.svg')
+                                        child:new SvgPicture.asset('assets/yellow-mail-icon.svg')
                                     ),
                                     SizedBox(width:5),
                                     Expanded(
@@ -151,10 +156,7 @@ class _ListOfDriversState extends State<ListOfDrivers>
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              widget.driverObject.phone!=null?new Text(widget.driverObject.phone.toString(), style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular')):
-                                              new Text("NA",
-                                                  maxLines: 10,
-                                                  style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                              new Text(widget.taggedDriverObject.uniqueid.toString(), style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
                                             ]
                                         )
                                     )
@@ -187,27 +189,6 @@ class _ListOfDriversState extends State<ListOfDrivers>
                                         fit:FlexFit.tight,
                                         child:GestureDetector(
                                           onTap: (){
-                                            widget.onTabCicked("Edit");
-                                          },
-                                          child: new Container(
-                                              width: MediaQuery.of(context).size.width,
-                                              height: 45,
-                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
-                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
-                                              decoration: new BoxDecoration(
-                                                color: global.transparent,
-                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                              ),
-                                              child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
-                                          ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        flex:1,
-                                        fit:FlexFit.tight,
-                                        child:GestureDetector(
-                                          onTap: (){
                                             widget.onTabCicked("Delete");
                                           },
                                           child: new Container(
@@ -225,37 +206,14 @@ class _ListOfDriversState extends State<ListOfDrivers>
                                         )
                                     ),
                                     Flexible(
+                                        flex:1,
+                                        fit:FlexFit.tight,
+                                        child:new Container()
+                                    ),
+                                    Flexible(
                                         flex:2,
                                         fit:FlexFit.tight,
                                         child:new Container(
-//                                            margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
-//                                            decoration: new BoxDecoration(
-//                                              color: global.transparent,
-//                                              border: Border.all(color: Color(0xffc4c4c4),width: 1),
-//                                              borderRadius: BorderRadius.all(Radius.circular(8.0),),
-//                                            ),
-//                                            child:new Row(
-//                                              mainAxisAlignment: MainAxisAlignment.center,
-//                                              crossAxisAlignment: CrossAxisAlignment.center,
-//                                              children: <Widget>[
-//                                                Flexible(
-//                                                    flex:1,
-//                                                    fit:FlexFit.tight,
-//                                                    child:new Row(
-//                                                      mainAxisAlignment: MainAxisAlignment.center,
-//                                                      crossAxisAlignment: CrossAxisAlignment.center,
-//                                                      children: <Widget>[
-//                                                        new Text("Status", style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')),
-//                                                      ],
-//                                                    )
-//                                                ),
-//                                                Flexible(
-//                                                    flex:1,
-//                                                    fit:FlexFit.tight,
-//                                                    child: new Container()
-//                                                )
-//                                              ],
-//                                            )
                                         )
                                     )
                                   ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/activities/DevicesScreen.dart';
+import 'package:thingsuptrackapp/activities/DriverScreen.dart';
+import 'package:thingsuptrackapp/activities/DriverTaggingScreen.dart';
 import 'package:thingsuptrackapp/activities/UserDevicesScreen.dart';
 import 'package:thingsuptrackapp/activities/UserSharedDevicesScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
@@ -23,7 +25,7 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> with Si
     super.initState();
 
 
-    _controller = TabController(length: 3, vsync: this);
+    _controller = TabController(length: 5, vsync: this);
     _controller.addListener(() {
       tabIndex = _controller.index;
       setState(() {});
@@ -130,6 +132,40 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> with Si
                           ),
                         ),
                       ),
+                      Tab(
+                        child: Container(
+                            padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            decoration: BoxDecoration(
+                                color: tabIndex==3?Color(0xff3C74DC):global.whiteColor,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Color(0xff3C74DC), width: 1)),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment:CrossAxisAlignment.center,
+                              children: <Widget>[
+                                tabIndex==3?Text("Drivers",style: TextStyle(fontSize: global.font13,color:global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
+                                Text("Drivers",style: TextStyle(fontSize: global.font13,color:Color(0xff3C74DC),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                              ],
+                            )
+                        ),
+                      ),
+                      Tab(
+                        child: Container(
+                            padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            decoration: BoxDecoration(
+                                color: tabIndex==4?Color(0xff3C74DC):global.whiteColor,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Color(0xff3C74DC), width: 1)),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment:CrossAxisAlignment.center,
+                              children: <Widget>[
+                                tabIndex==4?Text("Tagged Drivers",style: TextStyle(fontSize: global.font13,color:global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
+                                Text("Tagged Drivers",style: TextStyle(fontSize: global.font13,color:Color(0xff3C74DC),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                              ],
+                            )
+                        ),
+                      ),
                     ]
                 ),
                 backgroundColor:global.screenBackColor,
@@ -139,7 +175,9 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> with Si
                 children: [
                   DevicesScreen(),
                   UserDevicesScreen(),
-                  UserSharedDevicesScreen()
+                  UserSharedDevicesScreen(),
+                  DriverScreen(),
+                  DriverTaggingScreen(),
                 ],
               ),
             )
