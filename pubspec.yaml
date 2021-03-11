@@ -98,6 +98,44 @@ flutter:
      - assets/speed-icon.svg
      - assets/green-driver-icon.svg
      - assets/share-icon.svg
+     - assets/close-driver-info-icon.svg
+     - assets/share-fb-icon.svg
+     - assets/share-twitter-icon.svg
+     - assets/share-mail-icon.svg
+     - assets/share-whatsapp-icon.svg
+     - assets/home-no-device-found.svg
+     - assets/light/animal.svg
+     - assets/light/bicycle.svg
+     - assets/light/boat.svg
+     - assets/light/box.svg
+     - assets/light/bus.svg
+     - assets/light/car.svg
+     - assets/light/container.svg
+     - assets/light/crane.svg
+     - assets/light/default.svg
+     - assets/light/freezer.svg
+     - assets/light/helicopter.svg
+     - assets/light/home.svg
+     - assets/light/motorcycle.svg
+     - assets/light/offroad.svg
+     - assets/light/person.svg
+     - assets/light/pickup.svg
+     - assets/light/plane.svg
+     - assets/light/rickshaw.svg
+     - assets/light/bicycle.svg
+     - assets/light/room.svg
+     - assets/light/scooter.svg
+     - assets/light/ship.svg
+     - assets/light/tank.svg
+     - assets/light/tanker.svg
+     - assets/light/tractor.svg
+     - assets/light/train.svg
+     - assets/light/tram.svg
+     - assets/light/tree.svg
+     - assets/light/truck.svg
+     - assets/light/van.svg
+     - assets/light/warehouse.svg
+     - assets/geofence-not-found.svg
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

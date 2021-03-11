@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
 import 'package:thingsuptrackapp/activities/AllAPIScreen.dart';
+import 'package:thingsuptrackapp/activities/GeofenceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/UserManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/DeviceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/DevicesScreen.dart';

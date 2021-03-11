@@ -67,7 +67,7 @@ class ShowDevicePopupForUserState extends State<ShowDevicePopupForUser>
                             child:  new Container(
                               height:20,
                               width:20,
-                              child:Image(image: AssetImage("assets/close-red-icon.png")),
+                              child:Image(image: AssetImage("assets/close-red-icon.png"),color: global.mainBlackColor,),
                             ),
                           )
                         ],

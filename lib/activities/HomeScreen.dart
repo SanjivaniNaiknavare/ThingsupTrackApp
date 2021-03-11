@@ -1,19 +1,24 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thingsuptrackapp/activities/DeviceManagementScreen.dart';
+import 'package:thingsuptrackapp/activities/GeofenceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/GeofenceScreen.dart';
 import 'package:thingsuptrackapp/activities/UserManagementScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
-import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/helpers/HomeScreenBottomSheet.dart';
 import 'package:thingsuptrackapp/helpers/NavDrawer.dart';
@@ -38,14 +43,24 @@ class _HomeScreenState extends State<HomeScreen>
   bool isDeviceFound=false;
   List<DeviceObjectAllAccount> listOfDevices=new List();
 
+
+  Set<Marker> _markers=new HashSet<Marker>();
+
+  List<Marker> _markerList=new List();
+
+  int _markerIdCounter=1;
+  LatLng _center=new LatLng(18.6, 73.7);
+  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController mapController;
+
   @override
   void initState()
   {
     super.initState();
 
     print(LOGTAG+" initState called");
-   // getDevices();
-   // getUserData();
+    // getDevices();
+    // getUserData();
 
   }
 
@@ -119,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-
   void updateUI(BuildContext context,int value) async
   {
     if(value==2)
@@ -137,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen>
     else if(value==5)
     {
       //geofence
-      Navigator.push(context, MaterialPageRoute(builder: (context) => GeofenceScreen(),),);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => GeofenceManagementScreen(),),);
     }
     else if(value==6)
     {
@@ -153,19 +167,117 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+
+  void _onMapCreated(GoogleMapController controller)
+  {
+    mapController=controller;
+    _controller.complete(controller);
+  }
+
+  void setMarkers() async
+  {
+    for(int k=0;k<listOfDevices.length;k++)
+    {
+      DeviceObjectAllAccount deviceObjectAllAccount = listOfDevices.elementAt(k);
+      double rotation=0;
+      double lat = deviceObjectAllAccount.latitude;
+      double lng = deviceObjectAllAccount.longitude;
+      var rot=deviceObjectAllAccount.course;
+      String name=deviceObjectAllAccount.name.toString();
+      if(rot!=null)
+      {
+        rotation=rot.toDouble();
+      }
+      String assetSTR="assets/"+global.currentAppMode.toString()+"/"+deviceObjectAllAccount.type.toString()+".svg";
+
+      if (lat != null && lng != null)
+      {
+        LatLng point = new LatLng(lat, lng);
+        BitmapDescriptor bitmapDescriptor = await global.helperClass.bitmapDescriptorFromSvgAsset(context, assetSTR);
+
+        final String markerIdVal = 'marker_id_$_markerIdCounter';
+        _markerIdCounter++;
+
+        Marker marker=new Marker(
+            icon: bitmapDescriptor,
+            markerId: MarkerId(markerIdVal),
+            position: point,
+            rotation: rotation,
+            infoWindow: InfoWindow(
+              title: name,
+            ), anchor: Offset(0, 0)
+        );
+
+        setState(() {
+          _markers.add(marker);
+          _markerList.add(marker);
+        });
+      }
+    }
+    checkMarkers();
+  }
+
+  void checkMarkers() async
+  {
+    LatLngBounds bounds = await getBounds(_markerList);
+    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
+    this.mapController.animateCamera(cameraUpdate);
+  }
+
+  Future<LatLngBounds> getBounds(List<Marker> markers) {
+
+    Future<LatLngBounds> fuBounds=Future.value(new LatLngBounds(southwest:  LatLng(0, 0), northeast: LatLng(0, 0)));
+
+    var lngs = markers.map<double>((m) => m.position.longitude).toList();
+    var lats = markers.map<double>((m) => m.position.latitude).toList();
+
+    double topMost = lngs.reduce(max);
+    double leftMost = lats.reduce(min);
+    double rightMost = lats.reduce(max);
+    double bottomMost = lngs.reduce(min);
+
+    LatLngBounds bounds = LatLngBounds(
+      northeast: LatLng(rightMost, topMost),
+      southwest: LatLng(leftMost, bottomMost),
+    );
+
+    fuBounds=Future.value(bounds);
+    return fuBounds;
+  }
+
+  void changePositionToSelectedDevice(DeviceObjectAllAccount deviceObjectAllAccount)
+  {
+    double lat=deviceObjectAllAccount.latitude;
+    double lng=deviceObjectAllAccount.longitude;
+
+    print(LOGTAG+" lat->"+lat.toString()+" lng->"+lng.toString());
+
+    if(lat!=null && lng!=null)
+    {
+      _center=new LatLng(lat,lng);
+
+      LatLngBounds bounds = LatLngBounds(northeast: LatLng(lat, lng), southwest: LatLng(lat, lng),);
+      CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
+      this.mapController.animateCamera(cameraUpdate);
+      setState(() {});
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     mContext=context;
     return new WillPopScope (
         onWillPop: _willPopCallback,
         child:Scaffold(
+            extendBodyBehindAppBar: true,
             key: _scaffoldKey,
             drawer: NavDrawer(optionSelected: (value){
               updateUI(context,value);
             }),
             appBar:AppBar(
               titleSpacing: 0.0,
-              elevation: 2,
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -179,36 +291,66 @@ class _HomeScreenState extends State<HomeScreen>
                             setState(() {});
                           },
                           child:new Container(
-                              height: 30,
+                              decoration: new BoxDecoration(
+                                color: global.whiteColor,
+                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                              ),
+                              padding: EdgeInsets.all(10),
                               child:SvgPicture.asset('assets/sidemenu-icon.svg')
                           )
                       )
                   ),
-                  Container(
-                      padding: EdgeInsets.fromLTRB(15,8,8,8),
-                      child:  Text("Home", style: new TextStyle(fontSize: global.font18, color: global.appbarTextColor, fontWeight: FontWeight.normal,fontFamily: 'PoppinsRegular'))
-                  )
                 ],
               ),
-              backgroundColor: global.appbarBackColor,
+              backgroundColor: Colors.transparent,
             ),
             body:new Stack(
                 children: <Widget>[
                   Positioned(
-                      top: 0,
-                      left: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                      )
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    child:  new Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width,
+                      child:  GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition:CameraPosition(
+                          target: _center,
+                          zoom: 10.0,
+                        ),
+                        markers: _markers,
+
+                        gestureRecognizers: Set()
+                          ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                          ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                          ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                          ..add(Factory<VerticalDragGestureRecognizer>(
+                                  () => VerticalDragGestureRecognizer())),
+                        onTap: (point){
+
+                        },
+                      ),
+                    ),
                   ),
                   DraggableScrollableSheet(
-                    initialChildSize: 0.8,
+                    initialChildSize: 0.2,
                     minChildSize: 0.2,
                     maxChildSize: 1.0,
+
                     builder: (BuildContext context, ScrollController scrollController){
-                      return HomeScreenBottomSheet(scrollController: scrollController,);
+                      return HomeScreenBottomSheet(scrollController: scrollController,onDevicesReceived: (value){
+
+                        listOfDevices.addAll(value);
+                        setMarkers();
+
+
+                      },onDeviceSelected: (device){
+
+                        changePositionToSelectedDevice(device);
+
+                      },);
                     },
                   )
                 ]

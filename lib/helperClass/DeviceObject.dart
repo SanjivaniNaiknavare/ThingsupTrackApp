@@ -59,7 +59,8 @@ class DeviceObjectAllAccount
     this.idle,
     this.offline,
     this.stopped,
-    this.status
+    this.status,
+    this.course
   });
 
   int id;
@@ -83,6 +84,7 @@ class DeviceObjectAllAccount
   bool offline;
   bool stopped;
   String status;
+  int course;
 
 
   DeviceObjectAllAccount.fromJson(Map<String, dynamic> json)
@@ -106,7 +108,8 @@ class DeviceObjectAllAccount
         idle = json['idle'],
         offline = json['offline'],
         stopped = json['stopped'],
-        status = json['status'];
+        status = json['status'],
+        course = json['course'];
 
   Map<String, dynamic> toJson() {
     return {
@@ -131,6 +134,7 @@ class DeviceObjectAllAccount
       'offline':offline,
       'stopped':stopped,
       'status':status,
+      'course':course,
 
     };
   }

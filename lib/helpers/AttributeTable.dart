@@ -35,7 +35,7 @@ class _AttributeTableState extends State<AttributeTable>
             flex:1,
             fit: FlexFit.tight,
             child:Container(
-              height: 50,
+                padding: EdgeInsets.fromLTRB(0, 7, 0, 7),
                 decoration: new BoxDecoration(
                   color: widget.index==0?Color(0xffafafaf):global.whiteColor,
                   border: Border.all(color: Color(0xffc4c4c4),width: 0.5),
@@ -45,7 +45,7 @@ class _AttributeTableState extends State<AttributeTable>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    new Text(widget.keyData.toString(), style: TextStyle(fontSize: global.font14, color: Color(0xff121212),fontFamily: 'MulishRegular'))
+                    new Text(widget.keyData.toString(), style: TextStyle(fontSize: global.font14, color: global.mainBlackColor,fontFamily: 'MulishRegular'))
                   ],
                 )
             )
@@ -54,7 +54,7 @@ class _AttributeTableState extends State<AttributeTable>
             flex:1,
             fit: FlexFit.tight,
             child:Container(
-              height: 50,
+                padding: EdgeInsets.fromLTRB(0, 7, 0, 7),
                 decoration: new BoxDecoration(
                   color:  widget.index==0?Color(0xffafafaf):global.whiteColor,
                   border: Border.all(color: Color(0xffc4c4c4),width: 0.5),
@@ -64,7 +64,7 @@ class _AttributeTableState extends State<AttributeTable>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    new Text(widget.valueData.toString(), style: TextStyle(fontSize: global.font14, color: Color(0xff121212),fontFamily: 'MulishRegular'))
+                    new Text(widget.valueData.toString(), style: TextStyle(fontSize: global.font14, color: global.mainBlackColor,fontFamily: 'MulishRegular'))
                   ],
                 )
             )

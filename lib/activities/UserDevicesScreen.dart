@@ -397,7 +397,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                                             child:new Container(
                                               width:20,
                                               height:20,
-                                              child: Image(image: AssetImage('assets/close-red-icon.png')),
+                                              child: Image(image: AssetImage('assets/close-red-icon.png'),color: global.mainBlackColor),
                                             ),
                                           )
                                         ],

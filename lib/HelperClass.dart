@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 
 
@@ -143,6 +147,31 @@ class HelperClass
             ),
           );
         });
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
+  }
+
+  Future<BitmapDescriptor> bitmapDescriptorFromSvgAsset(BuildContext context, String assetName) async {
+    // Read SVG file as String
+    String svgString = await DefaultAssetBundle.of(context).loadString(assetName);
+    // Create DrawableRoot from SVG String
+    DrawableRoot svgDrawableRoot = await svg.fromSvgString(svgString, null);
+
+    // toPicture() and toImage() don't seem to be pixel ratio aware, so we calculate the actual sizes here
+    MediaQueryData queryData = MediaQuery.of(context);
+    double devicePixelRatio = queryData.devicePixelRatio;
+    double width = 32 * devicePixelRatio; // where 32 is your SVG's original width
+    double height = 32 * devicePixelRatio; // same thing
+
+    ui.Picture picture = svgDrawableRoot.toPicture(size: Size(width, height));
+    ui.Image image = await picture.toImage(width.toInt(), height.toInt());
+    ByteData bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
   }
 
 

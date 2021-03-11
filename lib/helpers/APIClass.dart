@@ -707,6 +707,32 @@ class APIClass
     return flag;
   }
 
+  Future<Response> CreateSharingToken(String jsonBody) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    global.idToken=idToken;
+
+    String url = SERVER_URL+"/api/device/sharing";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    print(LOGTAG+" CreateSharingToken url->"+url);
+
+    Response response = await put(url, headers: headers,body: jsonBody).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
 
   Future<Response> GetDrivers() async
   {
@@ -907,5 +933,39 @@ class APIClass
     flag=Future.value(response);
     return flag;
   }
+
+
+  Future<Response> GetDriverInfoFromDevice(String uniqueid) async
+  {
+    Future<Response> flag=Future.value(null);
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+
+    String url = SERVER_URL+"/api/device/driver";
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "accept": "*/*",
+      "Authorization": "Bearer "+idToken,
+    };
+
+    Map<String, String> queryParams = {
+      'uniqueid': uniqueid,
+    };
+    String queryString = Uri(queryParameters: queryParams).query;
+    url = url + '?' + queryString;
+    url=Uri.decodeComponent(url);
+
+    print(LOGTAG+" GetDriverInfoFromDevice url->"+url);
+
+    Response response = await get(url, headers: headers).catchError((error,stacktrace){
+      return null;
+    }).timeout(Duration(milliseconds: timeoutPeriod),onTimeout: (){
+      return null;
+    });
+    flag=Future.value(response);
+    return flag;
+  }
+
 
 }

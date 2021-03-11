@@ -22,6 +22,7 @@ Color popupBackColor=Color(0xfff0f0f3);
 Color popupDarkGreyColor=Color(0xff414141).withOpacity(0.5);
 Color secondaryBlueColor=Color(0xff0176FE);
 Color appbarTextColor=Color(0xff121212);
+Color mainBlackColor=Color(0xff121212);
 Color appbarBackColor=Color(0xffffffff);
 Color mainColor=Color(0xff0175fe);
 Color lightBlueColor=Color(0x500176fe);
@@ -44,7 +45,7 @@ double font22=22;
 double font24=24;
 double font26=26;
 
-
+String currentAppMode="light";
 FirebaseAuth firebaseInstance;
 HelperClass helperClass;
 APIClass apiClass;

@@ -302,3 +302,23 @@ class TagDriverToDeviceClass
 }
 
 
+class SharingDeviceClass
+{
+  SharingDeviceClass({this.uniqueid,this.interval});
+
+  String uniqueid;
+  int interval;
+
+  SharingDeviceClass.fromJson(Map<String, dynamic> json)
+      : interval = json['interval'],
+        uniqueid = json['uniqueid'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'interval':interval,
+      'uniqueid':uniqueid,
+    };
+  }
+}
+
+
