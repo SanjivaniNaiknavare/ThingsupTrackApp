@@ -23,6 +23,7 @@ class _GeofenceScreenState extends State<GeofenceScreen>
   String LOGTAG="GeofenceScreen";
 
   List<GeofenceObject> listOfGeofence=new List();
+  List<GeofenceObject> currentListOfGeofence=new List();
   ScrollController _scrollController=new ScrollController();
   bool isResponseReceived=false;
   bool isGeofenceFound=false;
@@ -39,6 +40,7 @@ class _GeofenceScreenState extends State<GeofenceScreen>
   void getGeofence() async
   {
     listOfGeofence.clear();
+    currentListOfGeofence.clear();
     isResponseReceived=false;
     isGeofenceFound=false;
     setState(() {});
@@ -83,6 +85,7 @@ class _GeofenceScreenState extends State<GeofenceScreen>
           isResponseReceived = true;
           if (listOfGeofence.length > 0)
           {
+            currentListOfGeofence.addAll(listOfGeofence);
             isGeofenceFound = true;
           }
           setState(() {});
@@ -152,8 +155,20 @@ class _GeofenceScreenState extends State<GeofenceScreen>
       {
         var resBody = json.decode(response.body);
         print(LOGTAG+" deleteGeofence->"+resBody.toString());
-        listOfGeofence.removeAt(index);
-        if(listOfGeofence.length==0)
+        int finalIndex=0;
+        for(int s=0;s<listOfGeofence.length;s++)
+        {
+         GeofenceObject gObj=listOfGeofence.elementAt(s);
+         if(gObj.id.compareTo(id)==0)
+         {
+           finalIndex=s;
+         }
+        }
+        listOfGeofence.removeAt(finalIndex);
+        currentListOfGeofence.removeAt(index);
+        currentListOfGeofence.clear();
+        currentListOfGeofence.addAll(listOfGeofence);
+        if(currentListOfGeofence.length==0)
         {
           isGeofenceFound=false;
         }
@@ -254,6 +269,21 @@ class _GeofenceScreenState extends State<GeofenceScreen>
   }
 
 
+  void sortList(String searchSTR) async
+  {
+    currentListOfGeofence.clear();
+    for(int k=0;k<listOfGeofence.length;k++)
+    {
+      GeofenceObject geofenceObject=listOfGeofence.elementAt(k);
+      if(geofenceObject.name.toString().toLowerCase().contains(searchSTR.toLowerCase()))
+      {
+        currentListOfGeofence.add(geofenceObject);
+      }
+    }
+
+    setState(() {});
+
+  }
 
   Future<bool> _onbackButtonPressed()
   {
@@ -268,90 +298,170 @@ class _GeofenceScreenState extends State<GeofenceScreen>
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
           body: isResponseReceived?(
-              !isGeofenceFound?new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
-                    width: MediaQuery.of(context).size.width,
-                    child:new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container()
-                        ),
-                        Flexible(
-                          flex:2,
-                          fit:FlexFit.tight,
-                          child:
-                          new Column(
-                            children: <Widget>[
-                              Flexible(
+              !isGeofenceFound?new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
+                        width: MediaQuery.of(context).size.width,
+                        child:new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Flexible(
                                 flex:1,
                                 fit:FlexFit.tight,
-                                child:new Container(
-                                    padding: EdgeInsets.all(10),
-                                    child:new SvgPicture.asset('assets/geofence-not-found.svg')
-                                ),
-                              ),
-                              new Container(
-                                color: global.screenBackColor,
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                child: new Text('No Geofence Added Yet', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                              )
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container()
-                        ),
-
-                      ],
-                    ),
-                  ),
-                ],
-              ):new Stack(
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin:EdgeInsets.fromLTRB(8,10,8,10),
-                    child: CustomScrollView(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: <Widget>[
-                          SliverList(
-                              delegate: SliverChildBuilderDelegate((context, index)
-                              {
-                                return Container(
-                                  color: global.transparent,
-                                  child: ListOfGeofences(index: index, geofenceObject: listOfGeofence[index],onTabCicked: (flag){
-
-                                    if(flag.toString().compareTo("Edit")==0)
-                                    {
-                                      onTabClicked(index, listOfGeofence[index]);
-                                    }
-                                    else if(flag.toString().compareTo("Delete")==0){
-                                      deleteConfirmationPopup(listOfGeofence[index], index);
-                                    }
-
-                                  },
+                                child:new Container()
+                            ),
+                            Flexible(
+                              flex:4,
+                              fit:FlexFit.tight,
+                              child:
+                              new Column(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child:new Container(
+                                        padding: EdgeInsets.all(10),
+                                        child:new SvgPicture.asset('assets/geofence-not-found.svg')
+                                    ),
                                   ),
-                                );
-                              }, childCount: listOfGeofence.length)
-                          )
-                        ]
-                    ),
+                                  new Container(
+                                    color: global.screenBackColor,
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: new Text('No Geofence Added Yet', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                  ),
+                                  new Container(
+                                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                    width: MediaQuery.of(context).size.width/2,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        boxShadow: [BoxShadow(
+                                          color: Color(0xff121212).withOpacity(0.25),
+                                          blurRadius: 32.0,
+                                          offset: new Offset(8.0, 8.0),
+                                        ),
+                                        ]
+                                    ),
+                                    child: new RaisedButton(
+                                        onPressed: () {
+                                          onTabClicked(null,null);
+                                        },
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
+                                        color: global.mainColor,
+                                        child:new Text('Add Geofence',textAlign: TextAlign.center, style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Flexible(
+                                flex:1,
+                                fit:FlexFit.tight,
+                                child:new Container()
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ],
                   )
-                  //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
-                ],
+              ):new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin:EdgeInsets.fromLTRB(8,10,8,10),
+                        child: CustomScrollView(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: <Widget>[
+                              SliverList(
+                                  delegate: SliverChildListDelegate(
+                                      [
+                                        new Row(
+                                          children: <Widget>[
+                                            Flexible(
+                                              flex: 5,
+                                              fit: FlexFit.tight,
+                                              child: new Container(
+                                                height:kToolbarHeight-10,
+                                                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                child: TextField(
+                                                  textAlign: TextAlign.left,
+                                                  textAlignVertical: TextAlignVertical.center,
+                                                  decoration: InputDecoration(
+                                                    contentPadding: EdgeInsets.zero,
+                                                    prefixIcon:  Icon(Icons.search,color: Color(0xff3C74DC)),
+                                                    filled: true,
+                                                    fillColor: Color(0xffF4F8FF),
+                                                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    hintText: ' Search Geofence By Name',
+                                                    hintStyle: TextStyle(fontSize: global.font15,color:Color(0xff3C74DC),fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    sortList(value);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Flexible(
+                                                flex: 1,
+                                                fit: FlexFit.tight,
+                                                child:GestureDetector(
+                                                  onTap: (){
+                                                    onTabClicked(null, null);
+                                                  },
+                                                  child: new Container(
+                                                    height: kToolbarHeight-10,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: global.mainColor),
+                                                    child:Icon(Icons.add,color: global.whiteColor,),
+                                                  ),
+                                                )
+                                            )
+                                          ],
+                                        )
+
+                                      ]
+                                  )
+                              ),
+                              SliverList(
+                                  delegate: SliverChildBuilderDelegate((context, index)
+                                  {
+                                    return Container(
+                                      color: global.transparent,
+                                      child: ListOfGeofences(index: index, geofenceObject: currentListOfGeofence[index],onTabCicked: (flag){
+
+                                        if(flag.toString().compareTo("Edit")==0)
+                                        {
+                                          onTabClicked(index, currentListOfGeofence[index]);
+                                        }
+                                        else if(flag.toString().compareTo("Delete")==0){
+                                          deleteConfirmationPopup(currentListOfGeofence[index], index);
+                                        }
+
+                                      },
+                                      ),
+                                    );
+                                  }, childCount: currentListOfGeofence.length)
+                              )
+                            ]
+                        ),
+                      )
+                      //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
+                    ],
+                  )
               )
           ):new Container(
+              color: global.screenBackColor,
               child:Center(
                 child:new Container(
                   height: 50,

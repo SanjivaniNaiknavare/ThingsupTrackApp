@@ -41,6 +41,7 @@ dependencies:
   flutter_svg: ^0.17.4
   image_picker: ^0.6.7+3
   path_provider: ^1.6.11
+  web_socket_channel: ^1.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -136,6 +137,8 @@ flutter:
      - assets/light/van.svg
      - assets/light/warehouse.svg
      - assets/geofence-not-found.svg
+     - assets/search-device-list-icon.svg
+     - assets/no-user-found.svg
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

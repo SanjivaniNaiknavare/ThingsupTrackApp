@@ -52,11 +52,11 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
   void initState(){
     super.initState();
     global.lastFunction="";
-    if(global.userRole.toString().compareTo("manager")==0)
+    if(global.myObject.role.toString().compareTo("manager")==0)
     {
       expectedRole="user";
     }
-    else if(global.userRole.toString().compareTo("admin")==0)
+    else if(global.myObject.role.toString().compareTo("admin")==0)
     {
       expectedRole="manager";
     }
@@ -371,17 +371,17 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       controller: nameController,
       decoration:!nameValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.userObject==null?"Name":widget.userObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.userObject==null?"Name":widget.userObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -401,17 +401,19 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       controller: useridController,
       decoration:!useridValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.userObject==null?"User ID":widget.userObject.email.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText:  widget.userObject==null?"User ID":widget.userObject.email.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -437,17 +439,19 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
           onPressed: () { setState(() { obscureText = !obscureText; }); },
         ):null,
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText:  "Password",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "Password",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -463,9 +467,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         controller: roleController,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Color(0xffEFF0F6),
-          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-          focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+          fillColor: Color(0xffffffff),
+          disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText:  expectedRole,
           hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -484,19 +489,19 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       controller: phoneController,
       decoration:!phoneValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText:  widget.userObject==null?"Phone No(+919988776655)":widget.userObject.phone.toString(),
+        hintText:  widget.userObject==null?"Phone No":widget.userObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.userObject==null?"Phone No(+919988776655)":widget.userObject.phone.toString(),
+        hintText: widget.userObject==null?"Phone No":widget.userObject.phone.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -511,17 +516,17 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
       obscureText: false,
       decoration:!customMapValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText:  widget.userObject==null || widget.userObject.custommap.length==0?"CustomMap":widget.userObject.custommap.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.userObject==null || widget.userObject.custommap.length==0?"CustomMap":widget.userObject.custommap.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -546,17 +551,19 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
           ),
         ),
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color:Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "Devices",
         hintStyle: TextStyle( color:Color.fromRGBO(0, 0, 0, 0.4),fontSize:global.font14,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color:Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "Devices",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -568,32 +575,63 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
         child: Scaffold(
             appBar:AppBar(
               titleSpacing: 0.0,
-              elevation: 5,
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  GestureDetector(
-                          onTap: (){_onbackButtonPressed();},
-                          child: new Container(
-                            height: 25,
-                            child:Image(image: AssetImage('assets/back-arrow.png')),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child:  Container(
+                                height: kToolbarHeight-10,
+                                padding:  EdgeInsets.fromLTRB(15,0,0,0),
+                                child: new Container(
+                                    child: GestureDetector(
+                                        onTap: (){_onbackButtonPressed();},
+                                        child: new Container(
+                                          height: 20,
+                                          child:Image(image: AssetImage('assets/back-arrow.png')),
+                                        )
+                                    )
+                                )
+                            ),
                           )
+                        ],
                       )
                   ),
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child: widget.userObject!=null? new Text("Edit User",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
-                      new Text("Add User",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                  Flexible(
+                    flex: 5,
+                    fit: FlexFit.tight,
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        new Container(
+                            margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            child: new Text("Add User",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                        )
+                      ],
+
+                    ),
                   ),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Container()
+                  )
                 ],
               ),
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
+              color: global.screenBackColor,
               padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child:isResponseReceived?SingleChildScrollView(
                   child: new Column(
@@ -790,10 +828,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                               child:new Row(
                                 children: <Widget>[
                                   new Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        new Text("TwelveHourFormat :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                        new Text("TwelveHourFormat",style: new TextStyle(fontSize: global.font15, color: global.mainBlackColor, fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                                         Checkbox(
                                           onChanged: (bool flag) {
                                             twelveHourFormat=flag;

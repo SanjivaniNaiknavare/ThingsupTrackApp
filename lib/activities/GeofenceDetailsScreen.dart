@@ -95,11 +95,9 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
   {
     nameValidate = false;
     descValidate = false;
-    atttrValidate = false;
 
     String nameData = nameController.text;
     String descData = descController.text;
-    String attrData = attrController.text;
 
     if (nameData.isEmpty || nameData == " " || nameData.length == 0)
     {
@@ -120,26 +118,9 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
     }
 
 
-    if (attrData.isEmpty || attrData == " " || attrData.length < 2)
-    {
-      atttrValidate = true;
-    }
-    else
-    {
-      bool flag = await global.helperClass.isJsonObject(attrData);
-      if (flag)
-      {
-        atttrValidate = false;
-      }
-      else
-      {
-        atttrValidate = true;
-      }
-    }
-
     setState(() {});
 
-    if (!nameValidate && !descValidate && !atttrValidate)
+    if (!nameValidate && !descValidate)
     {
       if (initialListOfLatLngs.length>=3)
       {
@@ -159,19 +140,7 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
           area.add(latLngClass);
         }
 
-        attrData=attrData.replaceAll(" ", "");
-        if(attrData.length>2)
-        {
-          Map sensorMap = json.decode(attrData);
-          for (var key in sensorMap.keys)
-          {
-            attributes=new AttributeClass(key, sensorMap[key]);
-          }
-        }
-        else
-        {
-          attributes = new AttributeClass("Test", "123");
-        }
+        attributes = new AttributeClass("", "");
 
         AddGeofenceClass addGeofenceClass = new AddGeofenceClass(name: name, description: description, area: area, attributes: attributes);
         var jsonBody = jsonEncode(addGeofenceClass);
@@ -229,11 +198,9 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
 
     nameValidate=false;
     descValidate=false;
-    atttrValidate=false;
 
     String nameData=nameController.text;
     String descData=descController.text;
-    String attrData=attrController.text;
 
     if(nameData.isEmpty || nameData==" " || nameData.length==0)
     {
@@ -253,24 +220,6 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
       descValidate=false;
     }
 
-
-    if(attrData.isEmpty || attrData==" " || attrData.length<2)
-    {
-      atttrValidate=true;
-    }
-    else
-    {
-      bool flag=await global.helperClass.isJsonObject(attrData);
-      if(flag)
-      {
-        atttrValidate = false;
-      }
-      else
-      {
-        atttrValidate = true;
-      }
-    }
-
     setState(() {});
 
     if(!nameValidate && !descValidate && !atttrValidate)
@@ -288,19 +237,7 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
         area.add(latLngClass);
       }
 
-      attrData=attrData.replaceAll(" ", "");
-      if(attrData.length>2)
-      {
-        Map sensorMap = json.decode(attrData);
-        for (var key in sensorMap.keys)
-        {
-          attributes=new AttributeClass(key, sensorMap[key]);
-        }
-      }
-      else
-      {
-        attributes = new AttributeClass("Test", "123");
-      }
+      attributes = new AttributeClass("", "");
 
       UpdateGeofenceClass updateGeofenceClass=new UpdateGeofenceClass(name: name,description: description,area: area,attributes: attributes,id:id);
       var jsonBody=jsonEncode(updateGeofenceClass);
@@ -374,7 +311,7 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
     setState(() {
       _markers.add(
         Marker(
-            icon:  BitmapDescriptor.fromBytes(markerIcon),
+            icon:  BitmapDescriptor.defaultMarker,
             markerId: MarkerId(markerIdVal),
             position: point,
             anchor: Offset(0.5,0.5)
@@ -404,17 +341,17 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
       controller: nameController,
       decoration:!nameValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5,), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.geofenceObject==null?"Name":widget.geofenceObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.geofenceObject==null?"Name":widget.geofenceObject.name.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
@@ -433,47 +370,19 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
       controller: descController,
       decoration:!descValidate? InputDecoration(
         filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        fillColor: Color(0xffffffff),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.geofenceObject==null?"Description":widget.geofenceObject.description.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
         fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
+        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: widget.geofenceObject==null?"Description":widget.geofenceObject.description.toString(),
-        hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
-      ),
-    );
-
-    final attributeField = TextField(
-      onTap: () {
-        setState(() {atttrValidate = false;});
-      },
-      textInputAction: TextInputAction.done,
-      style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
-      cursorColor: global.mainColor,
-      obscureText: false,
-      controller: attrController,
-      decoration:!atttrValidate? InputDecoration(
-        filled: true,
-        fillColor: Color(0xffEFF0F6),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.geofenceObject==null?"Attributes":attributeStr.toString(),
-        hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
-      ):InputDecoration(
-        filled: true,
-        fillColor: global.errorTextFieldFillColor,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffEFF0F6),), borderRadius: BorderRadius.circular(10.0),),
-        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffEFF0F6)), borderRadius: BorderRadius.circular(10.0),),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.geofenceObject==null?"Attributes":attributeStr.toString(),
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
@@ -484,31 +393,76 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
         child: Scaffold(
             appBar:AppBar(
               titleSpacing: 0.0,
-              elevation: 5,
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  GestureDetector(
-                          onTap: (){_onbackButtonPressed();},
-                          child: new Container(
-                            height: 25,
-                            child:Image(image: AssetImage('assets/back-arrow.png')),
+//                  Container(
+//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                      child:  GestureDetector(
+//                          onTap: (){_onbackButtonPressed();},
+//                          child: new Container(
+//                            height: 25,
+//                            child:Image(image: AssetImage('assets/back-arrow.png')),
+//                          )
+//                      )
+//                  ),
+//                  Container(
+//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                      child:  new Text("Geofence Details",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+//                  ),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child:  Container(
+                                height: kToolbarHeight-10,
+                                padding:  EdgeInsets.fromLTRB(15,0,0,0),
+                                child: new Container(
+                                    child: GestureDetector(
+                                        onTap: (){_onbackButtonPressed();},
+                                        child: new Container(
+                                          height: 20,
+                                          child:Image(image: AssetImage('assets/back-arrow.png')),
+                                        )
+                                    )
+                                )
+                            ),
                           )
+                        ],
                       )
                   ),
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child:  new Text("Geofence Details",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                  Flexible(
+                      flex: 5,
+                      fit: FlexFit.tight,
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: new Text("Geofence Details",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                          ),
+                        ],
+                      )
                   ),
+                  Flexible(
+                      flex: 1,
+                      fit: FlexFit.tight,
+                      child:new Container()
+                  )
                 ],
               ),
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
+                color: global.screenBackColor,
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child:SingleChildScrollView(
 
@@ -568,33 +522,6 @@ class _GeofenceDetailsScreenState extends State<GeofenceDetailsScreen>
                           ],
                         ),
                         SizedBox(height: 10,),
-                        widget.geofenceObject!=null?new Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            new Container(
-                                child:new Text("Attributes :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                            ),
-                          ],
-                        ):new Container(width: 0,height: 0,),
-                        SizedBox(height: 5,),
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                                flex:1,
-                                fit:FlexFit.tight,
-                                child:new Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: attributeField,
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10,),
-
                         new Container(
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.width,

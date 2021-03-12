@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
+import 'package:thingsuptrackapp/activities/SearchDeviceHomeScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
@@ -11,13 +14,15 @@ import 'package:thingsuptrackapp/helpers/HomeScreenDeviceDetails.dart';
 import 'package:thingsuptrackapp/helpers/HomeScreenDriverInfo.dart';
 import 'package:thingsuptrackapp/helpers/ListOfHomeScreenDevices.dart';
 import 'package:thingsuptrackapp/helpers/ShareDevicePopup.dart';
+import 'package:web_socket_channel/io.dart';
 
 
 class HomeScreenBottomSheet extends StatefulWidget
 {
-  HomeScreenBottomSheet({Key key,this.scrollController,this.onDevicesReceived,this.onDeviceSelected}) : super(key: key);
+  HomeScreenBottomSheet({Key key,this.scrollController,this.onDevicesReceived,this.onDeviceSelected,this.onDevicesUpdated}) : super(key: key);
   ScrollController scrollController;
   ValueChanged<List<DeviceObjectAllAccount>> onDevicesReceived;
+  ValueChanged<List<DeviceObjectAllAccount>> onDevicesUpdated;
   ValueChanged<DeviceObjectAllAccount> onDeviceSelected;
 
   HomeScreenBottomSheetState createState()=> HomeScreenBottomSheetState();
@@ -47,6 +52,235 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
   void initState() {
     super.initState();
     getDevices();
+
+    // socketConnect();
+
+  }
+
+  void socketConnect() async
+  {
+
+    FirebaseApp defaultApp = await Firebase.initializeApp();
+    FirebaseAuth _auth = FirebaseAuth.instanceFor(app: defaultApp);
+    String idToken=await _auth.currentUser.getIdToken(true);
+    String socketURL="wss://dev.trackapi.thingsup.io/socket.io/?EIO=4&transport=websocket&authorization=Bearer "+idToken.toString();
+
+    int count=0;
+    // var inputJson='42["DeviceUpdate",{"id":375968,"name":"TestDevice2","uniqueid":"121","lastupdate":"2021-03-12T07:51:20.000Z","positionid":375968,"groupid":0,"ownerid":2,"attributes":"{\\"sat\\": 7, \\"hdop\\": 0.9, \\"io68\\": 0, \\"pdop\\": 1, \\"rssi\\": 5, \\"event\\": 0, \\"io200\\": 0, \\"power\\": 0, \\"temp1\\": 25, \\"motion\\": true, \\"battery\\": 3.857, \\"distance\\": 7.32, \\"ignition\\": false, \\"odometer\\": 8124, \\"operator\\": 40490, \\"priority\\": 0, \\"gpsStatus\\": 1, \\"totalDistance\\": 9018161.78}","static":null,"status":1,"moving":0,"ignition":0,"phone":"","model":"","contact":"","type":"tanker","disabled":0,"created_at":"2021-02-27T06:26:35.000Z","protocol":"teltonika","deviceid":6,"servertime":"2021-03-12T07:51:20.000Z","devicetime":"2021-03-12T07:51:14.000Z","fixtime":"2021-03-12T07:51:14.000Z","valid":1,"latitude":18.5059699,"longitude":73.9459983,"altitude":578,"speed":0,"course":104,"address":null,"accuracy":0,"network":null}]';
+
+    var channel =IOWebSocketChannel.connect(Uri.parse(socketURL));
+    print("connection closeCode->"+channel.closeCode.toString());
+    print("connection closeReason->"+channel.closeReason.toString());
+    channel.stream.listen((message) {
+
+      print(message);
+      if(message.toString().startsWith("0{"))
+      {
+        channel.sink.add('40');
+      }
+      if(message.toString().compareTo("2")==0)
+      {
+        channel.sink.add('3');
+      }
+
+
+      //  print(LOGTAG+" message->"+message.toString());
+
+      if (message.toString().contains('42["DeviceUpdate"'))
+      {
+        print(LOGTAG+" deviceUpdate string  found");
+        var jsonStr = message.toString().substring(18, message.toString().indexOf("]"));
+        var resBody=json.decode(jsonStr.toString());
+
+        print(LOGTAG+" resBody->");
+        print(resBody);
+
+        Map<String,dynamic> payloadList = resBody;
+
+        bool isMoving=false;
+        bool isIdle=false;
+        bool isOffline=false;
+        bool isStopped=false;
+        String status="Stopped";
+
+        int id = payloadList['id'];
+        String uniqueid = payloadList['uniqueid'];
+        String name = payloadList['name'];
+        String type = payloadList['type'];
+        String phone = payloadList['phone'];
+        String model = payloadList['model'];
+        String contact = payloadList['contact'];
+        var latlngStatic = payloadList['static'];
+
+        String lastUpdate2=payloadList['lastupdate'];
+        String lastUpdate="";
+        if(lastUpdate2!=null)
+        {
+          var strToDateTime = DateTime.parse(lastUpdate2.toString());
+          final convertLocal = strToDateTime.toLocal();
+          String updatedDt = global.formatter.format(convertLocal);
+          lastUpdate=updatedDt.toString();
+        }
+
+
+        var speedData=payloadList['speed'];
+        int valid=payloadList['valid'];
+
+
+        double latitude=0;
+        double longitude=0;
+        if(payloadList['latitude']!=null)
+        {
+          if(payloadList['latitude']==0)
+          {
+            latitude=0;
+          }
+          else{
+            latitude=payloadList['latitude'];
+          }
+        }
+        else{
+          latitude=payloadList['latitude'];
+        }
+
+        if(payloadList['longitude']!=null)
+        {
+          if(payloadList['longitude']==0)
+          {
+            longitude=0;
+          }
+          else{
+            longitude=payloadList['longitude'];
+          }
+        }
+        else
+        {
+          longitude=payloadList['longitude'];
+        }
+
+        int accuracy=payloadList['accuracy'];
+        var attributeData=payloadList['attributes'];
+        Map<String,dynamic> attributes=new Map();
+        int movingData=payloadList['moving'];
+        int ignitionData=payloadList['ignition'];
+        int statusData=payloadList['status'];
+        int course=payloadList['course'];
+
+        double speed=0;
+
+        if(speedData!=null)
+        {
+          speed=double.parse(speedData.toString());
+          speed = double.parse((speed).toStringAsFixed(2));
+        }
+
+        if(attributeData!=null)
+        {
+          attributes=jsonDecode(attributeData);
+        }
+
+
+        if(ignitionData==0 && statusData==1 && movingData==1)
+        {
+          isMoving=true;
+          status="Moving";
+        }
+
+        if(ignitionData==1 && statusData==1 && movingData==0)
+        {
+          isIdle=true;
+          status="Idle";
+        }
+
+        if(ignitionData==0 && statusData==1 && movingData==0)
+        {
+          isStopped=true;
+          status="Stopped";
+        }
+
+        if(statusData==0)
+        {
+          isOffline=true;
+          status="Offline";
+        }
+
+
+        LatLngClass static;
+        if (latlngStatic != null)
+        {
+          Map<String, dynamic> datamap = json.decode(latlngStatic);
+          if (datamap.length > 0)
+          {
+            double lat = datamap['lat'];
+            double lng = datamap['lng'];
+            static = new LatLngClass(lat: lat, lng: lng);
+            latitude=lat;
+            longitude=lng;
+          }
+        }
+
+
+        DeviceObjectAllAccount deviceObjectAllAccount = new DeviceObjectAllAccount(id: id,
+            name: name,
+            uniqueid: uniqueid,
+            static: static,
+            groupid: null,
+            phone: phone.toString(),
+            model: model.toString(),
+            contact: contact.toString(),
+            type: type,
+            lastUpdate:lastUpdate,
+            speed: speed,valid: valid,latitude: latitude,longitude: longitude,attributes: attributes,
+            accuracy: accuracy,moving: isMoving,idle: isIdle,offline: isOffline,stopped: isStopped,status: status,course: course);
+
+        if(expandDeviceObject!=null)
+        {
+          String expandName=expandDeviceObject.name.toString();
+          String expandUniqueID=expandDeviceObject.uniqueid.toString();
+          if(deviceObjectAllAccount.name.toString().compareTo(expandName)==0 && deviceObjectAllAccount.uniqueid.toString().compareTo(expandUniqueID)==0)
+          {
+            print(LOGTAG+" inside expand object match");
+            expandDeviceObject.attributes=attributes;
+            expandDeviceObject.lastUpdate=lastUpdate;
+            isShowDriverInfo=false;
+          }
+        }
+
+        for(int k=0;k<listOfDevices.length;k++)
+        {
+          int j=k;
+          DeviceObjectAllAccount devObject=listOfDevices.elementAt(k);
+          if(devObject.name.toString().compareTo(name)==0 && devObject.uniqueid.toString().compareTo(uniqueid)==0)
+          {
+            print(LOGTAG+" updated device found in my acc attributes->"+attributes.toString());
+            devObject.lastUpdate=lastUpdate;
+            devObject.model=model;
+            devObject.contact=contact;
+            devObject.type=type;
+            devObject.speed=speed;
+            devObject.valid=valid;
+            devObject.latitude=latitude;
+            devObject.longitude=longitude;
+            devObject.attributes=attributes;
+            devObject.accuracy=accuracy;
+            devObject.moving=isMoving;
+            devObject.idle=isIdle;
+            devObject.offline=isOffline;
+            devObject.stopped=isStopped;
+            devObject.status=status;
+            devObject.course=course;
+          }
+        }
+
+        setState(() {});
+        widget.onDevicesUpdated(listOfDevices);
+        print(LOGTAG+" listOFDevices length->"+listOfDevices.length.toString());
+        changeDeviceCount();
+      }
+
+      //channel.sink.close(status.goingAway);
+    });
+
   }
 
   void getDevices() async
@@ -61,23 +295,25 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
     }
 
     Response response=await global.apiClass.GetAccountDevices();
-    print(LOGTAG+" getAccountDevices response->"+response.toString());
+    // print(LOGTAG+" getAccountDevices response->"+response.toString());
 
     if(response!=null)
     {
-      print(LOGTAG+" getAccountDevices statusCode->"+response.statusCode.toString());
+      //print(LOGTAG+" getAccountDevices statusCode->"+response.statusCode.toString());
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        print(LOGTAG+" getAccountDevices->"+resBody.toString());
+        //  print(LOGTAG+" getAccountDevices body->"+response.body);
+
+        //print(LOGTAG+" getAccountDevices resBody->"+resBody.toString());
 
         int reslength=resBody.toString().length;
-        print(LOGTAG+" resBody length->"+reslength.toString());
+        //  print(LOGTAG+" resBody length->"+reslength.toString());
 
         if(reslength>50)
         {
           List<dynamic> payloadList = resBody;
-          print(LOGTAG + " payloadList->" + payloadList.length.toString());
+
 
           for (int i = 0; i < payloadList.length; i++)
           {
@@ -85,7 +321,12 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             bool isIdle=false;
             bool isOffline=false;
             bool isStopped=false;
-            String status="Stoppepd";
+            String status="";
+
+            print(LOGTAG + " name->" + payloadList.elementAt(i)['name'].toString());
+            print(LOGTAG + " lat->" + payloadList.elementAt(i)['latitude'].toString());
+            print(LOGTAG + " lng->" + payloadList.elementAt(i)['longitude'].toString());
+
 
             int id = payloadList.elementAt(i)['id'];
             String uniqueid = payloadList.elementAt(i)['uniqueid'];
@@ -96,11 +337,56 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             String contact = payloadList.elementAt(i)['contact'];
             var latlngStatic = payloadList.elementAt(i)['static'];
 
-            String lastUpdate=payloadList.elementAt(i)['lastupdate'];
+            //String lastUpdate=payloadList.elementAt(i)['lastupdate'];
+            String lastUpdate2=payloadList.elementAt(i)['lastupdate'];
+            String lastUpdate="";
+            if(lastUpdate2!=null)
+            {
+              var strToDateTime = DateTime.parse(lastUpdate2.toString());
+              final convertLocal = strToDateTime.toLocal();
+              String updatedDt = global.formatter.format(convertLocal);
+              lastUpdate=updatedDt.toString();
+            }
+
+
             var speedData=payloadList.elementAt(i)['speed'];
             int valid=payloadList.elementAt(i)['valid'];
-            double latitude=payloadList.elementAt(i)['latitude'];
-            double longitude=payloadList.elementAt(i)['longitude'];
+            double latitude=0;
+            double longitude=0;
+            if(payloadList.elementAt(i)['latitude']!=null)
+            {
+              if(payloadList.elementAt(i)['latitude']==0)
+              {
+                latitude=0;
+              }
+              else{
+                latitude=payloadList.elementAt(i)['latitude'];
+              }
+            }
+            else{
+              latitude=payloadList.elementAt(i)['latitude'];
+            }
+
+            if(payloadList.elementAt(i)['longitude']!=null)
+            {
+              if(payloadList.elementAt(i)['longitude']==0)
+              {
+                longitude=0;
+              }
+              else{
+                longitude=payloadList.elementAt(i)['longitude'];
+              }
+            }
+            else
+            {
+              longitude=payloadList.elementAt(i)['longitude'];
+            }
+
+
+            print(LOGTAG + " name**->" + name.toString());
+            print(LOGTAG + " lat**->" + latitude.toString());
+            print(LOGTAG + " lng**->" + longitude.toString());
+
             int accuracy=payloadList.elementAt(i)['accuracy'];
             var attributeData=payloadList.elementAt(i)['attributes'];
             Map<String,dynamic> attributes=new Map();
@@ -124,12 +410,6 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
               attributes=jsonDecode(attributeData);
             }
 
-            if(lastUpdate!=null)
-            {
-              lastUpdate=lastUpdate.replaceAll("T", " ");
-              lastUpdate=lastUpdate.replaceAll(".000Z", "");
-            }
-
             if(ignitionData==0 && statusData==1 && movingData==1)
             {
               isMoving=true;
@@ -142,6 +422,13 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
               isIdle=true;
               status="Idle";
               idleDevices++;
+            }
+
+            if(ignitionData==0 && statusData==1 && movingData==0)
+            {
+              isStopped=true;
+              status="Stopped";
+              stoppedDevices++;
             }
 
             if(statusData==0)
@@ -184,6 +471,7 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             global.myDevices.putIfAbsent(uniqueid, () => deviceObjectAllAccount);
           }
 
+          socketConnect();
           sortList();
           widget.onDevicesReceived(listOfDevices);
 
@@ -227,6 +515,43 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
       }
       global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
     }
+
+  }
+
+  void changeDeviceCount() async
+  {
+    totalDevices=0;
+    movingDevices=0;
+    idleDevices=0;
+    offlineDevices=0;
+    stoppedDevices=0;
+    alertDevices=0;
+
+    for(int k=0;k<listOfDevices.length;k++)
+    {
+      DeviceObjectAllAccount devObject=listOfDevices.elementAt(k);
+      String status=devObject.status;
+      totalDevices++;
+
+      if(status.toString().toLowerCase().compareTo("moving")==0)
+      {
+        movingDevices++;
+      }
+      else if(status.toString().toLowerCase().compareTo("idle")==0)
+      {
+        idleDevices++;
+      }
+      else if(status.toString().toLowerCase().compareTo("offline")==0)
+      {
+        offlineDevices++;
+      }
+      else if(status.toString().toLowerCase().compareTo("stopped")==0)
+      {
+        stoppedDevices++;
+      }
+    }
+
+    setState(() {});
 
   }
 
@@ -317,9 +642,9 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             child: Container(
 
               decoration: BoxDecoration(
-                color: global.whiteColor,
-                border: Border.all(color:global.popupBackColor, width: 1.0),
-               // borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                  color: global.whiteColor,
+                  border: Border.all(color:global.popupBackColor, width: 1.0),
+                  // borderRadius: BorderRadius.all(Radius.circular(15.0)),
                   borderRadius: new BorderRadius.only(
                     topLeft: const Radius.circular(15.0),
                     topRight: const Radius.circular(15.0),
@@ -395,7 +720,13 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
     // TODO: implement build
     return new Container(
         width: MediaQuery.of(context).size.width,
-        color: global.whiteColor,
+        decoration: BoxDecoration(
+          color: global.whiteColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(12.0),
+            topRight: Radius.circular(12.0),
+          ),
+        ),
         child:Padding(
             padding: EdgeInsets.symmetric(vertical: 0.0,horizontal: 10.0),
             child: isResponseReceived?(!expandFlag?CustomScrollView(
@@ -410,7 +741,6 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
                               children: <Widget>[
                                 Container(
                                     decoration: BoxDecoration(
-                                      color: global.whiteColor,
                                       borderRadius: const BorderRadius.only(
                                         topLeft: Radius.circular(12.0),
                                         topRight: Radius.circular(12.0),
@@ -423,14 +753,13 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: <Widget>[
                                               new Container(
-                                                width:20,
+                                                width:30,
                                                 margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                                 height: 4,
                                                 decoration: BoxDecoration(
-                                                  color: Color(0xffd0d0d0),
-                                                  border: Border.all(color: Color(0xffd0d0d0), width: 1.0),
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(2.0)),
+                                                  color: Color(0xff121212).withOpacity(0.2),
+                                                  border: Border.all(color: Color(0xff121212).withOpacity(0.2), width: 0),
+                                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
                                                 ),
                                               ),
                                             ],
@@ -471,6 +800,14 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
                                             child: GestureDetector(
                                               onTap: (){
 
+                                                Navigator.push(context, MaterialPageRoute(builder: (context) => SearchDeviceHomeScreen(listOfDevices: listOfDevices,onTabClicked: (deviceObject){
+
+                                                  expandDeviceObject=deviceObject;
+                                                  expandFlag=true;
+                                                  isShowDriverInfo=false;
+                                                  setState(() {});
+
+                                                },),),);
                                               },
                                               child: new Container(
                                                   width: MediaQuery.of(context).size.width,
@@ -857,18 +1194,31 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
                                         flex:1,
                                         fit: FlexFit.tight,
                                         child: new GestureDetector(
-                                          onTap: (){
-                                            expandFlag=!expandFlag;
-                                            setState(() {});
-                                          },
-                                          child: new Container(
-                                            child:new Row(
-                                              children: <Widget>[
-                                                Icon(Icons.keyboard_arrow_left,color: global.mainBlackColor,),
-                                                new Text('All Devices :',textAlign: TextAlign.center, style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                              ],
-                                            ),
-                                          ),
+                                            onTap: (){
+                                              expandFlag=!expandFlag;
+                                              setState(() {});
+                                            },
+                                            child: new Container(
+                                              child: new Row(
+                                                children: <Widget>[
+                                                  new Container(
+                                                      padding: EdgeInsets.fromLTRB(0, 2, 10, 2),
+                                                      decoration: new BoxDecoration(
+                                                        color: global.whiteColor,
+                                                        border: Border.all(color: Color(0xffc4c4c4),width: 0.5),
+                                                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                                                      ),
+                                                      child:new Row(
+                                                        children: <Widget>[
+                                                          Icon(Icons.keyboard_arrow_left,color: global.mainBlackColor,),
+                                                          new Text('All Devices',textAlign: TextAlign.center, style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+
+                                                        ],
+                                                      )
+                                                  )
+                                                ],
+                                              ),
+                                            )
                                         )
                                     ),
                                     Flexible(

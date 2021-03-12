@@ -120,219 +120,214 @@ class _ListOfUsersState extends State<ListOfUsers>
   @override
   Widget build(BuildContext context) {
     return new Container(
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-        child:new Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
-            child:Container(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                decoration: new BoxDecoration(
-                  color: global.whiteColor,
-                  border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                  borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                ),
-                child:new Column(
+        margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+        child:Container(
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+            decoration: new BoxDecoration(
+              color: global.whiteColor,
+              border: Border.all(color: Color(0xffc4c4c4),width: 1),
+              borderRadius: BorderRadius.all(Radius.circular(8.0),),
+            ),
+            child:new Column(
+              children: <Widget>[
+                new Row(
                   children: <Widget>[
-                    new Row(
-                      children: <Widget>[
-                        new Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: Image(image: AssetImage("assets/default-avatar-icon.png")),
-                            )
-                        ),
-                        new Flexible(
-                            flex:3,
-                            fit:FlexFit.tight,
-                            child:new Column(
+                    new Flexible(
+                        flex:1,
+                        fit:FlexFit.tight,
+                        child:new Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Image(image: AssetImage("assets/default-avatar-icon.png")),
+                        )
+                    ),
+                    new Flexible(
+                        flex:3,
+                        fit:FlexFit.tight,
+                        child:new Column(
+                          children: <Widget>[
+                            new Row(
                               children: <Widget>[
-                                new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                        child:new SvgPicture.asset('assets/blue-user-icon.svg')
-                                    ),
-                                    SizedBox(width:5),
-                                    Expanded(
-                                        child: new Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              new Text(widget.userObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
-                                            ]
-                                        )
-                                    ),
-                                  ],
+                                new Container(
+                                    child:new SvgPicture.asset('assets/blue-user-icon.svg')
                                 ),
-                                SizedBox(height:5),
-                                new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                        child:new SvgPicture.asset('assets/yellow-mail-icon.svg')
-                                    ),
-                                    SizedBox(width:5),
-                                    Expanded(
-                                        child: new Column(
+                                SizedBox(width:5),
+                                Expanded(
+                                    child: new Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          new Text(widget.userObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font15, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                        ]
+                                    )
+                                ),
+                              ],
+                            ),
+                            SizedBox(height:5),
+                            new Row(
+                              children: <Widget>[
+                                new Container(
+                                    child:new SvgPicture.asset('assets/yellow-mail-icon.svg')
+                                ),
+                                SizedBox(width:5),
+                                Expanded(
+                                    child: new Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        new Text(widget.userObject.email.toString(),
+                                          maxLines: 10,
+                                          style: TextStyle(fontSize: global.font15, color: global.darkBlack,fontFamily: 'MulishRegular'),
+                                        )
+                                      ],
+                                    )
+                                )
+                              ],
+                            ),
+                            SizedBox(height:5),
+                            new Row(
+                              children: <Widget>[
+                                new Container(
+                                    child:new SvgPicture.asset('assets/green-phone-icon.svg')
+                                ),
+                                SizedBox(width:5),
+                                Expanded(
+                                    child: new Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          widget.userObject.phone!=null?(widget.userObject.phone.length!=0?new Text(widget.userObject.phone.toString(), style: TextStyle(fontSize: global.font15, color: global.darkBlack,fontFamily: 'MulishRegular')):new Text("NA", maxLines: 10, style: TextStyle(fontSize: global.font15, color: global.darkBlack,fontFamily: 'MulishRegular'))):
+                                          new Text("NA", maxLines: 10, style: TextStyle(fontSize: global.font15, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                        ]
+                                    )
+                                )
+                              ],
+                            ),
+                            SizedBox(height:5),
+                          ],
+                        )
+                    )
+                  ],
+                ),
+                SizedBox(height:5),
+                new Row(
+                  children: <Widget>[
+                    new Flexible(
+                        flex:1,
+                        fit:FlexFit.tight,
+                        child:new Container(
+                        )
+                    ),
+                    new Flexible(
+                        flex:3,
+                        fit:FlexFit.tight,
+                        child:new Container(
+                            height: 45,
+                            child: new Row(
+                              children: <Widget>[
+                                Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child:GestureDetector(
+                                      onTap: (){
+                                        widget.onTabCicked("Edit");
+                                      },
+                                      child: new Container(
+                                          width: MediaQuery.of(context).size.width,
+                                          height: 45,
+                                          padding: EdgeInsets.fromLTRB(8,8,8,8),
+                                          margin: EdgeInsets.fromLTRB(5,0,5,0),
+                                          decoration: new BoxDecoration(
+                                            color: global.transparent,
+                                            border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                            borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                          ),
+                                          child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
+                                      ),
+                                    )
+                                ),
+                                Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child:GestureDetector(
+                                      onTap: (){
+                                        widget.onTabCicked("Delete");
+                                      },
+                                      child: new Container(
+                                          height: 45,
+                                          padding: EdgeInsets.fromLTRB(8,8,8,8),
+                                          margin: EdgeInsets.fromLTRB(5,0,5,0),
+                                          width: MediaQuery.of(context).size.width,
+                                          decoration: new BoxDecoration(
+                                            color: global.transparent,
+                                            border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                            borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                          ),
+                                          child: new SvgPicture.asset('assets/delete-icon.svg')
+                                      ),
+                                    )
+                                ),
+                                Flexible(
+                                    flex:2,
+                                    fit:FlexFit.tight,
+                                    child:new Container(
+                                        margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                        decoration: new BoxDecoration(
+                                          color: global.transparent,
+                                          border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                                          borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                        ),
+                                        child:new Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: <Widget>[
-                                            new Text(widget.userObject.email.toString(),
-                                              maxLines: 10,
-                                              style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'),
+                                            Flexible(
+                                                flex:1,
+                                                fit:FlexFit.tight,
+                                                child:new Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    new Text("Status", style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')),
+                                                  ],
+                                                )
+                                            ),
+                                            Flexible(
+                                                flex:1,
+                                                fit:FlexFit.tight,
+                                                child: Switch(
+                                                  onChanged: (val){
+                                                    setState(() {
+                                                      status = val;
+                                                    });
+                                                    if(val)
+                                                    {
+                                                      enableUser();
+                                                    }
+                                                    else
+                                                    {
+                                                      disableUser();
+                                                    }
+                                                  },
+                                                  value: status,
+                                                  activeColor: Color(0xff0E4DA4),
+                                                  activeTrackColor: Color(0xff0E4DA4).withOpacity(0.24),
+                                                  inactiveThumbColor: Color(0xff4D5259),
+                                                  inactiveTrackColor:Color(0xff0E4DA4).withOpacity(0.1),
+                                                )
                                             )
                                           ],
                                         )
                                     )
-                                  ],
-                                ),
-                                SizedBox(height:5),
-                                new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                        child:new SvgPicture.asset('assets/green-phone-icon.svg')
-                                    ),
-                                    SizedBox(width:5),
-                                    Expanded(
-                                        child: new Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              widget.userObject.phone!=null?new Text(widget.userObject.phone.toString(), style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular')):
-                                              new Text("NA",
-                                                  maxLines: 10,
-                                                  style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
-                                            ]
-                                        )
-                                    )
-                                  ],
-                                ),
-                                SizedBox(height:5),
+                                )
                               ],
                             )
                         )
-                      ],
-                    ),
-                    SizedBox(height:5),
-                    new Row(
-                      children: <Widget>[
-                        new Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                            )
-                        ),
-                        new Flexible(
-                            flex:3,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                                height: 45,
-                                child: new Row(
-                                  children: <Widget>[
-                                    Flexible(
-                                        flex:1,
-                                        fit:FlexFit.tight,
-                                        child:GestureDetector(
-                                          onTap: (){
-                                            widget.onTabCicked("Edit");
-                                          },
-                                          child: new Container(
-                                              width: MediaQuery.of(context).size.width,
-                                              height: 45,
-                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
-                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
-                                              decoration: new BoxDecoration(
-                                                color: global.transparent,
-                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                              ),
-                                              child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
-                                          ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        flex:1,
-                                        fit:FlexFit.tight,
-                                        child:GestureDetector(
-                                          onTap: (){
-                                            widget.onTabCicked("Delete");
-                                          },
-                                          child: new Container(
-                                              height: 45,
-                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
-                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
-                                              width: MediaQuery.of(context).size.width,
-                                              decoration: new BoxDecoration(
-                                                color: global.transparent,
-                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                              ),
-                                              child: new SvgPicture.asset('assets/delete-icon.svg')
-                                          ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        flex:2,
-                                        fit:FlexFit.tight,
-                                        child:new Container(
-                                            margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
-                                            decoration: new BoxDecoration(
-                                              color: global.transparent,
-                                              border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                              borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                            ),
-                                            child:new Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                Flexible(
-                                                    flex:1,
-                                                    fit:FlexFit.tight,
-                                                    child:new Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: <Widget>[
-                                                        new Text("Status", style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')),
-                                                      ],
-                                                    )
-                                                ),
-                                                Flexible(
-                                                    flex:1,
-                                                    fit:FlexFit.tight,
-                                                    child: Switch(
-                                                      onChanged: (val){
-                                                        setState(() {
-                                                          status = val;
-                                                        });
-                                                        if(val)
-                                                        {
-                                                          enableUser();
-                                                        }
-                                                        else
-                                                        {
-                                                          disableUser();
-                                                        }
-                                                      },
-                                                      value: status,
-                                                      activeColor: Color(0xff0E4DA4),
-                                                      activeTrackColor: Color(0xff0E4DA4).withOpacity(0.24),
-                                                      inactiveThumbColor: Color(0xff4D5259),
-                                                      inactiveTrackColor:Color(0xff0E4DA4).withOpacity(0.1),
-                                                    )
-                                                )
-                                              ],
-                                            )
-                                        )
-                                    )
-                                  ],
-                                )
-                            )
-                        )
-                      ],
                     )
                   ],
                 )
+              ],
             )
+
         )
     );
   }

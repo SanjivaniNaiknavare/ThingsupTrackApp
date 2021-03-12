@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:thingsuptrackapp/activities/UserDetailsScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
@@ -23,6 +24,7 @@ class _UserScreenState extends State<UserScreen>
 
   List<DeviceObjectOwned> listofDevices=new List();
   List<UserObject> listOfUsers=new List();
+  List<UserObject> currentListOfUsers=new List();
   ScrollController _scrollController=new ScrollController();
   bool isResponseReceived=false;
   bool isUserFound=false;
@@ -90,6 +92,7 @@ class _UserScreenState extends State<UserScreen>
     isResponseReceived=false;
     isUserFound=false;
     listOfUsers.clear();
+    currentListOfUsers.clear();
     global.myUsers.clear();
     setState(() {});
 
@@ -106,9 +109,11 @@ class _UserScreenState extends State<UserScreen>
         int resLength=resBody.toString().length;
         print(LOGTAG+" resLength->"+resLength.toString());
 
-        if(resLength>30) {
+        if(resLength>30)
+        {
           List<dynamic> payloadList = resBody;
-          for (int i = 0; i < payloadList.length; i++) {
+          for (int i = 0; i < payloadList.length; i++)
+          {
             int id = payloadList.elementAt(i)['id'];
             String email = payloadList.elementAt(i)['email'];
             String name = payloadList.elementAt(i)['name'];
@@ -116,36 +121,30 @@ class _UserScreenState extends State<UserScreen>
             String role = payloadList.elementAt(i)['role'];
             int disabledInt = payloadList.elementAt(i)['disabled'];
             String phone = payloadList.elementAt(i)['phone'];
-            int twelvehourformatInt = payloadList.elementAt(
-                i)['twelvehourformat'];
+            int twelvehourformatInt = payloadList.elementAt(i)['twelvehourformat'];
             String customMap = payloadList.elementAt(i)['custommap'];
             bool disabled = false;
             bool twelvehourformat = false;
 
-            if (disabledInt == 1) {
+            if (disabledInt == 1)
+            {
               disabled = true;
             }
 
-            if (twelvehourformatInt == 1) {
+            if (twelvehourformatInt == 1)
+            {
               twelvehourformat = true;
             }
 
-            UserObject userObject = new UserObject(id: id,
-                email: email,
-                name: name,
-                password: password,
-                role: role,
-                disabled: disabled,
-                phone: phone,
-                twelvehourformat: twelvehourformat,
-                custommap: customMap,
-                devices: "");
+            UserObject userObject = new UserObject(id: id, email: email, name: name, password: password, role: role, disabled: disabled, phone: phone, twelvehourformat: twelvehourformat, custommap: customMap, devices: "");
             listOfUsers.add(userObject);
             global.myUsers.putIfAbsent(email, () => userObject);
           }
           isResponseReceived = true;
-          if (listOfUsers.length > 0) {
+          if (listOfUsers.length > 0)
+          {
             isUserFound = true;
+            currentListOfUsers.addAll(listOfUsers);
           }
           setState(() {});
         }
@@ -272,9 +271,21 @@ class _UserScreenState extends State<UserScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        listOfUsers.removeAt(index);
+        //listOfUsers.removeAt(index);
+        int finalIndex=0;
+        for(int s=0;s<listOfUsers.length;s++)
+        {
+          UserObject gObj=listOfUsers.elementAt(s);
+          if(gObj.email.compareTo(useremail)==0)
+          {
+            finalIndex=s;
+          }
+        }
+        listOfUsers.removeAt(finalIndex);
+        currentListOfUsers.removeAt(index);
         isResponseReceived=true;
-        if(listOfUsers.length==0)
+        currentListOfUsers.addAll(listOfUsers);
+        if(currentListOfUsers.length==0)
         {
           isUserFound=false;
         }
@@ -309,6 +320,20 @@ class _UserScreenState extends State<UserScreen>
     Navigator.of(context).pop();
   }
 
+  void sortList(String searchSTR) async
+  {
+    currentListOfUsers.clear();
+    for(int k=0;k<listOfUsers.length;k++)
+    {
+      UserObject userObject=listOfUsers.elementAt(k);
+      if(userObject.name.toString().toLowerCase().contains(searchSTR.toString().toLowerCase()))
+      {
+        currentListOfUsers.add(userObject);
+      }
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -316,18 +341,18 @@ class _UserScreenState extends State<UserScreen>
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
           body: isResponseReceived?(
-              !isUserFound?new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
-                    width: MediaQuery.of(context).size.width,
-                    child:new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        new Row(
+              !isUserFound?new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
+                        width: MediaQuery.of(context).size.width,
+                        child:new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Flexible(
                                 flex:1,
@@ -335,63 +360,177 @@ class _UserScreenState extends State<UserScreen>
                                 child:new Container()
                             ),
                             Flexible(
-                              flex:2,
+                              flex:4,
                               fit:FlexFit.tight,
-                              child:new Container(
-                                padding: EdgeInsets.all(10),
-                                // child:Image(image: AssetImage('assets/no-device-found.png')),
+                              child:
+                              new Column(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child:
+                                    new Container(
+                                        padding: EdgeInsets.all(10),
+                                        child:new SvgPicture.asset('assets/no-user-found.svg')
+                                    ),
+                                  ),
+                                  new Container(
+                                    color: global.screenBackColor,
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: new Text('No User Added Yet', style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                  ),
+                                  new Container(
+                                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                    width: MediaQuery.of(context).size.width/3,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        boxShadow: [BoxShadow(
+                                          color: Color(0xff121212).withOpacity(0.25),
+                                          blurRadius: 32.0,
+                                          offset: new Offset(8.0, 8.0),
+                                        ),
+                                        ]
+                                    ),
+                                    child: new RaisedButton(
+                                        onPressed: () {
+                                          onTabClicked(null,null);
+                                        },
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
+                                        color: global.mainColor,
+                                        child:new Text('Add User',textAlign: TextAlign.center, style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             Flexible(
                                 flex:1,
                                 fit:FlexFit.tight,
                                 child:new Container()
-                            )
+                            ),
+
+//                            new Row(
+//                              children: <Widget>[
+//                                Flexible(
+//                                    flex:1,
+//                                    fit:FlexFit.tight,
+//                                    child:new Container()
+//                                ),
+//                                Flexible(
+//                                  flex:2,
+//                                  fit:FlexFit.tight,
+//                                  child:new Container(
+//                                    padding: EdgeInsets.all(10),
+//                                    child:new SvgPicture.asset('assets/no-user-found.svg'),
+//                                  ),
+//                                ),
+//                                Flexible(
+//                                    flex:1,
+//                                    fit:FlexFit.tight,
+//                                    child:new Container()
+//                                )
+//                              ],
+//                            ),
+//                            new Container(
+//                              color: global.screenBackColor,
+//                              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+//                              child: new Text('No User Added Yet', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+//                            ),
+
+
                           ],
                         ),
-                        new Container(
-                          color: global.screenBackColor,
-                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No User Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ):new Stack(
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin:EdgeInsets.fromLTRB(8,10,8,10),
-                    child: CustomScrollView(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: <Widget>[
-                          SliverList(
-                              delegate: SliverChildBuilderDelegate((context, index)
-                              {
-                                return Container(
-                                  color: global.transparent,
-                                  child: ListOfUsers(index: index, userObject: listOfUsers[index],onTabCicked: (flag){
-                                    if(flag.toString().compareTo("Edit")==0)
-                                    {
-                                      onTabClicked(index, listOfUsers[index]);
-                                    }
-                                    else if(flag.toString().compareTo("Delete")==0)
-                                    {
-                                      deleteConfirmationPopup(listOfUsers[index],index);
-                                    }
-                                  },
-                                  ),
-                                );
-                              }, childCount: listOfUsers.length)
-                          )
-                        ]
-                    ),
-                  )
-                ],
-              )
+                      ),
+                    ],
+                  )):new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin:EdgeInsets.fromLTRB(8,10,8,10),
+                        child: CustomScrollView(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: <Widget>[
+                              SliverList(
+                                  delegate: SliverChildListDelegate(
+                                      [
+                                        new Row(
+                                          children: <Widget>[
+                                            Flexible(
+                                              flex: 5,
+                                              fit: FlexFit.tight,
+                                              child: new Container(
+                                                height:kToolbarHeight-10,
+                                                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                child: TextField(
+                                                  textAlign: TextAlign.left,
+                                                  textAlignVertical: TextAlignVertical.center,
+                                                  decoration: InputDecoration(
+                                                    contentPadding: EdgeInsets.zero,
+                                                    prefixIcon:  Icon(Icons.search,color: Color(0xff3C74DC)),
+                                                    filled: true,
+                                                    fillColor: Color(0xffF4F8FF),
+                                                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    hintText: ' Search User By Name',
+                                                    hintStyle: TextStyle(fontSize: global.font15,color:Color(0xff3C74DC),fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    sortList(value);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Flexible(
+                                                flex: 1,
+                                                fit: FlexFit.tight,
+                                                child:GestureDetector(
+                                                  onTap: (){
+                                                    onTabClicked(null, null);
+                                                  },
+                                                  child: new Container(
+                                                    height: kToolbarHeight-10,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: global.mainColor),
+                                                    child:Icon(Icons.add,color: global.whiteColor,),
+                                                  ),
+                                                )
+                                            )
+                                          ],
+                                        )
+
+                                      ]
+                                  )
+                              ),
+                              SliverList(
+                                  delegate: SliverChildBuilderDelegate((context, index)
+                                  {
+                                    return Container(
+                                      color: global.screenBackColor,
+                                      child: ListOfUsers(index: index, userObject: currentListOfUsers[index],onTabCicked: (flag){
+                                        if(flag.toString().compareTo("Edit")==0)
+                                        {
+                                          onTabClicked(index, currentListOfUsers[index]);
+                                        }
+                                        else if(flag.toString().compareTo("Delete")==0)
+                                        {
+                                          deleteConfirmationPopup(currentListOfUsers[index],index);
+                                        }
+                                      },
+                                      ),
+                                    );
+                                  }, childCount: currentListOfUsers.length)
+                              )
+                            ]
+                        ),
+                      )
+                    ],
+                  ))
           ):new Container(
+              color: global.screenBackColor,
               child:Center(
                 child:new Container(
                   height: 50,
@@ -402,15 +541,6 @@ class _UserScreenState extends State<UserScreen>
                     strokeWidth: 5,),
                 ),
               )
-          ),
-          floatingActionButton:FloatingActionButton(
-            child: new Container(
-              child:Icon(Icons.add,color: global.whiteColor,),
-            ),
-            backgroundColor: global.mainColor,
-            onPressed: () {
-              onTabClicked(null,null);
-            },
           ),
         )
     );

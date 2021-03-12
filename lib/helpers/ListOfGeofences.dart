@@ -22,7 +22,7 @@ class _ListOfGeofencesState extends State<ListOfGeofences>
   @override
   Widget build(BuildContext context) {
     return new Container(
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+        margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
         child:new Column(
           children: <Widget>[
             Container(
@@ -49,7 +49,7 @@ class _ListOfGeofencesState extends State<ListOfGeofences>
                         )
                     ),
                     Flexible(
-                        flex: 3,
+                        flex: 4,
                         fit: FlexFit.tight,
                         child: new Column(
                           mainAxisAlignment: MainAxisAlignment.center,

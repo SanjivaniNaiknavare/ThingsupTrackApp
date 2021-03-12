@@ -61,9 +61,9 @@ class _AllAPIScreenState extends State<AllAPIScreen>
     String role="";
     var resBody=json.decode(decodedUserJson.toString());
     role=resBody["role"];
-    global.userRole=role;
-    global.userID=_auth.currentUser.uid;
-    print(LOGTAG+" role->"+global.userRole.toString());
+//    global.userRole=role;
+//    global.userID=_auth.currentUser.uid;
+//    print(LOGTAG+" role->"+global.userRole.toString());
     print(LOGTAG+" userID->"+global.userID.toString());
 
     idToken=global.idToken.toString();

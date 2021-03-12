@@ -13,15 +13,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thingsuptrackapp/activities/DeviceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/GeofenceManagementScreen.dart';
 import 'package:thingsuptrackapp/activities/GeofenceScreen.dart';
 import 'package:thingsuptrackapp/activities/UserManagementScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
+import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
+import 'package:thingsuptrackapp/helperClass/MyObject.dart';
 import 'package:thingsuptrackapp/helpers/HomeScreenBottomSheet.dart';
 import 'package:thingsuptrackapp/helpers/NavDrawer.dart';
+import 'package:web_socket_channel/io.dart';
 
 
 
@@ -43,9 +47,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool isDeviceFound=false;
   List<DeviceObjectAllAccount> listOfDevices=new List();
 
-
+  Map<String,dynamic> markerIDToMarkerMap=new Map();
   Set<Marker> _markers=new HashSet<Marker>();
-
   List<Marker> _markerList=new List();
 
   int _markerIdCounter=1;
@@ -57,10 +60,9 @@ class _HomeScreenState extends State<HomeScreen>
   void initState()
   {
     super.initState();
-
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     print(LOGTAG+" initState called");
-    // getDevices();
-    // getUserData();
+    getUserData();
 
   }
 
@@ -72,39 +74,100 @@ class _HomeScreenState extends State<HomeScreen>
     global.idToken=idToken;
     print(LOGTAG+" idToken->"+idToken.toString());
 
-    List<String> idTokenList=idToken.split(".");
-    int decodelength=idTokenList[1].length;
-    if(decodelength%4!=0)
+//    List<String> idTokenList=idToken.split(".");
+//    int decodelength=idTokenList[1].length;
+//    if(decodelength%4!=0)
+//    {
+//      int modData=decodelength%4;
+//      for(int k=0;k<modData;k++)
+//      {
+//        idTokenList[1]=idTokenList[1]+"=";
+//      }
+//    }
+//
+//    print(LOGTAG+" idTokenList->"+idTokenList[1].length.toString());
+//
+//    String decodedUserJson = utf8.decode(base64.decode(idTokenList[1]));
+//    print(LOGTAG+" decodedUserJson->"+decodedUserJson);
+//
+//    String role="";
+//    var resBody=json.decode(decodedUserJson.toString());
+//    role=resBody["role"];
+//    global.userRole=role;
+//    global.userName=resBody["name"];
+//    global.userID=_auth.currentUser.uid;
+//    print(LOGTAG+" role->"+global.userRole.toString());
+//    print(LOGTAG+" userID->"+global.userID.toString());
+//
+//    idToken=global.idToken.toString();
+//    setState(() {});
+
+    Response response=await global.apiClass.GetUser();
+    print(LOGTAG+" getUser response->"+response.toString());
+
+    if(response!=null)
     {
-      int modData=decodelength%4;
-      for(int k=0;k<modData;k++)
+      print(LOGTAG + " getUser statusCode->" + response.statusCode.toString());
+      if (response.statusCode == 200)
       {
-        idTokenList[1]=idTokenList[1]+"=";
+        var resBody = json.decode(response.body);
+        print(LOGTAG + " getuser->" + resBody.toString());
+
+        int reslength = resBody.toString().length;
+        print(LOGTAG + " resBody length->" + reslength.toString());
+
+        if (reslength > 30)
+        {
+          Map<String, dynamic> payloadList = resBody;
+          bool disabled = false;
+          bool twelvehourformat = false;
+
+          int id = payloadList['id'];
+          String name = payloadList['name'];
+          String email = payloadList['email'];
+          String password = payloadList['password'];
+          String role = payloadList['role'];
+          String phone = payloadList['phone'];
+          String mode = payloadList['mode'];
+          String avatar = payloadList['avatar'];
+          String custommap = payloadList['custommap'];
+          String attributes = payloadList['attributes'];
+          int disabledData = payloadList['disabled'];
+          int twelvehourformatData = payloadList['twelvehourformat'];
+          if (disabledData == 0)
+          {
+            disabled = false;
+          }
+          if (twelvehourformatData == 1)
+          {
+            twelvehourformat = true;
+          }
+
+          MyObject myObject = new MyObject(id: id,
+              email: email,
+              name: name,
+              password: password,
+              role: role,
+              disabled: disabled,
+              phone: phone,
+              twelvehourformat: twelvehourformat,
+              custommap: custommap,
+              attributes: attributes,
+              mode: mode,
+              avatar: avatar);
+          global.myObject = myObject;
+        }
+        else if (response.statusCode == 500)
+        {
+          global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+        }
+      }
+      else
+      {
+        global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
       }
     }
-
-    print(LOGTAG+" idTokenList->"+idTokenList[1].length.toString());
-
-    String decodedUserJson = utf8.decode(base64.decode(idTokenList[1]));
-    print(LOGTAG+" decodedUserJson->"+decodedUserJson);
-
-    String role="";
-    var resBody=json.decode(decodedUserJson.toString());
-    role=resBody["role"];
-    global.userRole=role;
-    global.userName=resBody["name"];
-    global.userID=_auth.currentUser.uid;
-    print(LOGTAG+" role->"+global.userRole.toString());
-    print(LOGTAG+" userID->"+global.userID.toString());
-
-    idToken=global.idToken.toString();
-    setState(() {});
-
   }
-
-
-
-
 
   Future<bool> _willPopCallback() async
   {
@@ -146,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen>
     }
     else if(value==4)
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => DeviceManagementScreen(),),);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => DeviceManagementScreen(),));
     }
     else if(value==5)
     {
@@ -176,6 +239,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   void setMarkers() async
   {
+    _markerIdCounter=0;
+    _markers.clear();
+    _markerList.clear();
     for(int k=0;k<listOfDevices.length;k++)
     {
       DeviceObjectAllAccount deviceObjectAllAccount = listOfDevices.elementAt(k);
@@ -184,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen>
       double lng = deviceObjectAllAccount.longitude;
       var rot=deviceObjectAllAccount.course;
       String name=deviceObjectAllAccount.name.toString();
+      String uniqueID=deviceObjectAllAccount.uniqueid.toString();
       if(rot!=null)
       {
         rotation=rot.toDouble();
@@ -196,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen>
         BitmapDescriptor bitmapDescriptor = await global.helperClass.bitmapDescriptorFromSvgAsset(context, assetSTR);
 
         final String markerIdVal = 'marker_id_$_markerIdCounter';
-        _markerIdCounter++;
+
 
         Marker marker=new Marker(
             icon: bitmapDescriptor,
@@ -208,6 +275,8 @@ class _HomeScreenState extends State<HomeScreen>
             ), anchor: Offset(0, 0)
         );
 
+        markerIDToMarkerMap.putIfAbsent(markerIdVal, () => marker);
+        _markerIdCounter++;
         setState(() {
           _markers.add(marker);
           _markerList.add(marker);
@@ -224,7 +293,8 @@ class _HomeScreenState extends State<HomeScreen>
     this.mapController.animateCamera(cameraUpdate);
   }
 
-  Future<LatLngBounds> getBounds(List<Marker> markers) {
+  Future<LatLngBounds> getBounds(List<Marker> markers)
+  {
 
     Future<LatLngBounds> fuBounds=Future.value(new LatLngBounds(southwest:  LatLng(0, 0), northeast: LatLng(0, 0)));
 
@@ -257,10 +327,103 @@ class _HomeScreenState extends State<HomeScreen>
       _center=new LatLng(lat,lng);
 
       LatLngBounds bounds = LatLngBounds(northeast: LatLng(lat, lng), southwest: LatLng(lat, lng),);
-      CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
+      //CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
+      CameraUpdate cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(lat, lng), 16);
       this.mapController.animateCamera(cameraUpdate);
       setState(() {});
     }
+  }
+
+  void updateMarkers() async
+  {
+    _markerIdCounter=0;
+    _markers.clear();
+    _markerList.clear();
+    for(int k=0;k<listOfDevices.length;k++)
+    {
+      DeviceObjectAllAccount deviceObjectAllAccount = listOfDevices.elementAt(k);
+      double rotation=0;
+      double lat = deviceObjectAllAccount.latitude;
+      double lng = deviceObjectAllAccount.longitude;
+      var rot=deviceObjectAllAccount.course;
+      String name=deviceObjectAllAccount.name.toString();
+      if(rot!=null)
+      {
+        rotation=rot.toDouble();
+      }
+      String assetSTR="assets/"+global.currentAppMode.toString()+"/"+deviceObjectAllAccount.type.toString()+".svg";
+
+      if (lat != null && lng != null)
+      {
+        LatLng point = new LatLng(lat, lng);
+        BitmapDescriptor bitmapDescriptor = await global.helperClass.bitmapDescriptorFromSvgAsset(context, assetSTR);
+
+        final String markerIdVal = 'marker_id_$_markerIdCounter';
+        _markerIdCounter++;
+
+        Marker marker=new Marker(
+            icon: bitmapDescriptor,
+            markerId: MarkerId(markerIdVal),
+            position: point,
+            rotation: rotation,
+            infoWindow: InfoWindow(
+              title: name,
+            ), anchor: Offset(0, 0)
+        );
+
+        _markers.add(marker);
+        _markerList.add(marker);
+
+        setState(() {});
+      }
+    }
+
+
+//    _markerIdCounter=0;
+//    for(int k=0;k<listOfDevices.length;k++)
+//    {
+//      DeviceObjectAllAccount deviceObjectAllAccount = listOfDevices.elementAt(k);
+//      double rotation=0;
+//      double lat = deviceObjectAllAccount.latitude;
+//      double lng = deviceObjectAllAccount.longitude;
+//      var rot=deviceObjectAllAccount.course;
+//      String name=deviceObjectAllAccount.name.toString();
+//      String uniqueID=deviceObjectAllAccount.uniqueid.toString();
+//
+//      if(rot!=null)
+//      {
+//        rotation=rot.toDouble();
+//      }
+//      String assetSTR="assets/"+global.currentAppMode.toString()+"/"+deviceObjectAllAccount.type.toString()+".svg";
+//
+//      if (lat != null && lng != null)
+//      {
+//        LatLng point = new LatLng(lat, lng);
+//        BitmapDescriptor bitmapDescriptor = await global.helperClass.bitmapDescriptorFromSvgAsset(context, assetSTR);
+//
+//        final String markerIdVal = 'marker_id_$_markerIdCounter';
+//
+//        Marker marker=new Marker(
+//            icon: bitmapDescriptor,
+//            markerId: MarkerId(markerIdVal),
+//            position: point,
+//            rotation: rotation,
+//            infoWindow: InfoWindow(
+//              title: name,
+//            ), anchor: Offset(0, 0)
+//        );
+//
+//
+//        markerIDToMarkerMap[markerIdVal]=marker;
+//        _markerList.insert(_markerIdCounter, marker);
+//        int temp=_markerIdCounter;
+//        _markerList.removeAt(temp+1);
+//        setState(() {});
+//      }
+//    }
+
+
+
   }
 
 
@@ -342,6 +505,7 @@ class _HomeScreenState extends State<HomeScreen>
                     builder: (BuildContext context, ScrollController scrollController){
                       return HomeScreenBottomSheet(scrollController: scrollController,onDevicesReceived: (value){
 
+                        listOfDevices.clear();
                         listOfDevices.addAll(value);
                         setMarkers();
 
@@ -350,6 +514,11 @@ class _HomeScreenState extends State<HomeScreen>
 
                         changePositionToSelectedDevice(device);
 
+                      },onDevicesUpdated: (deviceList){
+
+                        listOfDevices.clear();
+                        listOfDevices.addAll(deviceList);
+                        updateMarkers();
                       },);
                     },
                   )

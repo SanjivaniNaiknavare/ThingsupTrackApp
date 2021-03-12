@@ -104,7 +104,7 @@ class NavDrawerState extends State<NavDrawer>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Text(global.userName, style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                    new Text(global.myObject.name.toString(), style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                                     SizedBox(height:10),
                                     new Container(
                                         margin: EdgeInsets.fromLTRB(0, 0, 0, 0),

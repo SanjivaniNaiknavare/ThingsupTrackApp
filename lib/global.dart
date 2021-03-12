@@ -2,8 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:thingsuptrackapp/HelperClass.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:thingsuptrackapp/helperClass/MyObject.dart';
 import 'package:thingsuptrackapp/helpers/APIClass.dart';
 import 'helperClass/DeviceObject.dart';
+import 'package:intl/intl.dart';
 
 
 Color greenColor=Color(0xff00D355);
@@ -17,7 +19,7 @@ Color textDarkGreyColor=Color(0xff484848);
 Color textLightGreyColor=Color(0xff808081);
 Color checkboxColor=Color(0xff2C98F0);
 Color cardBackColor=Color(0xfff0f0f3);
-Color screenBackColor=Color(0xfffbfcfe);
+Color screenBackColor=Color(0xffffffff);
 Color popupBackColor=Color(0xfff0f0f3);
 Color popupDarkGreyColor=Color(0xff414141).withOpacity(0.5);
 Color secondaryBlueColor=Color(0xff0176FE);
@@ -51,11 +53,9 @@ HelperClass helperClass;
 APIClass apiClass;
 String idToken="";
 
-
-User currentUser;
+DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
+MyObject myObject;
 String userID="";
-String userName="";
-String userRole="manager";
 String lastFunction="";
 
 
