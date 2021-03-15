@@ -151,7 +151,7 @@ class _HomeScreenDriverInfoState extends State<HomeScreenDriverInfo> {
                   ):new BoxDecoration(
                       color: global.whiteColor,
                       image:  DecorationImage(
-                        image:  AssetImage("assets/dummy-user-profile.png"),
+                        image:  AssetImage("assets/default-avatar-icon.png"),
                         fit: BoxFit.cover,
                       ),
                       border: Border.all(

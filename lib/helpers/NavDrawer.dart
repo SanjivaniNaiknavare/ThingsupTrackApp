@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
+import 'package:thingsuptrackapp/helpers/AvatarList.dart';
 
 class NavDrawer extends StatefulWidget
 {
@@ -16,9 +17,11 @@ class NavDrawer extends StatefulWidget
 
 class NavDrawerState extends State<NavDrawer>
 {
-
+  String LOGTAG="NAVDrawer";
   File userSelectedImg;
   bool status=false;
+
+
 
   @override
   Widget build(BuildContext context)
@@ -69,32 +72,33 @@ class NavDrawerState extends State<NavDrawer>
                               flex:2,
                               fit: FlexFit.tight,
                               child:  new Container(
-                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                child:  new Container(
-                                  decoration: userSelectedImg!=null?new BoxDecoration(
-                                    color: global.whiteColor,
-                                    image:  DecorationImage(
-                                      image:  FileImage(File(userSelectedImg.path)),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    border: Border.all(
-                                      color: global.whiteColor,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                  ):new BoxDecoration(
-                                      color: global.whiteColor,
-                                      image:  DecorationImage(
-                                        image: AssetImage("assets/default-avatar-icon.png"),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      border: Border.all(
+                                  padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                  child:  new Container(
+                                      decoration: userSelectedImg!=null?new BoxDecoration(
                                         color: global.whiteColor,
-                                        width: 1.0,
+                                        image:  DecorationImage(
+                                          image:  FileImage(File(userSelectedImg.path)),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        border: Border.all(
+                                          color: global.whiteColor,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                      ):new BoxDecoration(
+                                          color: global.whiteColor,
+                                          image:  DecorationImage(
+                                            image: global.myObject==null?AssetImage("assets/Avatar/default-avatar.png"):(global.myObject.avatar.toString().toLowerCase().contains("default")?AssetImage("assets/Avatar/default-avatar.png"):AssetImage(global.AvatarMap[global.myObject.avatar])),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          border: Border.all(
+                                            color: global.whiteColor,
+                                            width: 1.0,
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(20.0))
                                       ),
-                                      borderRadius: BorderRadius.all(Radius.circular(20.0))
-                                  ),
-                                ),
+                                    ),
+
                               ),
                             ),
                             Flexible(

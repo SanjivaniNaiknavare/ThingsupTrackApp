@@ -57,20 +57,65 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> with Si
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                        padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                        child:  GestureDetector(
-                            onTap: (){_onbackButtonPressed();},
-                            child: new Container(
-                              height: 25,
-                              child:Image(image: AssetImage('assets/back-arrow.png')),
+//                    Container(
+//                        padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                        child:  GestureDetector(
+//                            onTap: (){_onbackButtonPressed();},
+//                            child: new Container(
+//                              height: 25,
+//                              child:Image(image: AssetImage('assets/back-arrow.png')),
+//                            )
+//                        )
+//                    ),
+//                    Container(
+//                        padding:  EdgeInsets.fromLTRB(15,0,0,0),
+//                        child:  new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+//                    ),
+                    Flexible(
+                        flex:1,
+                        fit: FlexFit.tight,
+                        child:new Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Expanded(
+                              child:  Container(
+                                  height: kToolbarHeight-10,
+                                  padding:  EdgeInsets.fromLTRB(15,0,0,0),
+                                  child: new Container(
+                                      child: GestureDetector(
+                                          onTap: (){_onbackButtonPressed();},
+                                          child: new Container(
+                                            height: 20,
+                                            child:Image(image: AssetImage('assets/back-arrow.png')),
+                                          )
+                                      )
+                                  )
+                              ),
                             )
+                          ],
                         )
                     ),
-                    Container(
-                        padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                        child:  new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                    Flexible(
+                      flex: 5,
+                      fit: FlexFit.tight,
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Container(
+                              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: new Text("Device Management",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                          )
+                        ],
+
+                      ),
                     ),
+                    Flexible(
+                        flex:1,
+                        fit: FlexFit.tight,
+                        child:new Container()
+                    )
                   ],
                 ),
                 bottom:

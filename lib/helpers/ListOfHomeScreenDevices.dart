@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class ListOfHomeScreenDevices extends StatefulWidget
 {
@@ -25,16 +26,40 @@ class _ListOfHomeScreenDevicesState extends State<ListOfHomeScreenDevices>
 
   String LOGTAG="ListOfHomeScreenDevices";
   bool status = false;
+  String lastUpdateData="NA";
   // bool expandFlag=false;
 
   @override
   void initState(){
     super.initState();
 
+
+
   }
 
   @override
   Widget build(BuildContext context) {
+
+    if(global.myObject!=null)
+    {
+
+      if (widget.deviceObjectAllAccount.lastUpdate == null)
+      {
+        lastUpdateData = "NA";
+      }
+      else
+      {
+        if(widget.deviceObjectAllAccount.lastUpdate.toString().isEmpty)
+        {
+          lastUpdateData="NA";
+        }
+        else
+        {
+          lastUpdateData = widget.deviceObjectAllAccount.lastUpdate;
+        }
+      }
+    }
+
     return new Container(
         margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
         child:GestureDetector(
@@ -193,7 +218,7 @@ class _ListOfHomeScreenDevicesState extends State<ListOfHomeScreenDevices>
                                                   children: <Widget>[
                                                     new Text("Last Updated",textAlign: TextAlign.center, style: TextStyle(fontSize: global.font12, color: Color(0xff6b6b6b),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
                                                     SizedBox(height: 5,),
-                                                    new Text(widget.deviceObjectAllAccount.lastUpdate.toString(), style: TextStyle(fontSize: global.font12, color: Color(0xff121212),fontWeight: FontWeight.w600,fontFamily: 'MulishRegular')),
+                                                    new Text(lastUpdateData.toString(), style: TextStyle(fontSize: global.font12, color: Color(0xff121212),fontWeight: FontWeight.w600,fontFamily: 'MulishRegular')),
                                                   ],
                                                 )
                                             ),

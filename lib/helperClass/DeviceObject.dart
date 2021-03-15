@@ -40,6 +40,7 @@ class DeviceObjectOwned
 class DeviceObjectAllAccount
 {
   DeviceObjectAllAccount({this.id,
+    this.deviceid,
     this.name,
     this.uniqueid,
     this.static,
@@ -64,6 +65,7 @@ class DeviceObjectAllAccount
   });
 
   int id;
+  int deviceid;
   String name;
   String uniqueid;
   LatLngClass static;
@@ -89,6 +91,7 @@ class DeviceObjectAllAccount
 
   DeviceObjectAllAccount.fromJson(Map<String, dynamic> json)
       : id = json['id'],
+        deviceid = json['deviceid'],
         name = json['name'],
         uniqueid = json['uniqueid'],
         static = json['static'],
@@ -114,6 +117,7 @@ class DeviceObjectAllAccount
   Map<String, dynamic> toJson() {
     return {
       'id':id,
+      'deviceid':deviceid,
       'name':name,
       'uniqueid':uniqueid,
       'static':static,

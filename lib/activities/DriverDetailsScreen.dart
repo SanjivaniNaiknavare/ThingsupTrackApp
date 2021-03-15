@@ -39,6 +39,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
 
   File tempfile;
   File userSelectedImg;
+  String selectedImagePath="";
 
   @override
   void initState()
@@ -55,6 +56,12 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     {
       nameController.text = widget.driverObject.name.toString();
       phoneController.text = widget.driverObject.phone.toString();
+      var resBody=jsonDecode(widget.driverObject.attributes.toString());
+      String licenseNo=resBody['license'];
+      attrController.text = licenseNo.toString();
+
+      print(LOGTAG+" resBody->"+resBody.toString()+" licenseNo->"+licenseNo.toString());
+      print(LOGTAG+" attributes->"+widget.driverObject.attributes.toString());
 
       if(widget.driverObject.photo!=null)
       {
@@ -65,6 +72,12 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
           final file = await new File('${tempDir.path}/image' + DateTime.now().millisecondsSinceEpoch.toString() + '.jpg').create();
           file.writeAsBytesSync(MainprofileImg);
           userSelectedImg = file;
+
+          List<String> pathList=userSelectedImg.path.toString().split("/");
+
+          int pathLength=pathList.length;
+          selectedImagePath=pathList.elementAt(pathLength-1);
+
         }
       }
     }
@@ -134,7 +147,15 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     }
     else
     {
-      phoneValidate = false;
+      if(phoneIDData.length==13 && phoneIDData.toString().contains("+"))
+      {
+        phoneValidate=false;
+      }
+      else
+      {
+        phoneValidate=true;
+        global.helperClass.showAlertDialog(context, "", "Please enter valid phone number with country code", false, "");
+      }
     }
 
     setState(() {});
@@ -145,7 +166,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       {
         List<int> imageBytes = userSelectedImg.readAsBytesSync();
         imageSelected = base64Encode(imageBytes);
-        print(LOGTAG+" image length->"+imageSelected.length.toString());
       }
 
       if(imageSelected.length>0 && imageSelected.length>102400)
@@ -160,7 +180,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         String name = nameData;
         String phone = phoneIDData;
         String photo = imageSelected;
-        String attributes = "{}";
+        AttributeClass attributes=new AttributeClass("license", attrController.text.toString());
+
 
         AddDriverClass addDriverClass = new AddDriverClass(name: name, phone: phone, photo: photo, attributes: attributes);
         var jsonBody = jsonEncode(addDriverClass);
@@ -231,7 +252,15 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     }
     else
     {
-      phoneValidate = false;
+      if(phoneData.length==13 && phoneData.toString().contains("+"))
+      {
+        phoneValidate=false;
+      }
+      else
+      {
+        phoneValidate=true;
+        global.helperClass.showAlertDialog(context, "", "Please enter valid phone number with country code", false, "");
+      }
     }
     setState(() {});
 
@@ -257,7 +286,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         String name = nameData;
         String phone = phoneController.text;
         String photo = imageSelected;
-        String attributes = "{}";
+
+        AttributeClass attributes=new AttributeClass("license", attrController.text.toString());
 
         UpdateDriverClass updateDriverClass = new UpdateDriverClass(id: id, name: name, phone: phone, photo: photo, attributes: attributes);
         var jsonBody = jsonEncode(updateDriverClass);
@@ -300,10 +330,20 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
 
   void GalleryImage() async
   {
+    List<String> pathList;
+    int pathLength=0;
     await ImagePicker.pickImage(source: ImageSource.gallery).then((value) => {
 
       tempfile=value,
       userSelectedImg=value,
+      pathList=userSelectedImg.path.toString().split("/"),
+
+      pathLength=pathList.length,
+      selectedImagePath=pathList.elementAt(pathLength-1),
+      selectedImagePath=selectedImagePath.substring(selectedImagePath.length-10,selectedImagePath.length),
+      selectedImagePath="image"+selectedImagePath,
+      print(LOGTAG+" path->"+selectedImagePath.toString()),
+
       setState((){}),
 
     }).catchError((onError){
@@ -394,7 +434,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.driverObject==null?"Attributes":widget.driverObject.attributes.toString(),
+        hintText: "License No",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ):InputDecoration(
         filled: true,
@@ -402,42 +442,78 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xffc4c4c4),width: 0.5), borderRadius: BorderRadius.circular(8.0),),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: widget.driverObject==null?"Attributes":widget.driverObject.attributes.toString(),
+        hintText: "License No",
         hintStyle: TextStyle(fontSize: global.font15,color:global.popupDarkGreyColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
       ),
     );
+
+
 
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
             appBar:AppBar(
               titleSpacing: 0.0,
-              elevation: 5,
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                      padding: EdgeInsets.fromLTRB(15,0,0,0),
-                      child: GestureDetector(
-                          onTap: (){_onbackButtonPressed();},
-                          child: new Container(
-                            height: 25,
-                            child:Image(image: AssetImage('assets/back-arrow.png')),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child:  Container(
+                                height: kToolbarHeight-10,
+                                padding:  EdgeInsets.fromLTRB(15,0,0,0),
+                                child: new Container(
+                                    child: GestureDetector(
+                                        onTap: (){_onbackButtonPressed();},
+                                        child: new Container(
+                                          height: 20,
+                                          child:Image(image: AssetImage('assets/back-arrow.png')),
+                                        )
+                                    )
+                                )
+                            ),
                           )
+                        ],
                       )
                   ),
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child: widget.driverObject!=null?new Text("Edit Driver",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')):
-                      new Text("Add Driver",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                  Flexible(
+                    flex: 5,
+                    fit: FlexFit.tight,
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        new Container(
+                            margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            child: widget.driverObject==null?new Text("Add Driver",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular')):
+                            new Text("Edit Driver",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                        )
+                      ],
+
+                    ),
                   ),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Container()
+                  )
+
                 ],
               ),
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
+              height: MediaQuery.of(context).size.height,
+              color: global.screenBackColor,
               padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child:isResponseReceived? SingleChildScrollView(
                   child: new Column(
@@ -501,7 +577,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           new Container(
-                              child:new Text("Attributes :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                              child:new Text("License No :",style: new TextStyle(fontSize: global.font12, color: Color.fromRGBO(18, 18, 18, 0.7), fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
                           ),
                         ],
                       ):new Container(width: 0,height: 0,),
@@ -532,73 +608,120 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                         ],
                       ):new Container(width: 0,height: 0,),
                       SizedBox(height: 5,),
-                      SizedBox(
-                        height:150,
-                        child:
-                        new Row(
-                          children: <Widget>[
-                            Flexible(
-                              flex:2,
-                              fit: FlexFit.tight,
-                              child:  new Container(
+                      new Row(
+                        children: <Widget>[
+                          Flexible(
+                              flex:1,
+                              fit:FlexFit.tight,
+                              child:new Container(
                                 padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                                child:  new Container(
-                                  decoration: userSelectedImg!=null?new BoxDecoration(
-                                    color: global.whiteColor,
-                                    image:  DecorationImage(
-                                      image:  FileImage(File(userSelectedImg.path)),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    border: Border.all(
+                                child: SizedBox(
+                                  height: 50,
+                                  child: new Container(
+                                    decoration: new BoxDecoration(
                                       color: global.whiteColor,
-                                      width: 1.0,
+                                      border: Border.all(color: Color(0xffc4c4c4),width: 0.5),
+                                      borderRadius: BorderRadius.all(Radius.circular(8.0),),
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                  ):new BoxDecoration(
-                                      color: global.whiteColor,
-                                      image:  DecorationImage(
-                                        image:  AssetImage("assets/dummy-user-profile.png"),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      border: Border.all(
-                                        color: global.whiteColor,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.all(Radius.circular(20.0))
+                                    child: new Row(
+                                      children: <Widget>[
+                                        Flexible(
+                                            flex:1,
+                                            fit: FlexFit.tight,
+                                            child:new Container(
+                                              margin: EdgeInsets.fromLTRB(3, 3, 3, 3),
+                                              decoration: userSelectedImg!=null?new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: global.whiteColor,
+                                                image:  DecorationImage(
+                                                  image:  FileImage(File(userSelectedImg.path)),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ):new BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: global.whiteColor,
+                                                image:  DecorationImage(
+                                                  image:  AssetImage("assets/default-avatar-icon.png"),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            )
+                                        ),
+                                        Flexible(
+                                            flex:4,
+                                            fit: FlexFit.tight,
+                                            child:new Container(
+                                              margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                              child: new Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  new Text(selectedImagePath.toString(),textAlign:TextAlign.center,style: TextStyle(fontSize: global.font12,color:global.mainBlackColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),)
+                                                ],
+                                              ),
+                                            )
+                                        ),
+                                        Flexible(
+                                            flex:2,
+                                            fit: FlexFit.tight,
+                                            child:new Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                new Container(
+                                                    height: 50,
+                                                    child:userSelectedImg!=null?new Container(
+                                                        height: 50,
+                                                        margin: EdgeInsets.fromLTRB(5, 3, 5, 3),
+                                                        decoration: new BoxDecoration(
+                                                          color: global.mainColor,
+                                                          border: Border.all(color: global.mainColor,width: 1),
+                                                          borderRadius: BorderRadius.all(Radius.circular(20.0),),
+                                                        ),
+                                                        child: GestureDetector(
+                                                          onTap: (){
+                                                            GalleryImage();
+                                                          },
+                                                          child: new Container(
+                                                              padding: EdgeInsets.fromLTRB(3, 0, 3,0),
+                                                              child:new Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                                children: <Widget>[
+                                                                  new Text("Change",textAlign:TextAlign.center,style: TextStyle(fontSize: global.font12,color:global.whiteColor,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),)
+                                                                ],
+                                                              )
+                                                          ),
+                                                        )
+                                                    ):GestureDetector(
+                                                      onTap: (){
+                                                        GalleryImage();
+                                                      },
+                                                      child: new Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        margin: EdgeInsets.fromLTRB(5, 3, 5, 3),
+                                                        decoration: new BoxDecoration(
+                                                          color: global.mainColor,
+                                                          border: Border.all(color: global.mainColor,width: 1),
+                                                          borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                                                        ),
+                                                        child: Icon(Icons.attach_file,color: global.whiteColor,),
+                                                      ),
+                                                    )
+
+                                                )
+                                              ],
+                                            )
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Flexible(
-                                flex:2,
-                                fit:FlexFit.tight,
-                                child:new Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Text('*File size must be less than 1MB', style: TextStyle(fontSize: global.font12, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                                    SizedBox(height:10),
-                                    new Container(
-                                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                      height: 50,
-                                      child: new RaisedButton(
-                                          onPressed: () {
-                                            GalleryImage();
-                                          },
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                                          color: global.mainColor,
-                                          child:new Text('Upload', style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-                                      ),
-                                    ),
-                                  ],
-                                )
-                            )
-                          ],
-                        ),
+                              )
+                          ),
+                        ],
                       ),
                       SizedBox(height: 10,),
-
-
                       widget.driverObject!=null?new Row(
                         children: <Widget>[
                           Flexible(

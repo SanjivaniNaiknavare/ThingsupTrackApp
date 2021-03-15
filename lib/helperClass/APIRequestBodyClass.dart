@@ -236,7 +236,7 @@ class AddDriverClass
   String name;
   String phone;
   String photo;
-  String attributes;
+  AttributeClass attributes;
 
   AddDriverClass.fromJson(Map<String, dynamic> json)
       : name = json['name'],
@@ -262,7 +262,7 @@ class UpdateDriverClass
   String name;
   String phone;
   String photo;
-  String attributes;
+  AttributeClass attributes;
 
   UpdateDriverClass.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -317,6 +317,23 @@ class SharingDeviceClass
     return {
       'interval':interval,
       'uniqueid':uniqueid,
+    };
+  }
+}
+
+
+class AvatarClass
+{
+  AvatarClass({this.avatar});
+
+  String avatar;
+
+  AvatarClass.fromJson(Map<String, dynamic> json)
+      : avatar = json['avatar'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'avatar':avatar,
     };
   }
 }

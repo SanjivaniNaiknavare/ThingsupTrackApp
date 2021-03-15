@@ -66,207 +66,137 @@ class _ListOfDriversState extends State<ListOfDrivers>
   @override
   Widget build(BuildContext context) {
     return new Container(
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-        child:new Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0),),
-            child:Container(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                decoration: new BoxDecoration(
-                  color: global.whiteColor,
-                  border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                  borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                ),
-                child:new Column(
-                  children: <Widget>[
-                    new Row(
-                      children: <Widget>[
-                        new Flexible(
-                          flex:1,
-                          fit:FlexFit.tight,
-                          child:new Container(
-                            height: 80,
-                              decoration: userSelectedImg!=null?new BoxDecoration(
-                                color: global.whiteColor,
-                                image:  DecorationImage(
-                                  image:  FileImage(File(userSelectedImg.path)),
-                                  fit: BoxFit.cover,
-                                ),
-                                border: Border.all(
-                                  color: global.whiteColor,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                              ):new BoxDecoration(
-                                  color: global.whiteColor,
-                                  image:  DecorationImage(
-                                    image:  AssetImage("assets/dummy-user-profile.png"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  border: Border.all(
-                                    color: global.whiteColor,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
-                              ),
-
-//                              child: userSelectedImg==null?new Container(
-//                                child: Image(image: AssetImage("assets/dummy-user-profile.png")),
-//                              ):new Container(
-//                                  child: Image(image: MemoryImage(imageBytes))
-//                              )
-                          ),
-                        ),
-                        new Flexible(
-                            flex:3,
-                            fit:FlexFit.tight,
-                            child:new Column(
-                              children: <Widget>[
-                                new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                        child:new SvgPicture.asset('assets/blue-user-icon.svg')
-                                    ),
-                                    SizedBox(width:5),
-                                    Expanded(
-                                        child: new Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              new Text(widget.driverObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
-                                            ]
-                                        )
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height:5),
-                                new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                        child:new SvgPicture.asset('assets/green-phone-icon.svg')
-                                    ),
-                                    SizedBox(width:5),
-                                    Expanded(
-                                        child: new Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              widget.driverObject.phone!=null?new Text(widget.driverObject.phone.toString(), style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular')):
-                                              new Text("NA",
-                                                  maxLines: 10,
-                                                  style: TextStyle(fontSize: global.font16, color: global.darkBlack,fontFamily: 'MulishRegular'))
-                                            ]
-                                        )
-                                    )
-                                  ],
-                                ),
-                                SizedBox(height:5),
-                              ],
-                            )
-                        )
-                      ],
+        margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+        child:Container(
+          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+          decoration: new BoxDecoration(
+            color: global.whiteColor,
+            border: Border.all(color: Color(0xffc4c4c4),width: 1),
+            borderRadius: BorderRadius.all(Radius.circular(8.0),),
+          ),
+          child:
+          new Row(
+            children: <Widget>[
+              new Flexible(
+                flex:1,
+                fit:FlexFit.tight,
+                child:new Container(
+                  height: 80,
+                  decoration: userSelectedImg!=null?new BoxDecoration(
+                    color: global.whiteColor,
+                    image:  DecorationImage(
+                      image:  FileImage(File(userSelectedImg.path)),
+                      fit: BoxFit.cover,
                     ),
-                    SizedBox(height:5),
-                    new Row(
-                      children: <Widget>[
-                        new Flexible(
-                            flex:1,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                            )
-                        ),
-                        new Flexible(
-                            flex:3,
-                            fit:FlexFit.tight,
-                            child:new Container(
-                                height: 45,
-                                child: new Row(
+                    border: Border.all(
+                      color: global.whiteColor,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ):new BoxDecoration(
+                      color: global.whiteColor,
+                      image:  DecorationImage(
+                        image:  AssetImage("assets/default-avatar-icon.png"),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: global.whiteColor,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(8.0))
+                  ),
+                ),
+              ),
+              new Flexible(
+                  flex:2,
+                  fit:FlexFit.tight,
+                  child:new Column(
+                    children: <Widget>[
+                      new Row(
+                        children: <Widget>[
+                          new Container(
+                              child:new SvgPicture.asset('assets/blue-user-icon.svg')
+                          ),
+                          SizedBox(width:5),
+                          Expanded(
+                              child: new Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Flexible(
-                                        flex:1,
-                                        fit:FlexFit.tight,
-                                        child:GestureDetector(
-                                          onTap: (){
-                                            widget.onTabCicked("Edit");
-                                          },
-                                          child: new Container(
-                                              width: MediaQuery.of(context).size.width,
-                                              height: 45,
-                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
-                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
-                                              decoration: new BoxDecoration(
-                                                color: global.transparent,
-                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                              ),
-                                              child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
-                                          ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        flex:1,
-                                        fit:FlexFit.tight,
-                                        child:GestureDetector(
-                                          onTap: (){
-                                            widget.onTabCicked("Delete");
-                                          },
-                                          child: new Container(
-                                              height: 45,
-                                              padding: EdgeInsets.fromLTRB(8,8,8,8),
-                                              margin: EdgeInsets.fromLTRB(5,0,5,0),
-                                              width: MediaQuery.of(context).size.width,
-                                              decoration: new BoxDecoration(
-                                                color: global.transparent,
-                                                border: Border.all(color: Color(0xffc4c4c4),width: 1),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0),),
-                                              ),
-                                              child: new SvgPicture.asset('assets/delete-icon.svg')
-                                          ),
-                                        )
-                                    ),
-                                    Flexible(
-                                        flex:2,
-                                        fit:FlexFit.tight,
-                                        child:new Container(
-//                                            margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
-//                                            decoration: new BoxDecoration(
-//                                              color: global.transparent,
-//                                              border: Border.all(color: Color(0xffc4c4c4),width: 1),
-//                                              borderRadius: BorderRadius.all(Radius.circular(8.0),),
-//                                            ),
-//                                            child:new Row(
-//                                              mainAxisAlignment: MainAxisAlignment.center,
-//                                              crossAxisAlignment: CrossAxisAlignment.center,
-//                                              children: <Widget>[
-//                                                Flexible(
-//                                                    flex:1,
-//                                                    fit:FlexFit.tight,
-//                                                    child:new Row(
-//                                                      mainAxisAlignment: MainAxisAlignment.center,
-//                                                      crossAxisAlignment: CrossAxisAlignment.center,
-//                                                      children: <Widget>[
-//                                                        new Text("Status", style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')),
-//                                                      ],
-//                                                    )
-//                                                ),
-//                                                Flexible(
-//                                                    flex:1,
-//                                                    fit:FlexFit.tight,
-//                                                    child: new Container()
-//                                                )
-//                                              ],
-//                                            )
-                                        )
-                                    )
-                                  ],
-                                )
-                            )
-                        )
-                      ],
-                    )
+                                    new Text(widget.driverObject.name.toString(), maxLines: 10,style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight:FontWeight.normal,fontFamily: 'MulishRegular'))
+                                  ]
+                              )
+                          ),
+                        ],
+                      ),
+                      SizedBox(height:5),
+                      new Row(
+                        children: <Widget>[
+                          new Container(
+                              child:new SvgPicture.asset('assets/green-phone-icon.svg')
+                          ),
+                          SizedBox(width:5),
+                          Expanded(
+                              child: new Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    widget.driverObject.phone!=null?new Text(widget.driverObject.phone.toString(), style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular')):
+                                    new Text("NA", maxLines: 10, style: TextStyle(fontSize: global.font14, color: global.darkBlack,fontFamily: 'MulishRegular'))
+                                  ]
+                              )
+                          )
+                        ],
+                      ),
+                      SizedBox(height:5),
+                    ],
+                  )
+              ),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: (){
+                        widget.onTabCicked("Edit");
+                      },
+                      child: new Container(
+                          height: 40,
+                          width: 40,
+                          padding: EdgeInsets.fromLTRB(5,5,5,5),
+                          decoration: new BoxDecoration(
+                            color: global.transparent,
+                            border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                            borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                          ),
+                          child:new SvgPicture.asset('assets/edit-pencil-icon.svg',height: 20,)
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        widget.onTabCicked("Delete");
+                      },
+                      child: new Container(
+                          height: 40,
+                          width: 40,
+                          padding: EdgeInsets.fromLTRB(5,5,5,5),
+                          margin: EdgeInsets.fromLTRB(0,7,0,0),
+                          decoration: new BoxDecoration(
+                            color: global.transparent,
+                            border: Border.all(color: Color(0xffc4c4c4),width: 1),
+                            borderRadius: BorderRadius.all(Radius.circular(8.0),),
+                          ),
+                          child: new SvgPicture.asset('assets/delete-icon.svg',height: 20)
+                      ),
+                    ),
                   ],
-                )
-            )
+                ),
+              )
+            ],
+          ),
         )
     );
   }

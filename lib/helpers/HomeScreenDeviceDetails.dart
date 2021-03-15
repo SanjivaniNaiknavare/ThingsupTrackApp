@@ -27,6 +27,9 @@ class _HomeScreenDeviceDetailsState extends State<HomeScreenDeviceDetails> {
   void initState() {
     super.initState();
 
+    attributeKeysList.clear();
+    attributeValuesList.clear();
+
     if(widget.deviceObjectAllAccount.attributes!=null)
     {
       if(widget.deviceObjectAllAccount.attributes.length>0)
@@ -56,6 +59,33 @@ class _HomeScreenDeviceDetailsState extends State<HomeScreenDeviceDetails> {
 
   @override
   Widget build(BuildContext context) {
+
+    attributeKeysList.clear();
+    attributeValuesList.clear();
+
+    if(widget.deviceObjectAllAccount.attributes!=null)
+    {
+      if(widget.deviceObjectAllAccount.attributes.length>0)
+      {
+        attributeKeysList.add("Name");
+        attributeValuesList.add("value");
+        for (var entry in widget.deviceObjectAllAccount.attributes.entries) {
+          attributeKeysList.add(entry.key.toString());
+          attributeValuesList.add(entry.value.toString());
+        }
+      }
+      else if(widget.deviceObjectAllAccount.attributes.length==0)
+      {
+        attributeKeysList.add("Name");
+        attributeValuesList.add("value");
+      }
+    }
+    else
+    {
+      attributeKeysList.add("Name");
+      attributeValuesList.add("value");
+    }
+
     return new Container(
         margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
         child:Container(

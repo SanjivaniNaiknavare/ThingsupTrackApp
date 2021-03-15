@@ -132,6 +132,10 @@ class _DriverDetailsScreenState extends State<TaggedDriverDetailsScreen> {
           {
             global.helperClass.showAlertDialog(context, "", "Driver Already Exist", false, "");
           }
+          else if (status.toString().contains("User is not owner of Device"))
+          {
+            global.helperClass.showAlertDialog(context, "", "User Is Not Owner Of Device", false, "");
+          }
         }
         else if (response.statusCode == 500)
         {
@@ -164,31 +168,63 @@ class _DriverDetailsScreenState extends State<TaggedDriverDetailsScreen> {
         child: Scaffold(
             appBar:AppBar(
               titleSpacing: 0.0,
-              elevation: 5,
+              elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                      padding: EdgeInsets.fromLTRB(15,0,0,0),
-                      child: GestureDetector(
-                          onTap: (){_onbackButtonPressed();},
-                          child: new Container(
-                            height: 25,
-                            child:Image(image: AssetImage('assets/back-arrow.png')),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child:  Container(
+                                height: kToolbarHeight-10,
+                                padding:  EdgeInsets.fromLTRB(15,0,0,0),
+                                child: new Container(
+                                    child: GestureDetector(
+                                        onTap: (){_onbackButtonPressed();},
+                                        child: new Container(
+                                          height: 20,
+                                          child:Image(image: AssetImage('assets/back-arrow.png')),
+                                        )
+                                    )
+                                )
+                            ),
                           )
+                        ],
                       )
                   ),
-                  Container(
-                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-                      child: new Text("Tag Driver To Device",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                  Flexible(
+                    flex: 5,
+                    fit: FlexFit.tight,
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        new Container(
+                            margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            child: new Text("Tag Driver",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                        )
+                      ],
+                    ),
                   ),
+                  Flexible(
+                      flex:1,
+                      fit: FlexFit.tight,
+                      child:new Container()
+                  )
                 ],
               ),
               backgroundColor:global.screenBackColor,
             ),
             body:Container(
+              height: MediaQuery.of(context).size.height,
+              color: global.screenBackColor,
               padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child:isResponseReceived? SingleChildScrollView(
                   child: new Column(

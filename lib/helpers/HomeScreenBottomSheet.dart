@@ -10,6 +10,7 @@ import 'package:thingsuptrackapp/activities/SearchDeviceHomeScreen.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
 import 'package:thingsuptrackapp/helperClass/DeviceObject.dart';
+import 'package:thingsuptrackapp/helperClass/MyObject.dart';
 import 'package:thingsuptrackapp/helpers/HomeScreenDeviceDetails.dart';
 import 'package:thingsuptrackapp/helpers/HomeScreenDriverInfo.dart';
 import 'package:thingsuptrackapp/helpers/ListOfHomeScreenDevices.dart';
@@ -47,14 +48,96 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
   int offlineDevices=0;
   int stoppedDevices=0;
   int alertDevices=0;
+  int today_midnight=0;
 
   @override
   void initState() {
     super.initState();
-    getDevices();
 
+    getUserData();
+
+    // getDevices();
     // socketConnect();
 
+  }
+
+  void getUserData() async
+  {
+
+    final now = DateTime.now();
+    final lastMidnight = new DateTime(now.year, now.month, now.day);
+    today_midnight = lastMidnight.millisecondsSinceEpoch;
+
+    Response response=await global.apiClass.GetUser();
+    print(LOGTAG+" getUser response->"+response.toString());
+
+    if(response!=null)
+    {
+      print(LOGTAG + " getUser statusCode->" + response.statusCode.toString());
+      if (response.statusCode == 200)
+      {
+        var resBody = json.decode(response.body);
+        print(LOGTAG + " getuser->" + resBody.toString());
+
+        int reslength = resBody.toString().length;
+        print(LOGTAG + " resBody length->" + reslength.toString());
+
+        if (reslength > 30)
+        {
+          Map<String, dynamic> payloadList = resBody;
+          bool disabled = false;
+          bool twelvehourformat = false;
+
+          int id = payloadList['id'];
+          String name = payloadList['name'];
+          String email = payloadList['email'];
+          String password = payloadList['password'];
+          String role = payloadList['role'];
+          String phone = payloadList['phone'];
+          String mode = payloadList['mode'];
+          String avatar = payloadList['avatar'];
+          String custommap = payloadList['custommap'];
+          String attributes = payloadList['attributes'];
+          int disabledData = payloadList['disabled'];
+          int twelvehourformatData = payloadList['twelvehourformat'];
+          if (disabledData == 0)
+          {
+            disabled = false;
+          }
+          if (twelvehourformatData == 1)
+          {
+            twelvehourformat = true;
+          }
+
+          MyObject myObject = new MyObject(id: id,
+              email: email,
+              name: name,
+              password: password,
+              role: role,
+              disabled: disabled,
+              phone: phone,
+              twelvehourformat: twelvehourformat,
+              custommap: custommap,
+              attributes: attributes,
+              mode: mode,
+              avatar: avatar);
+          global.myObject = myObject;
+        }
+        else if (response.statusCode == 500)
+        {
+          global.helperClass.showAlertDialog(context, "", "Internal Server Error", false, "");
+        }
+      }
+      else
+      {
+        global.helperClass.showAlertDialog(context, "", "Please check internet connection", false, "");
+      }
+      getDevices();
+    }
+    else
+    {
+      getDevices();
+    }
   }
 
   void socketConnect() async
@@ -104,6 +187,7 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
         String status="Stopped";
 
         int id = payloadList['id'];
+        int deviceid=payloadList['deviceid'];
         String uniqueid = payloadList['uniqueid'];
         String name = payloadList['name'];
         String type = payloadList['type'];
@@ -117,11 +201,47 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
         if(lastUpdate2!=null)
         {
           var strToDateTime = DateTime.parse(lastUpdate2.toString());
-          final convertLocal = strToDateTime.toLocal();
-          String updatedDt = global.formatter.format(convertLocal);
-          lastUpdate=updatedDt.toString();
+          int miliTime=strToDateTime.millisecondsSinceEpoch;
+          var formattedDate;
+          print(LOGTAG+" miliTime->"+miliTime.toString());
+          if(global.myObject!=null)
+          {
+            if (global.myObject.twelvehourformat)
+            {
+              var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+              if(miliTime>today_midnight)
+              {
+                formattedDate = global.TodaytwelveHrFormatter.format(date);
+                lastUpdate="today, "+formattedDate.toString();
+              }
+              else
+              {
+                formattedDate = global.twelveHrFormatter.format(date);
+                lastUpdate=formattedDate.toString();
+              }
+            }
+            else
+            {
+              var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+              if(miliTime>today_midnight)
+              {
+                formattedDate = global.TodaytwentyfourHrFormatter.format(date);
+                lastUpdate="today, "+formattedDate.toString();
+              }
+              else
+              {
+                formattedDate = global.twentyfourHrFormatter.format(date);
+                lastUpdate=formattedDate.toString();
+              }
+            }
+          }
+          else
+          {
+            var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+            formattedDate = global.twelveHrFormatter.format(date);
+            lastUpdate=formattedDate.toString();
+          }
         }
-
 
         var speedData=payloadList['speed'];
         int valid=payloadList['valid'];
@@ -221,6 +341,7 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
 
 
         DeviceObjectAllAccount deviceObjectAllAccount = new DeviceObjectAllAccount(id: id,
+            deviceid: deviceid,
             name: name,
             uniqueid: uniqueid,
             static: static,
@@ -323,12 +444,11 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             bool isStopped=false;
             String status="";
 
-            print(LOGTAG + " name->" + payloadList.elementAt(i)['name'].toString());
-            print(LOGTAG + " lat->" + payloadList.elementAt(i)['latitude'].toString());
-            print(LOGTAG + " lng->" + payloadList.elementAt(i)['longitude'].toString());
+
 
 
             int id = payloadList.elementAt(i)['id'];
+            int deviceid = payloadList.elementAt(i)['deviceid'];
             String uniqueid = payloadList.elementAt(i)['uniqueid'];
             String name = payloadList.elementAt(i)['name'];
             String type = payloadList.elementAt(i)['type'];
@@ -343,11 +463,47 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             if(lastUpdate2!=null)
             {
               var strToDateTime = DateTime.parse(lastUpdate2.toString());
-              final convertLocal = strToDateTime.toLocal();
-              String updatedDt = global.formatter.format(convertLocal);
-              lastUpdate=updatedDt.toString();
-            }
+              int miliTime=strToDateTime.millisecondsSinceEpoch;
+              var formattedDate;
 
+              if(global.myObject!=null)
+              {
+                if (global.myObject.twelvehourformat)
+                {
+                  var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+                  if(miliTime>today_midnight)
+                  {
+                    formattedDate = global.TodaytwelveHrFormatter.format(date);
+                    lastUpdate="today, "+formattedDate.toString();
+                  }
+                  else
+                  {
+                    formattedDate = global.twelveHrFormatter.format(date);
+                    lastUpdate=formattedDate.toString();
+                  }
+                }
+                else
+                {
+                  var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+                  if(miliTime>today_midnight)
+                  {
+                    formattedDate = global.TodaytwentyfourHrFormatter.format(date);
+                    lastUpdate="today, "+formattedDate.toString();
+                  }
+                  else
+                  {
+                    formattedDate = global.twentyfourHrFormatter.format(date);
+                    lastUpdate=formattedDate.toString();
+                  }
+                }
+              }
+              else
+              {
+                var date = DateTime.fromMillisecondsSinceEpoch(miliTime);
+                formattedDate = global.twelveHrFormatter.format(date);
+                lastUpdate=formattedDate.toString();
+              }
+            }
 
             var speedData=payloadList.elementAt(i)['speed'];
             int valid=payloadList.elementAt(i)['valid'];
@@ -384,8 +540,8 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
 
 
             print(LOGTAG + " name**->" + name.toString());
-            print(LOGTAG + " lat**->" + latitude.toString());
-            print(LOGTAG + " lng**->" + longitude.toString());
+            print(LOGTAG + " uniqueid**->" + uniqueid.toString());
+            //  print(LOGTAG + " lng**->" + longitude.toString());
 
             int accuracy=payloadList.elementAt(i)['accuracy'];
             var attributeData=payloadList.elementAt(i)['attributes'];
@@ -454,7 +610,7 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
             }
 
 
-            DeviceObjectAllAccount deviceObjectAllAccount = new DeviceObjectAllAccount(id: id,
+            DeviceObjectAllAccount deviceObjectAllAccount = new DeviceObjectAllAccount(id: id,deviceid: deviceid,
                 name: name,
                 uniqueid: uniqueid,
                 static: static,
@@ -560,6 +716,7 @@ class HomeScreenBottomSheetState extends State<HomeScreenBottomSheet> {
 
     if(selectedType==0)
     {
+      currentListOfDevices.clear();
       currentListOfDevices.addAll(listOfDevices);
     }
     else if(selectedType==1)

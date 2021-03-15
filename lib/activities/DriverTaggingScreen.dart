@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 
 import 'package:thingsuptrackapp/activities/TaggedDriverDetailsScreen.dart';
@@ -23,9 +24,9 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
 {
   String LOGTAG="DriverTaggingScreen";
 
-  List<DeviceObjectOwned> listofDevices=new List();
   List<DriverObject> listOfDrivers=new List();
   List<TaggedDriverObject> listOfTaggedDrivers=new List();
+  List<TaggedDriverObject> currentlistOfTaggedDrivers=new List();
   ScrollController _scrollController=new ScrollController();
   bool isResponseReceived=false;
   bool isTaggedDriverFound=false;
@@ -33,17 +34,13 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
   @override
   void initState()
   {
-    getTaggedDrivers();
     getDrivers();
     super.initState();
   }
 
   void getDrivers() async
   {
-
     global.myDrivers.clear();
-
-
     Response response=await global.apiClass.GetDrivers();
     if(response!=null)
     {
@@ -73,6 +70,11 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
           }
         }
       }
+      getTaggedDrivers();
+    }
+    else
+    {
+      getTaggedDrivers();
     }
   }
 
@@ -81,6 +83,8 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
     isResponseReceived=false;
     isTaggedDriverFound=false;
     listOfDrivers.clear();
+    listOfTaggedDrivers.clear();
+    currentlistOfTaggedDrivers.clear();
     global.myUsers.clear();
     if(mounted){
       setState(() {});
@@ -107,12 +111,25 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
             int id = payloadList.elementAt(i)['id'];
             String uniqueid = payloadList.elementAt(i)['uniqueid'];
             String name = payloadList.elementAt(i)['name'];
+            String devicename="";
 
-            TaggedDriverObject taggedDriverObject = new TaggedDriverObject(id: id.toString(), uniqueid: uniqueid, name: name);
+            for(var keys in global.myDevices.keys)
+            {
+              DeviceObjectAllAccount deviceObjectAllAccount=global.myDevices[keys];
+              if(deviceObjectAllAccount.uniqueid.toString().compareTo(uniqueid)==0)
+              {
+                String tempData=deviceObjectAllAccount.name.toString();
+                devicename=tempData;
+              }
+            }
+
+            TaggedDriverObject taggedDriverObject = new TaggedDriverObject(id: id.toString(), uniqueid: uniqueid, name: name,deviceName: devicename);
             listOfTaggedDrivers.add(taggedDriverObject);
           }
           isResponseReceived = true;
-          if (listOfTaggedDrivers.length > 0) {
+          if (listOfTaggedDrivers.length > 0)
+          {
+            currentlistOfTaggedDrivers.addAll(listOfTaggedDrivers);
             isTaggedDriverFound = true;
           }
           if(mounted){
@@ -250,9 +267,21 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        listOfTaggedDrivers.removeAt(index);
+        int finalIndex=0;
+        for(int s=0;s<listOfTaggedDrivers.length;s++)
+        {
+          TaggedDriverObject dObj=listOfTaggedDrivers.elementAt(s);
+          if(dObj.id.compareTo(id)==0 && dObj.uniqueid.compareTo(uniqueid)==0)
+          {
+            finalIndex=s;
+          }
+        }
+        listOfTaggedDrivers.removeAt(finalIndex);
+        currentlistOfTaggedDrivers.removeAt(index);
         isResponseReceived=true;
-        if(listOfTaggedDrivers.length==0)
+        currentlistOfTaggedDrivers.clear();
+        currentlistOfTaggedDrivers.addAll(listOfTaggedDrivers);
+        if(currentlistOfTaggedDrivers.length==0)
         {
           isTaggedDriverFound=false;
         }
@@ -260,6 +289,7 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
           setState(() {});
         }
         print(LOGTAG+" untagUserFromDevice->"+resBody.toString());
+        global.helperClass.showAlertDialog(context, "", "Driver untagged successfully", false, "");
 
       }
       else if (response.statusCode == 400)
@@ -290,6 +320,20 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
 
   }
 
+  void sortList(String searchSTR) async
+  {
+    currentlistOfTaggedDrivers.clear();
+    for(int k=0;k<listOfTaggedDrivers.length;k++)
+    {
+      TaggedDriverObject driverObject=listOfTaggedDrivers.elementAt(k);
+      if(driverObject.name.toString().toLowerCase().contains(searchSTR.toString().toLowerCase()))
+      {
+        currentlistOfTaggedDrivers.add(driverObject);
+      }
+    }
+    setState(() {});
+  }
+
 
   Future<bool> _onbackButtonPressed()
   {
@@ -303,18 +347,18 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
           body: isResponseReceived?(
-              !isTaggedDriverFound?new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
-                    width: MediaQuery.of(context).size.width,
-                    child:new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        new Row(
+              !isTaggedDriverFound?new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
+                        width: MediaQuery.of(context).size.width,
+                        child:new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Flexible(
                                 flex:1,
@@ -322,59 +366,142 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
                                 child:new Container()
                             ),
                             Flexible(
-                              flex:2,
+                              flex:4,
                               fit:FlexFit.tight,
-                              child:new Container(
-                                padding: EdgeInsets.all(10),
-                                // child:Image(image: AssetImage('assets/no-device-found.png')),
+                              child:
+                              new Column(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child: new Container(
+                                        padding: EdgeInsets.all(10),
+                                        child:new SvgPicture.asset('assets/no-device-found.svg')
+                                    ),
+                                  ),
+                                  new Container(
+                                    color: global.screenBackColor,
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: new Text('No Driver Tagged Yet', style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                  ),
+                                  new Container(
+                                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                    width: MediaQuery.of(context).size.width/3,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        boxShadow: [BoxShadow(
+                                          color: Color(0xff121212).withOpacity(0.25),
+                                          blurRadius: 32.0,
+                                          offset: new Offset(8.0, 8.0),
+                                        ),
+                                        ]
+                                    ),
+                                    child: new RaisedButton(
+                                        onPressed: () {
+                                          onTabClicked(null,null);
+                                        },
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
+                                        color: global.mainColor,
+                                        child:new Text('Tag Driver',textAlign: TextAlign.center, style: TextStyle(fontSize: global.font14, color: global.whiteColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             Flexible(
                                 flex:1,
                                 fit:FlexFit.tight,
                                 child:new Container()
-                            )
+                            ),
                           ],
                         ),
-                        new Container(
-                          color: global.screenBackColor,
-                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Tagged Driver Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ):new Stack(
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin:EdgeInsets.fromLTRB(8,10,8,10),
-                    child: CustomScrollView(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: <Widget>[
-                          SliverList(
-                              delegate: SliverChildBuilderDelegate((context, index)
-                              {
-                                return Container(
-                                  color: global.transparent,
-                                  child: ListOfTaggedDrivers(index: index, taggedDriverObject: listOfTaggedDrivers[index],onTabCicked: (flag){
-                                    if(flag.toString().compareTo("Delete")==0)
-                                    {
-                                      deleteConfirmationPopup(listOfTaggedDrivers[index],index);
-                                    }
-                                  },
-                                  ),
-                                );
-                              }, childCount: listOfTaggedDrivers.length)
-                          )
-                        ]
-                    ),
+                      ),
+                    ],
                   )
-                ],
+              ):new Container(
+                  color: global.screenBackColor,
+                  child:new Stack(
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin:EdgeInsets.fromLTRB(8,10,8,10),
+                        child: CustomScrollView(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: <Widget>[
+                              SliverList(
+                                  delegate: SliverChildListDelegate(
+                                      [
+                                        new Row(
+                                          children: <Widget>[
+                                            Flexible(
+                                              flex: 5,
+                                              fit: FlexFit.tight,
+                                              child: new Container(
+                                                height:kToolbarHeight-10,
+                                                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                child: TextField(
+                                                  textAlign: TextAlign.left,
+                                                  textAlignVertical: TextAlignVertical.center,
+                                                  decoration: InputDecoration(
+                                                    contentPadding: EdgeInsets.zero,
+                                                    prefixIcon:  Icon(Icons.search,color: Color(0xff3C74DC)),
+                                                    filled: true,
+                                                    fillColor: Color(0xffF4F8FF),
+                                                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    hintText: ' Search Driver By Name',
+                                                    hintStyle: TextStyle(fontSize: global.font15,color:Color(0xff3C74DC),fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    sortList(value);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Flexible(
+                                                flex: 1,
+                                                fit: FlexFit.tight,
+                                                child:GestureDetector(
+                                                  onTap: (){
+                                                    onTabClicked(null, null);
+                                                  },
+                                                  child: new Container(
+                                                    height: kToolbarHeight-10,
+                                                    decoration: BoxDecoration(shape: BoxShape.circle, color: global.mainColor),
+                                                    child: Icon(Icons.add,color: global.whiteColor,),
+                                                  ),
+                                                )
+                                            )
+                                          ],
+                                        )
+
+                                      ]
+                                  )
+                              ),
+                              SliverList(
+                                  delegate: SliverChildBuilderDelegate((context, index)
+                                  {
+                                    return Container(
+                                      color: global.transparent,
+                                      child: ListOfTaggedDrivers(index: index, taggedDriverObject: currentlistOfTaggedDrivers[index],onTabCicked: (flag){
+                                        if(flag.toString().compareTo("Delete")==0)
+                                        {
+                                          deleteConfirmationPopup(currentlistOfTaggedDrivers[index],index);
+                                        }
+                                      },
+                                      ),
+                                    );
+                                  }, childCount: currentlistOfTaggedDrivers.length)
+                              )
+                            ]
+                        ),
+                      )
+                    ],
+                  )
               )
           ):new Container(
+              color: global.screenBackColor,
               child:Center(
                 child:new Container(
                   height: 50,
@@ -385,15 +512,6 @@ class _DriverTaggingScreenState extends State<DriverTaggingScreen>
                     strokeWidth: 5,),
                 ),
               )
-          ),
-          floatingActionButton:FloatingActionButton(
-            child: new Container(
-              child:Icon(Icons.add,color: global.whiteColor,),
-            ),
-            backgroundColor: global.mainColor,
-            onPressed: () {
-              onTabClicked(null,null);
-            },
           ),
         )
     );

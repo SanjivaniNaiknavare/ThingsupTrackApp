@@ -221,7 +221,7 @@ class _ListOfUsersState extends State<ListOfUsers>
                         flex:3,
                         fit:FlexFit.tight,
                         child:new Container(
-                            height: 45,
+                            height: 40,
                             child: new Row(
                               children: <Widget>[
                                 Flexible(
@@ -233,7 +233,7 @@ class _ListOfUsersState extends State<ListOfUsers>
                                       },
                                       child: new Container(
                                           width: MediaQuery.of(context).size.width,
-                                          height: 45,
+                                          height: 40,
                                           padding: EdgeInsets.fromLTRB(8,8,8,8),
                                           margin: EdgeInsets.fromLTRB(5,0,5,0),
                                           decoration: new BoxDecoration(
@@ -253,7 +253,7 @@ class _ListOfUsersState extends State<ListOfUsers>
                                         widget.onTabCicked("Delete");
                                       },
                                       child: new Container(
-                                          height: 45,
+                                          height: 40,
                                           padding: EdgeInsets.fromLTRB(8,8,8,8),
                                           margin: EdgeInsets.fromLTRB(5,0,5,0),
                                           width: MediaQuery.of(context).size.width,

@@ -139,6 +139,28 @@ flutter:
      - assets/geofence-not-found.svg
      - assets/search-device-list-icon.svg
      - assets/no-user-found.svg
+     - assets/no-device-found.svg
+     - assets/token-icon.svg
+     - assets/Avatar/default-avatar.png
+     - assets/Avatar/M-Avatar-1.png
+     - assets/Avatar/M-Avatar-2.png
+     - assets/Avatar/M-Avatar-3.png
+     - assets/Avatar/M-Avatar-4.png
+     - assets/Avatar/M-Avatar-5.png
+     - assets/Avatar/M-Avatar-6.png
+     - assets/Avatar/M-Avatar-7.png
+     - assets/Avatar/M-Avatar-8.png
+     - assets/Avatar/W-Avatar-1.png
+     - assets/Avatar/W-Avatar-2.png
+     - assets/Avatar/W-Avatar-3.png
+     - assets/Avatar/W-Avatar-4.png
+     - assets/Avatar/W-Avatar-5.png
+     - assets/Avatar/W-Avatar-6.png
+     - assets/Avatar/W-Avatar-7.png
+     - assets/Avatar/W-Avatar-8.png
+     - assets/device-tag-icon.svg
+     - assets/device-tag-icon.png
+     - assets/device-icon.svg
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

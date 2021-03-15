@@ -48,12 +48,19 @@ double font24=24;
 double font26=26;
 
 String currentAppMode="light";
+String sharedDevicePrefix="https://dev.track.thingsup.io/livedata?token=";
 FirebaseAuth firebaseInstance;
 HelperClass helperClass;
 APIClass apiClass;
 String idToken="";
 
 DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
+DateFormat twelveHrFormatter = DateFormat('dd-MM-yyyy');
+DateFormat twentyfourHrFormatter = DateFormat('dd-MM-yyyy');
+
+DateFormat TodaytwelveHrFormatter = DateFormat('hh:mm:ss a');
+DateFormat TodaytwentyfourHrFormatter = DateFormat('HH:mm:ss a');
+
 MyObject myObject;
 String userID="";
 String lastFunction="";
@@ -64,4 +71,24 @@ List<DeviceObjectOwned> listofOwnedDevices=new List();
 Map<String,dynamic> myDevices=new Map();
 Map<String,dynamic> myUsers=new Map();
 Map<String,dynamic> myDrivers=new Map();
+
+
+Map<String,dynamic> AvatarMap = {
+  "M1":"assets/Avatar/M-Avatar-1.png",
+  "M2":"assets/Avatar/M-Avatar-2.png",
+  "M3":"assets/Avatar/M-Avatar-3.png",
+  "M4":"assets/Avatar/M-Avatar-4.png",
+  "M5":"assets/Avatar/M-Avatar-5.png",
+  "M6":"assets/Avatar/M-Avatar-6.png",
+  "M7":"assets/Avatar/M-Avatar-7.png",
+  "M8":"assets/Avatar/M-Avatar-8.png",
+  "W1":"assets/Avatar/W-Avatar-1.png",
+  "W2":"assets/Avatar/W-Avatar-2.png",
+  "W3":"assets/Avatar/W-Avatar-3.png",
+  "W4":"assets/Avatar/W-Avatar-4.png",
+  "W5":"assets/Avatar/W-Avatar-5.png",
+  "W6":"assets/Avatar/W-Avatar-6.png",
+  "W7":"assets/Avatar/W-Avatar-7.png",
+  "W8":"assets/Avatar/W-Avatar-8.png",
+};
 

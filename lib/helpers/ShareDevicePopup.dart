@@ -110,7 +110,7 @@ class ShareDevicePopupState extends State<ShareDevicePopup>
             var resBody=json.decode(response.body);
             String token=resBody['token'];
             isDeviceShared=!isDeviceShared;
-            deviceController.text="https://dev.track.thingsup.io/livedata?token="+token.toString();
+            deviceController.text=global.sharedDevicePrefix.toString()+token.toString();
 
             isResponseReceived=true;
             setState(() {});
@@ -307,7 +307,9 @@ class ShareDevicePopupState extends State<ShareDevicePopup>
                     fit: FlexFit.tight,
                     child: GestureDetector(
                       onTap: (){
-                        _launchURL("https://twitter.com/intent/tweet?url=https://dev.track.thingsup.io/livedata?token=a73UPGpbNF");
+                        String urlData="https://twitter.com/intent/tweet?url="+deviceController.text.toString();
+                        _launchURL(urlData);
+                        //_launchURL("https://twitter.com/intent/tweet?url=https://dev.track.thingsup.io/livedata?token=a73UPGpbNF");
                       },
                       child: new Container(
                           height: 50,
@@ -328,7 +330,9 @@ class ShareDevicePopupState extends State<ShareDevicePopup>
                     fit: FlexFit.tight,
                     child: GestureDetector(
                       onTap: (){
-                        _launchURL("https://www.facebook.com/sharer/sharer.php?u=https://dev.track.thingsup.io/livedata?token=a73UPGpbNF");
+                        String urlData="https://www.facebook.com/sharer/sharer.php?u="+deviceController.text.toString();
+                        _launchURL(urlData);
+                        //_launchURL("https://www.facebook.com/sharer/sharer.php?u=https://dev.track.thingsup.io/livedata?token=a73UPGpbNF");
                       },
                       child: new Container(
                           height: 50,

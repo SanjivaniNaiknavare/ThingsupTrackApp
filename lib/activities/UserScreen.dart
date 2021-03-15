@@ -271,7 +271,7 @@ class _UserScreenState extends State<UserScreen>
       if (response.statusCode == 200)
       {
         var resBody = json.decode(response.body);
-        //listOfUsers.removeAt(index);
+
         int finalIndex=0;
         for(int s=0;s<listOfUsers.length;s++)
         {
@@ -408,36 +408,6 @@ class _UserScreenState extends State<UserScreen>
                                 fit:FlexFit.tight,
                                 child:new Container()
                             ),
-
-//                            new Row(
-//                              children: <Widget>[
-//                                Flexible(
-//                                    flex:1,
-//                                    fit:FlexFit.tight,
-//                                    child:new Container()
-//                                ),
-//                                Flexible(
-//                                  flex:2,
-//                                  fit:FlexFit.tight,
-//                                  child:new Container(
-//                                    padding: EdgeInsets.all(10),
-//                                    child:new SvgPicture.asset('assets/no-user-found.svg'),
-//                                  ),
-//                                ),
-//                                Flexible(
-//                                    flex:1,
-//                                    fit:FlexFit.tight,
-//                                    child:new Container()
-//                                )
-//                              ],
-//                            ),
-//                            new Container(
-//                              color: global.screenBackColor,
-//                              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-//                              child: new Text('No User Added Yet', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-//                            ),
-
-
                           ],
                         ),
                       ),

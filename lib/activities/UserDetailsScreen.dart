@@ -615,7 +615,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                       children: <Widget>[
                         new Container(
                             margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            child: new Text("Add User",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
+                            child: widget.userObject==null?new Text("Add User",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular')):
+                            new Text("Edit User",style: TextStyle(fontSize: global.font18, color: global.mainBlackColor,fontWeight: FontWeight.w600,fontFamily: 'MulishRegular'))
                         )
                       ],
 

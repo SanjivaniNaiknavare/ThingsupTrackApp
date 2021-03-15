@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:thingsuptrackapp/global.dart' as global;
 import 'package:thingsuptrackapp/helperClass/APIRequestBodyClass.dart';
@@ -26,7 +27,8 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
 
   ScrollController _scrollController=new ScrollController();
   List<SharedDeviceObject> listOfDevices = new List();
-  List<DeviceObjectAllAccount> myDeviceList = new List();
+  List<SharedDeviceObject> currentlistOfDevices = new List();
+
 
   @override
   void initState()
@@ -44,6 +46,7 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
     isResponseReceived=false;
     isDeviceFound=false;
     listOfDevices.clear();
+    currentlistOfDevices.clear();
 
     if(mounted) {
       setState(() {});
@@ -55,12 +58,13 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
     if(response!=null)
     {
       print(LOGTAG+" getSharedDevices statusCode->"+response.statusCode.toString());
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200)
+      {
         var resBody = json.decode(response.body);
         print(LOGTAG + " getSharedDevices->" + resBody.toString());
 
-        String status = resBody['status'];
-        if (status.toString().contains("success"))
+        int resLength=resBody.toString().length;
+        if (resLength>40)
         {
           List<dynamic> payloadList = resBody;
           print(LOGTAG + " payloadList->" + payloadList.length.toString());
@@ -71,26 +75,45 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
             int deviceid = payloadList.elementAt(i)['deviceid'];
             int userid = payloadList.elementAt(i)['userid'];
             String token = payloadList.elementAt(i)['token'];
+            String name="";
 
-            SharedDeviceObject sharedDeviceObject = new SharedDeviceObject(id: id, deviceid: deviceid, userid: userid, token: token);
+            for(var key in global.myDevices.keys)
+            {
+              DeviceObjectAllAccount deviceObjectAllAccount=global.myDevices[key];
+              print(LOGTAG+" name->"+deviceObjectAllAccount.name.toString()+" device id->"+deviceObjectAllAccount.deviceid.toString());
+              if(deviceObjectAllAccount.deviceid!=null)
+              {
+                if (deviceObjectAllAccount.deviceid.compareTo(deviceid) == 0)
+                {
+                  name = deviceObjectAllAccount.name;
+                }
+              }
+            }
+
+            SharedDeviceObject sharedDeviceObject = new SharedDeviceObject(id: id, deviceid: deviceid, userid: userid, token: token,name: name);
             listOfDevices.add(sharedDeviceObject);
           }
 
           isResponseReceived = true;
           if (listOfDevices.length > 0)
           {
+            currentlistOfDevices.addAll(listOfDevices);
             isDeviceFound = true;
           }
           if(mounted) {
             setState(() {});
           }
         }
-        else if(status.toString().contains("Devices not found"))
+        else
         {
-          isResponseReceived = true;
-          isDeviceFound = false;
-          if(mounted) {
-            setState(() {});
+          String status=resBody['status'];
+          if(status.toString().contains("Devices not found"))
+          {
+            isResponseReceived = true;
+            isDeviceFound = false;
+            if (mounted) {
+              setState(() {});
+            }
           }
         }
       }
@@ -234,57 +257,39 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
         });
   }
 
+
+  void sortList(String searchSTR) async
+  {
+    currentlistOfDevices.clear();
+    for(int k=0;k<listOfDevices.length;k++)
+    {
+      SharedDeviceObject sharedDeviceObject=listOfDevices.elementAt(k);
+      if(sharedDeviceObject.name.toString().toLowerCase().contains(searchSTR.toString().toLowerCase()))
+      {
+        currentlistOfDevices.add(sharedDeviceObject);
+      }
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-//          appBar: AppBar(
-//            titleSpacing: 0.0,
-//            elevation: 5,
-//            automaticallyImplyLeading: false,
-//            title: Row(
-//              mainAxisAlignment: MainAxisAlignment.start,
-//              crossAxisAlignment: CrossAxisAlignment.center,
-//              children: [
-//                Container(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: GestureDetector(
-//                        onTap: () {
-//                          _onbackButtonPressed();
-//                        },
-//                        child: new Container(
-//                          height: 25,
-//                          child: Image(
-//                              image: AssetImage('assets/back-arrow.png')),
-//                        )
-//                    )
-//                ),
-//                Container(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: new Text("UserDevices", style: TextStyle(
-//                        fontSize: global.font18,
-//                        color: global.mainColor,
-//                        fontWeight: FontWeight.normal,
-//                        fontFamily: 'MulishRegular'))
-//                ),
-//              ],
-//            ),
-//            backgroundColor: global.screenBackColor,
-//          ),
           body: isResponseReceived?(
-              !isDeviceFound?new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
-                    width: MediaQuery.of(context).size.width,
-                    child:new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        new Row(
+              !isDeviceFound?new Container(
+                  color:global.screenBackColor,
+                  child:new Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 30),
+                        width: MediaQuery.of(context).size.width,
+                        child:new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Flexible(
                                 flex:1,
@@ -292,59 +297,106 @@ class _UserSharedDevicesScreenState extends State<UserSharedDevicesScreen>
                                 child:new Container()
                             ),
                             Flexible(
-                              flex:2,
+                              flex:4,
                               fit:FlexFit.tight,
-                              child:new Container(
-                                padding: EdgeInsets.all(10),
-                                // child:Image(image: AssetImage('assets/no-device-found.png')),
+                              child:
+                              new Column(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex:1,
+                                    fit:FlexFit.tight,
+                                    child:
+                                    new Container(
+                                        padding: EdgeInsets.all(10),
+                                        child:new SvgPicture.asset('assets/no-device-found.svg')
+                                    ),
+                                  ),
+                                  new Container(
+                                    color: global.screenBackColor,
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: new Text('No Device Shared Yet', style: TextStyle(fontSize: global.font16, color: global.mainBlackColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
+                                  ),
+                                ],
                               ),
                             ),
                             Flexible(
                                 flex:1,
                                 fit:FlexFit.tight,
                                 child:new Container()
-                            )
+                            ),
                           ],
                         ),
-                        new Container(
-                          color: global.screenBackColor,
-                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: new Text('No Device Found', style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular')),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ):new Stack(
-                children: <Widget>[
-                  new Container(
-                    color: global.screenBackColor,
-                    margin:EdgeInsets.fromLTRB(8,10,8,10),
-                    child: CustomScrollView(
-                        controller: _scrollController,
-                        physics: AlwaysScrollableScrollPhysics(),
-                        slivers: <Widget>[
-                          SliverList(
-                              delegate: SliverChildBuilderDelegate((context, index)
-                              {
-                                return Container(
-                                  color: global.transparent,
-                                  child: ListOfSharedDevices(index: index, sharedDeviceObject: listOfDevices[index],onTabClicked: (flag){
-
-                                    deleteConfirmationPopup(listOfDevices[index],index);
-
-                                  },
-                                  ),
-                                );
-                              }, childCount: listOfDevices.length)
-                          )
-                        ]
-                    ),
+                      ),
+                    ],
                   )
-                  //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
-                ],
+              ):new Container(
+                  color:global.screenBackColor,
+                  child:new Stack(
+                    children: <Widget>[
+                      new Container(
+                        color: global.screenBackColor,
+                        margin:EdgeInsets.fromLTRB(8,10,8,10),
+                        child: CustomScrollView(
+                            controller: _scrollController,
+                            physics: AlwaysScrollableScrollPhysics(),
+                            slivers: <Widget>[
+                              SliverList(
+                                  delegate: SliverChildListDelegate(
+                                      [
+                                        new Row(
+                                          children: <Widget>[
+                                            Flexible(
+                                              flex: 5,
+                                              fit: FlexFit.tight,
+                                              child: new Container(
+                                                height:kToolbarHeight-10,
+                                                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                child: TextField(
+                                                  textAlign: TextAlign.left,
+                                                  textAlignVertical: TextAlignVertical.center,
+                                                  decoration: InputDecoration(
+                                                    contentPadding: EdgeInsets.zero,
+                                                    prefixIcon:  Icon(Icons.search,color: Color(0xff3C74DC)),
+                                                    filled: true,
+                                                    fillColor: Color(0xffF4F8FF),
+                                                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffE6EFFB),width: 2), borderRadius: BorderRadius.circular(8.0),),
+                                                    hintText: ' Search Device By Name',
+                                                    hintStyle: TextStyle(fontSize: global.font15,color:Color(0xff3C74DC),fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    sortList(value);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+
+                                      ]
+                                  )
+                              ),
+                              SliverList(
+                                  delegate: SliverChildBuilderDelegate((context, index)
+                                  {
+                                    return Container(
+                                      color: global.transparent,
+                                      child: ListOfSharedDevices(index: index, sharedDeviceObject: currentlistOfDevices[index],onTabClicked: (flag){
+                                        deleteConfirmationPopup(currentlistOfDevices[index], index);
+                                      },
+                                      ),
+                                    );
+                                  }, childCount: currentlistOfDevices.length)
+                              )
+                            ]
+                        ),
+                      )
+                      //showBottomFragment?showBottomSheet(deviceMAC,deviceIndex):new Container(width: 0,height: 0,)
+                    ],
+                  )
               )
           ):new Container(
+              color:global.screenBackColor,
               child:Center(
                 child:new Container(
                   height: 50,

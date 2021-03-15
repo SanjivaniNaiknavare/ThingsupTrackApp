@@ -134,14 +134,18 @@ class TagDevicePopupState extends State<TagDevicePopup>
                               items: deviceListStrList.map((String value) {
                                 return new DropdownMenuItem<String>(
                                     value: value,
-                                    child:
-                                    Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                    child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          new Text(
-                                            value,
-                                            style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
-                                            overflow: TextOverflow.ellipsis,
+                                          Flexible(
+                                              child:new Container(
+                                                  width: MediaQuery.of(context).size.width,
+                                                  child: new Text(
+                                                    value,
+                                                    style: TextStyle(fontSize: global.font15,color:global.darkBlack,fontStyle: FontStyle.normal,fontFamily: 'MulishRegular'),
+                                                  )
+                                              )
                                           )
                                         ]
                                     )

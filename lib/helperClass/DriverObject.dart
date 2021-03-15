@@ -32,23 +32,26 @@ class DriverObject
 
 class TaggedDriverObject
 {
-  TaggedDriverObject({this.id,this.uniqueid,this.name});
+  TaggedDriverObject({this.id,this.uniqueid,this.name,this.deviceName});
 
   String id;
   String uniqueid;
   String name;
+  String deviceName;
 
 
   TaggedDriverObject.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         uniqueid = json['uniqueid'],
-        name = json['name'];
+        name = json['name'],
+        deviceName = json['deviceName'];
 
   Map<String, dynamic> toJson() {
     return {
       'id':id,
       'uniqueid':uniqueid,
       'name':name,
+      'deviceName':deviceName,
     };
   }
 }

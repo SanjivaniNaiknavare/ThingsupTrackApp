@@ -427,32 +427,6 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
     return WillPopScope(
         onWillPop: _onbackButtonPressed,
         child: Scaffold(
-//            appBar:AppBar(
-//              titleSpacing: 0.0,
-//              elevation: 5,
-//              automaticallyImplyLeading: false,
-//              title: Row(
-//                mainAxisAlignment: MainAxisAlignment.start,
-//                crossAxisAlignment: CrossAxisAlignment.center,
-//                children: [
-//                  Container(
-//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-//                      child:  GestureDetector(
-//                          onTap: (){_onbackButtonPressed();},
-//                          child: new Container(
-//                            height: 25,
-//                            child:Image(image: AssetImage('assets/back-arrow.png')),
-//                          )
-//                      )
-//                  ),
-//                  Container(
-//                      padding:  EdgeInsets.fromLTRB(15,0,0,0),
-//                      child:  new Text("UserDevices",style: TextStyle(fontSize: global.font18, color: global.mainColor,fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'))
-//                  ),
-//                ],
-//              ),
-//              backgroundColor:global.screenBackColor,
-//            ),
             body:new Container(
                 child:  new Container(
                   color: global.screenBackColor,
@@ -586,7 +560,7 @@ class _UserDevicesScreenState extends State<UserDevicesScreen>
                                 [
                                   isAPICalled?new Container(
                                       height: MediaQuery.of(context).size.height,
-                                      child: new Text("No device found",style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'),)):new Container(width: 0,height: 0,)
+                                      child: new Text("No Device Found",style: TextStyle(fontSize: global.font16, color: Color(0xff30242A),fontWeight: FontWeight.normal,fontFamily: 'MulishRegular'),)):new Container(width: 0,height: 0,)
                                 ]
                             )
                         )
